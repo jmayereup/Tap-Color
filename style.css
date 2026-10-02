@@ -1,4 +1,5 @@
 :root {
+  color-scheme: dark;
   --bg-primary: #090d16;
   --bg-surface: rgba(18, 24, 38, 0.75);
   --bg-surface-elevated: rgba(28, 36, 56, 0.85);
@@ -715,9 +716,9 @@ html, body {
 }
 
 .section-label {
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 600;
-  color: var(--text-muted);
+  color: #e2e8f0;
   display: block;
   margin-bottom: 6px;
 }
@@ -735,9 +736,9 @@ html, body {
 }
 
 .btn-preset {
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid var(--border-subtle);
-  color: var(--text-main);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #f8fafc;
   padding: 10px;
   border-radius: var(--radius-md);
   font-size: 12px;
@@ -748,9 +749,10 @@ html, body {
 }
 
 .btn-preset.active, .btn-preset:hover {
-  background: rgba(99, 102, 241, 0.2);
+  background: rgba(99, 102, 241, 0.25);
   border-color: var(--accent-primary);
-  color: #c7d2fe;
+  color: #e0e7ff;
+  box-shadow: 0 0 10px rgba(99, 102, 241, 0.2);
 }
 
 .upload-box {
@@ -769,7 +771,7 @@ html, body {
 
 .upload-filename {
   font-size: 11px;
-  color: var(--text-muted);
+  color: #cbd5e1;
 }
 
 .custom-settings {
@@ -781,13 +783,14 @@ html, body {
 .setting-item {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 6px;
 }
 
 .setting-item label {
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 600;
-  color: var(--text-muted);
+  color: #e2e8f0;
+  letter-spacing: 0.01em;
 }
 
 .btn-sparkle {
@@ -816,12 +819,13 @@ html, body {
 .generator-section h4 {
   font-size: 14px;
   font-weight: 700;
+  color: #f8fafc;
   margin-bottom: 8px;
 }
 
 .subtitle {
   font-size: 12px;
-  color: var(--text-muted);
+  color: #cbd5e1;
   margin-bottom: 12px;
 }
 
@@ -832,18 +836,50 @@ html, body {
 
 .styled-select {
   flex: 1;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid var(--border-subtle);
-  color: var(--text-main);
+  background-color: #1a2333;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23e2e8f0' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  background-size: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  color: #f8fafc;
+  color-scheme: dark;
   border-radius: var(--radius-md);
-  padding: 8px 12px;
+  padding: 10px 38px 10px 14px;
   font-family: inherit;
   font-size: 13px;
+  font-weight: 500;
   outline: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+}
+
+.styled-select:hover {
+  background-color: #222d42;
+  border-color: rgba(99, 102, 241, 0.5);
 }
 
 .styled-select:focus {
+  background-color: #222d42;
   border-color: var(--accent-primary);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.3);
+}
+
+.styled-select option {
+  background-color: #111827;
+  color: #f8fafc;
+  padding: 10px 14px;
+  font-size: 13px;
+}
+
+.styled-select option:hover,
+.styled-select option:focus,
+.styled-select option:checked {
+  background-color: #4338ca;
+  color: #ffffff;
 }
 
 .btn-primary {
