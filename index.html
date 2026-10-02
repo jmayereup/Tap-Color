@@ -41,6 +41,43 @@
 
       <!-- Action Tools -->
       <div class="header-right">
+        <div class="tool-mode-group">
+          <button id="btn-mode-pen" class="btn-icon active" title="Diamond Pen (P): Touch or Click to Place Drills">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+            </svg>
+            <span class="btn-label">Pen</span>
+          </button>
+          <button id="btn-mode-erase" class="btn-icon" title="Eraser (E): Touch or Click to Clear Tiles">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="m7 21-4.3-4.3c-1-1-1-2.5 0-3.4l9.6-9.6c1-1 2.5-1 3.4 0l5.6 5.6c1 1 1 2.5 0 3.4L13 21"/>
+              <path d="M22 21H7"/>
+              <path d="m5 11 9 9"/>
+            </svg>
+            <span class="btn-label">Eraser</span>
+          </button>
+          <button id="btn-mode-pan" class="btn-icon" title="Pan Canvas (H): Two-Fingers or Arrow Keys to Pan">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M18 11V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v0"/>
+              <path d="M14 10V4a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v2"/>
+              <path d="M10 10.5V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v8"/>
+              <path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.83L7 15"/>
+            </svg>
+            <span class="btn-label">Pan</span>
+          </button>
+        </div>
+
+        <button id="btn-clear-canvas" class="btn-icon" title="Clear All Placed Tiles">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 6h18"/>
+            <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/>
+            <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/>
+            <line x1="10" y1="11" x2="10" y2="17"/>
+            <line x1="14" y1="11" x2="14" y2="17"/>
+          </svg>
+          <span class="btn-label">Clear</span>
+        </button>
+
         <button id="btn-sound" class="btn-icon" title="Toggle Sound">
           <svg id="icon-sound-on" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
@@ -64,13 +101,13 @@
           <span class="btn-label">Fill Color</span>
         </button>
 
-        <button id="btn-hint" class="btn-icon btn-glow" title="Find Hidden Piece (Space)">
+        <button id="btn-hint" class="btn-icon" title="Toggle Matching Tile Highlights (Space / H)">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="11" cy="11" r="8"/>
             <line x1="21" y1="21" x2="16.65" y2="16.65"/>
           </svg>
           <span class="btn-label">Hint</span>
-          <span id="hint-badge" class="badge">3</span>
+          <span id="hint-badge" class="badge">OFF</span>
         </button>
       </div>
     </header>
@@ -82,14 +119,9 @@
       <!-- Floating Canvas Zoom Controls -->
       <div class="floating-controls">
         <button id="btn-zoom-in" class="btn-float" title="Zoom In">+</button>
+        <button id="btn-zoom-drill" class="btn-float btn-diamond-zoom" title="Zoom to Diamond Drills (D)">💎</button>
         <button id="btn-zoom-reset" class="btn-float" title="Reset View (F)">⤢</button>
         <button id="btn-zoom-out" class="btn-float" title="Zoom Out">−</button>
-      </div>
-
-      <!-- Engine Status Pill (Rust WASM indicator) -->
-      <div id="engine-status" class="engine-status wasm-mode">
-        <span class="status-dot"></span>
-        <span id="engine-status-text">Rust WebAssembly Engine Active</span>
       </div>
     </main>
 
@@ -109,20 +141,76 @@
           <h2>Select Artwork</h2>
           <button id="btn-close-gallery" class="btn-close">&times;</button>
         </div>
-        <div class="artwork-grid" id="artwork-grid">
-          <!-- Populated dynamically -->
+
+        <!-- Gallery Category Tabs -->
+        <div class="gallery-tabs">
+          <button class="gallery-tab active" data-tab="diamond">💎 Diamond Art</button>
+          <button class="gallery-tab" data-tab="classic">🎨 Stained Glass</button>
+          <button class="gallery-tab" data-tab="custom">✨ Photo Studio</button>
         </div>
 
-        <div class="generator-section">
-          <h3>Procedural Stained Glass Generator</h3>
-          <p class="subtitle">Generate an infinite custom Voronoi stained-glass mosaic:</p>
-          <div class="generator-controls">
-            <select id="select-mosaic-palette" class="styled-select">
-              <option value="sunset">Sunset Glow (Warm Hues)</option>
-              <option value="emerald">Emerald Forest (Cool Hues)</option>
-              <option value="neon">Neon Cyber (Vivid Hues)</option>
-            </select>
-            <button id="btn-generate-mosaic" class="btn-primary">Generate Mosaic</button>
+        <div class="artwork-grid" id="artwork-grid">
+          <!-- Populated dynamically with rich visual thumbnails -->
+        </div>
+
+        <!-- Photo to Diamond Art Studio Tab Panel -->
+        <div id="tab-custom-panel" class="custom-panel hidden">
+          <div class="custom-studio-intro">
+            <h3>Photo to Diamond Art Studio</h3>
+            <p class="subtitle">Convert any photo or preset into a playable fine-scale diamond art canvas with sparkling gem drills:</p>
+          </div>
+
+          <div class="custom-studio-grid">
+            <div class="preset-pickers">
+              <label class="section-label">Select Sample Masterpiece:</label>
+              <div class="preset-buttons">
+                <button class="btn-preset active" data-preset="sunflower">🌻 Sunlit Sunflower</button>
+                <button class="btn-preset" data-preset="cat">🐱 Starlight Kitty</button>
+                <button class="btn-preset" data-preset="island">🏝️ Emerald Island</button>
+                <button class="btn-preset" data-preset="aurora">🌌 Polar Aurora</button>
+              </div>
+              <div class="upload-box">
+                <label for="input-custom-photo" class="btn-secondary upload-btn">
+                  📁 Or Upload Custom Image...
+                </label>
+                <input type="file" id="input-custom-photo" accept="image/*" style="display:none">
+                <span id="upload-filename" class="upload-filename">No file selected</span>
+              </div>
+            </div>
+
+            <div class="custom-settings">
+              <div class="setting-item">
+                <label>Diamond Grid Scale:</label>
+                <select id="select-custom-grid" class="styled-select">
+                  <option value="20">20 × 20 (400 Drills • Cozy)</option>
+                  <option value="28" selected>28 × 28 (784 Drills • Detailed)</option>
+                  <option value="36">36 × 36 (1,296 Drills • Masterpiece)</option>
+                </select>
+              </div>
+              <div class="setting-item">
+                <label>Color Palette Size:</label>
+                <select id="select-custom-colors" class="styled-select">
+                  <option value="8">8 Gemstone Colors</option>
+                  <option value="12" selected>12 Gemstone Colors</option>
+                  <option value="16">16 Gemstone Colors</option>
+                </select>
+              </div>
+              <button id="btn-convert-diamond" class="btn-primary btn-sparkle">
+                💎 Convert to Diamond Art & Play
+              </button>
+            </div>
+          </div>
+
+          <div class="generator-section">
+            <h4>Procedural Voronoi Mosaic Generator</h4>
+            <div class="generator-controls">
+              <select id="select-mosaic-palette" class="styled-select">
+                <option value="sunset">Sunset Glow (Warm Hues)</option>
+                <option value="emerald">Emerald Forest (Cool Hues)</option>
+                <option value="neon">Neon Cyber (Vivid Hues)</option>
+              </select>
+              <button id="btn-generate-mosaic" class="btn-secondary">Generate Mosaic</button>
+            </div>
           </div>
         </div>
       </div>

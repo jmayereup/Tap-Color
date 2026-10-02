@@ -19,6 +19,7 @@ pub struct GameEngine {
     pub hint_timer: f64,
     pub last_time: f64,
     pub pulse_phase: f64,
+    pub highlight_matching_tiles: bool,
 }
 
 impl GameEngine {
@@ -30,6 +31,7 @@ impl GameEngine {
             artwork,
             active_number: first_active,
             show_outlines: true,
+            highlight_matching_tiles: false,
             pan_x: 0.0,
             pan_y: 0.0,
             scale: 1.0,
@@ -54,11 +56,12 @@ impl GameEngine {
         self.reset_state();
     }
 
-    fn reset_state(&mut self) {
+    pub fn reset_state(&mut self) {
         self.active_number = self.artwork.palette.first().map(|p| p.number).unwrap_or(1);
         self.particles.clear();
         self.hint_region_id = None;
         self.hint_timer = 0.0;
+        self.highlight_matching_tiles = false;
         self.pan_x = 0.0;
         self.pan_y = 0.0;
         self.scale = 1.0;
@@ -89,12 +92,23 @@ impl GameEngine {
     pub fn handle_tap(&mut self, screen_x: f64, screen_y: f64) -> TapFeedback {
         let world_pt = self.screen_to_world(screen_x, screen_y);
 
-        // Find which region contains this point (search in reverse for top-most)
+        // Find which region contains this point (with fast bounding-box prefilter)
         let found_idx = self
             .artwork
             .regions
             .iter()
-            .rposition(|region| region.contains_point(world_pt));
+            .rposition(|region| {
+                if let (Some(p0), Some(p2)) = (region.polygon.first(), region.polygon.get(2)) {
+                    let min_x = p0.x.min(p2.x) - 0.5;
+                    let max_x = p0.x.max(p2.x) + 0.5;
+                    let min_y = p0.y.min(p2.y) - 0.5;
+                    let max_y = p0.y.max(p2.y) + 0.5;
+                    if world_pt.x < min_x || world_pt.x > max_x || world_pt.y < min_y || world_pt.y > max_y {
+                        return false;
+                    }
+                }
+                region.contains_point(world_pt)
+            });
 
         let total_regions = self.artwork.regions.len();
 
@@ -237,6 +251,136 @@ impl GameEngine {
         }
     }
 
+    /// Toggle highlight on all matching tiles of the active number
+    pub fn toggle_matching_hints(&mut self) -> bool {
+        self.highlight_matching_tiles = !self.highlight_matching_tiles;
+        self.highlight_matching_tiles
+    }
+
+    /// Set matching tiles highlight directly
+    pub fn set_matching_hints(&mut self, enabled: bool) {
+        self.highlight_matching_tiles = enabled;
+    }
+
+    /// Erase / remove color from a region under screen coordinates
+    pub fn handle_erase(&mut self, screen_x: f64, screen_y: f64) -> TapFeedback {
+        let world_pt = self.screen_to_world(screen_x, screen_y);
+
+        // Find which region contains this point
+        let found_idx = self
+            .artwork
+            .regions
+            .iter()
+            .rposition(|region| {
+                if let (Some(p0), Some(p2)) = (region.polygon.first(), region.polygon.get(2)) {
+                    let min_x = p0.x.min(p2.x) - 0.5;
+                    let max_x = p0.x.max(p2.x) + 0.5;
+                    let min_y = p0.y.min(p2.y) - 0.5;
+                    let max_y = p0.y.max(p2.y) + 0.5;
+                    if world_pt.x < min_x || world_pt.x > max_x || world_pt.y < min_y || world_pt.y > max_y {
+                        return false;
+                    }
+                }
+                region.contains_point(world_pt)
+            });
+
+        let total_regions = self.artwork.regions.len();
+
+        if let Some(idx) = found_idx {
+            let region = &mut self.artwork.regions[idx];
+            if region.is_filled {
+                region.is_filled = false;
+                region.fill_anim = 0.0;
+                let reg_num = region.number;
+                let reg_id = region.id;
+                let centroid = region.centroid;
+
+                // Spawn gentle eraser dust particles
+                self.spawn_burst(centroid.x, centroid.y, "#94A3B8", 8);
+
+                // Update palette count
+                if let Some(pal_item) = self
+                    .artwork
+                    .palette
+                    .iter_mut()
+                    .find(|p| p.number == reg_num)
+                {
+                    if pal_item.filled_count > 0 {
+                        pal_item.filled_count -= 1;
+                    }
+                    pal_item.is_completed = false;
+                }
+
+                let filled_count = self
+                    .artwork
+                    .regions
+                    .iter()
+                    .filter(|r| r.is_filled)
+                    .count();
+
+                return TapFeedback {
+                    success: true,
+                    region_id: Some(reg_id),
+                    number: Some(reg_num),
+                    correct_number: Some(self.active_number),
+                    color_completed: false,
+                    artwork_completed: false,
+                    total_filled: filled_count,
+                    total_regions,
+                    percent: (filled_count as f64 / total_regions as f64) * 100.0,
+                    target_point: Some(centroid),
+                };
+            }
+        }
+
+        let filled_count = self
+            .artwork
+            .regions
+            .iter()
+            .filter(|r| r.is_filled)
+            .count();
+
+        TapFeedback {
+            success: false,
+            region_id: None,
+            number: None,
+            correct_number: Some(self.active_number),
+            color_completed: false,
+            artwork_completed: false,
+            total_filled: filled_count,
+            total_regions,
+            percent: (filled_count as f64 / total_regions as f64) * 100.0,
+            target_point: None,
+        }
+    }
+
+    /// Clear all filled tiles on current artwork
+    pub fn clear_all_tiles(&mut self) -> TapFeedback {
+        for region in self.artwork.regions.iter_mut() {
+            region.is_filled = false;
+            region.fill_anim = 0.0;
+        }
+
+        for pal_item in self.artwork.palette.iter_mut() {
+            pal_item.filled_count = 0;
+            pal_item.is_completed = false;
+        }
+
+        let total_regions = self.artwork.regions.len();
+        TapFeedback {
+            success: true,
+            region_id: None,
+            number: None,
+            correct_number: Some(self.active_number),
+            color_completed: false,
+            artwork_completed: false,
+            total_filled: 0,
+            total_regions,
+            percent: 0.0,
+            target_point: None,
+        }
+    }
+
     /// Magic Wand: fills all remaining pieces of active number
     pub fn fill_all_of_current(&mut self) -> TapFeedback {
         let mut filled_any = false;
@@ -366,10 +510,14 @@ impl GameEngine {
         ctx.set_fill_style_str("#FFFFFF");
         ctx.fill_rect(0.0, 0.0, self.artwork.width, self.artwork.height);
 
-        // Reset shadow
+        // Completely reset shadow state so lines and numbers render sharp and clean
         ctx.set_shadow_blur(0.0);
+        ctx.set_shadow_offset_x(0.0);
+        ctx.set_shadow_offset_y(0.0);
+        ctx.set_shadow_color("transparent");
 
         let active_pulse = self.pulse_phase.sin() * 0.5 + 0.5; // 0.0 to 1.0
+        let is_diamond_art = self.artwork.id.contains("diamond") || self.artwork.regions.len() > 200;
 
         // 2. Render all regions (fills and animations)
         for region in &mut self.artwork.regions {
@@ -390,20 +538,71 @@ impl GameEngine {
             }
             ctx.close_path();
 
+            let is_hinted = Some(region.id) == self.hint_region_id;
+            let is_active_target = self.highlight_matching_tiles && (region.number == self.active_number);
+
             if region.is_filled {
-                // Filled color
+                // Base gem color
                 ctx.set_fill_style_str(&region.color_hex);
                 ctx.fill();
+
+                // Authentic 5D Diamond Facet Cut for diamond art tiles
+                if is_diamond_art && n == 4 {
+                    let p0 = region.polygon[0];
+                    let p1 = region.polygon[1];
+                    let p2 = region.polygon[2];
+                    let p3 = region.polygon[3];
+
+                    // Top-left diagonal highlight
+                    ctx.begin_path();
+                    ctx.move_to(p0.x, p0.y);
+                    ctx.line_to(p1.x, p1.y);
+                    ctx.line_to(p3.x, p3.y);
+                    ctx.close_path();
+                    ctx.set_fill_style_str("rgba(255, 255, 255, 0.18)");
+                    ctx.fill();
+
+                    // Bottom-right diagonal shadow
+                    ctx.begin_path();
+                    ctx.move_to(p1.x, p1.y);
+                    ctx.line_to(p2.x, p2.y);
+                    ctx.line_to(p3.x, p3.y);
+                    ctx.close_path();
+                    ctx.set_fill_style_str("rgba(0, 0, 0, 0.16)");
+                    ctx.fill();
+
+                    // Center table facet
+                    let cx = region.centroid.x;
+                    let cy = region.centroid.y;
+                    let hw = (p1.x - p0.x).abs() * 0.28;
+                    let hh = (p2.y - p1.y).abs() * 0.28;
+
+                    ctx.begin_path();
+                    ctx.move_to(cx, cy - hh);
+                    ctx.line_to(cx + hw, cy);
+                    ctx.line_to(cx, cy + hh);
+                    ctx.line_to(cx - hw, cy);
+                    ctx.close_path();
+                    ctx.set_fill_style_str("rgba(255, 255, 255, 0.12)");
+                    ctx.fill();
+
+                    // Crystal specular sparkle gleam
+                    if self.scale > 0.65 {
+                        let s_dot = 1.6 / self.scale.max(0.5);
+                        ctx.set_fill_style_str("rgba(255, 255, 255, 0.75)");
+                        ctx.fill_rect(cx - hw * 0.4, cy - hh * 0.4, s_dot, s_dot);
+                    }
+                }
             } else {
                 // Unfilled region
-                let is_hinted = Some(region.id) == self.hint_region_id;
-
                 if is_hinted {
-                    // Pulsing golden hint fill
                     let alpha = 0.45 + active_pulse * 0.35;
                     ctx.set_fill_style_str(&format!("rgba(255, 215, 0, {:.2})", alpha));
+                } else if is_active_target {
+                    // Gentle indicator glow for target active color drills
+                    let alpha = 0.16 + active_pulse * 0.12;
+                    ctx.set_fill_style_str(&format!("rgba(99, 102, 241, {:.2})", alpha));
                 } else {
-                    // Neutral soft white/tint
                     ctx.set_fill_style_str("#F8FAFC");
                 }
                 ctx.fill();
@@ -411,10 +610,15 @@ impl GameEngine {
 
             // Outline strokes
             if self.show_outlines {
-                let is_hinted = Some(region.id) == self.hint_region_id;
                 if is_hinted {
                     ctx.set_stroke_style_str("#F59E0B");
                     ctx.set_line_width(2.5 / self.scale.max(0.5));
+                } else if is_active_target {
+                    ctx.set_stroke_style_str("rgba(99, 102, 241, 0.6)");
+                    ctx.set_line_width(1.2 / self.scale.max(0.5));
+                } else if is_diamond_art {
+                    ctx.set_stroke_style_str("rgba(148, 163, 184, 0.35)");
+                    ctx.set_line_width(0.7 / self.scale.max(0.5));
                 } else {
                     ctx.set_stroke_style_str("rgba(30, 41, 59, 0.45)");
                     ctx.set_line_width(1.2 / self.scale.max(0.5));
@@ -434,11 +638,12 @@ impl GameEngine {
             }
 
             let is_hinted = Some(region.id) == self.hint_region_id;
+            let is_active_target = self.highlight_matching_tiles && (region.number == self.active_number);
             let cx = region.centroid.x;
             let cy = region.centroid.y;
 
             if is_hinted {
-                // Draw prominent hint halo
+                // Prominent hint halo
                 let ring_r = (18.0 + active_pulse * 6.0) / self.scale;
                 ctx.begin_path();
                 let _ = ctx.arc(cx, cy, ring_r, 0.0, 2.0 * PI);
@@ -447,15 +652,33 @@ impl GameEngine {
                 ctx.stroke();
             }
 
-            // Draw number text
-            if is_hinted || self.scale > 0.7 {
+            // Zoom Level of Detail (LOD):
+            // When zoomed out on diamond art (scale < 0.95), only draw indicator on active target drills.
+            // When zoomed in to drill level (scale >= 0.95), render crisp numbers inside each drill.
+            if is_diamond_art && self.scale < 0.95 {
+                if is_hinted || is_active_target {
+                    let dot_r = (2.4 / self.scale).clamp(1.5, 3.5);
+                    ctx.begin_path();
+                    let _ = ctx.arc(cx, cy, dot_r, 0.0, 2.0 * PI);
+                    ctx.set_fill_style_str(if is_hinted { "#F59E0B" } else { "rgba(99, 102, 241, 0.85)" });
+                    ctx.fill();
+                }
+            } else if is_hinted || self.scale >= 0.95 || !is_diamond_art {
                 let num_str = region.number.to_string();
-                let font_size = if is_hinted { font_base_size * 1.25 } else { font_base_size };
-                let font_weight = if is_hinted { "bold" } else { "600" };
+                let font_size = if is_hinted {
+                    if is_diamond_art { 12.0 } else { font_base_size * 1.25 }
+                } else if is_diamond_art {
+                    10.5
+                } else {
+                    font_base_size
+                };
+                let font_weight = if is_hinted || is_active_target { "bold" } else { "600" };
                 ctx.set_font(&format!("{} {}px 'Outfit', sans-serif", font_weight, font_size));
 
                 if is_hinted {
                     ctx.set_fill_style_str("#B45309");
+                } else if is_active_target {
+                    ctx.set_fill_style_str("#3730A3");
                 } else {
                     ctx.set_fill_style_str("rgba(71, 85, 105, 0.75)");
                 }

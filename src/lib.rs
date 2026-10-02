@@ -62,7 +62,7 @@ impl GameController {
 
     pub fn update_pan_zoom(&mut self, delta_x: f64, delta_y: f64, zoom_factor: f64, anchor_x: f64, anchor_y: f64) {
         let old_scale = self.engine.target_scale;
-        let new_scale = (old_scale * zoom_factor).clamp(0.4, 5.0);
+        let new_scale = (old_scale * zoom_factor).clamp(0.35, 10.0);
 
         // Zoom relative to anchor
         let wx = (anchor_x - self.engine.target_pan_x) / old_scale;
@@ -91,6 +91,28 @@ impl GameController {
         serde_json::to_string(&feedback).unwrap_or_else(|_| "{}".to_string())
     }
 
+    pub fn handle_erase(&mut self, screen_x: f64, screen_y: f64) -> String {
+        let feedback = self.engine.handle_erase(screen_x, screen_y);
+        serde_json::to_string(&feedback).unwrap_or_else(|_| "{}".to_string())
+    }
+
+    pub fn clear_all_tiles(&mut self) -> String {
+        let feedback = self.engine.clear_all_tiles();
+        serde_json::to_string(&feedback).unwrap_or_else(|_| "{}".to_string())
+    }
+
+    pub fn toggle_matching_hints(&mut self) -> bool {
+        self.engine.toggle_matching_hints()
+    }
+
+    pub fn set_matching_hints(&mut self, enabled: bool) {
+        self.engine.set_matching_hints(enabled);
+    }
+
+    pub fn get_matching_hints(&self) -> bool {
+        self.engine.highlight_matching_tiles
+    }
+
     pub fn toggle_outlines(&mut self) -> bool {
         self.engine.show_outlines = !self.engine.show_outlines;
         self.engine.show_outlines
@@ -101,6 +123,19 @@ impl GameController {
         let w = self.canvas.width() as f64;
         let h = self.canvas.height() as f64;
         self.engine.fit_to_screen(w, h);
+    }
+
+    pub fn load_artwork_json(&mut self, json_str: &str) -> bool {
+        if let Ok(artwork) = serde_json::from_str::<crate::models::ArtworkData>(json_str) {
+            self.engine.artwork = artwork;
+            self.engine.reset_state();
+            let w = self.canvas.width() as f64;
+            let h = self.canvas.height() as f64;
+            self.engine.fit_to_screen(w, h);
+            true
+        } else {
+            false
+        }
     }
 
     pub fn load_procedural_mosaic(&mut self, seed: u32, palette_type: &str) {
