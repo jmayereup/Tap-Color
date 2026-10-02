@@ -1,0 +1,37 @@
+[package]
+name = "tap_color"
+version = "0.1.0"
+edition = "2021"
+authors = ["Tap Color Team"]
+description = "A polished tap-to-color game compiled to WebAssembly with Rust and web-sys"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+wasm-bindgen = "0.2.129"
+js-sys = "0.3.106"
+serde = { version = "1.0.229", features = ["derive"] }
+serde_json = "1.0.151"
+console_error_panic_hook = "0.1.7"
+
+[dependencies.web-sys]
+version = "0.3.106"
+features = [
+  "CanvasRenderingContext2d",
+  "Document",
+  "Element",
+  "HtmlCanvasElement",
+  "ImageData",
+  "MouseEvent",
+  "TouchEvent",
+  "TouchList",
+  "Touch",
+  "Window",
+  "Performance"
+]
+
+[profile.release]
+opt-level = "s"
+lto = true
+codegen-units = 1

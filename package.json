@@ -1,0 +1,28 @@
+{
+  "name": "tap-color",
+  "version": "1.0.0",
+  "description": "A polished tap-to-color game compiled to WebAssembly with Rust and HTML5 Canvas",
+  "type": "module",
+  "scripts": {
+    "build:wasm": "wasm-pack build --target web --out-dir pkg",
+    "dev": "vite",
+    "build": "npm run build:wasm && vite build",
+    "preview": "vite preview",
+    "serve": "npx serve -l 8080 ."
+  },
+  "keywords": [
+    "rust",
+    "wasm",
+    "webassembly",
+    "canvas",
+    "game",
+    "tap-color",
+    "wasm-bindgen",
+    "web-sys"
+  ],
+  "author": "Tap Color Team",
+  "license": "MIT",
+  "devDependencies": {
+    "vite": "^8.3.2"
+  }
+}

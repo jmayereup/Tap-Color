@@ -1,0 +1,47 @@
+# Rust / Cargo
+target/
+**/*.rs.bk
+
+# WebAssembly & wasm-pack build output
+pkg/
+
+# Node & Package Managers
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Bundler & Build Outputs
+dist/
+dist-ssr/
+*.local
+
+# Vite / Dev Server Cache
+.vite/
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Editor & IDE Directories
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+.idea/
+*.sublime-project
+*.sublime-workspace
+*.swp
+*.swo
+*~
+
+# OS Generated Files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
