@@ -10,7 +10,7 @@ pub fn get_available_artwork_ids() -> Vec<(&'static str, &'static str)> {
         ("lotus_koi_diamond", "Zen Lotus & Golden Koi (Diamond Art)"),
         ("hummingbird", "Origami Hummingbird & Blossoms"),
         ("cosmic_whale", "Cosmic Whale & Constellations"),
-        ("stained_butterfly", "Stained Glass Monarch"),
+        ("stained_butterfly", "Monarch Butterfly"),
         ("sunset_landscape", "Geometric Sunset Mountains"),
     ]
 }
@@ -151,8 +151,8 @@ pub fn generate_procedural_mosaic(seed: u32, palette_type: &str) -> ArtworkData 
 
     ArtworkData {
         id: format!("mosaic_{}_{}", seed, palette_type),
-        title: format!("Stained Glass Mosaic #{}", seed % 1000),
-        artist: "Procedural Generator".to_string(),
+        title: format!("Surprise Mosaic #{}", seed % 1000),
+        artist: "Surprise Pattern".to_string(),
         width,
         height,
         palette,
@@ -507,8 +507,8 @@ fn generate_stained_butterfly() -> ArtworkData {
 
     ArtworkData {
         id: "stained_butterfly".to_string(),
-        title: "Stained Glass Monarch".to_string(),
-        artist: "Prism Sanctuary".to_string(),
+        title: "Monarch Butterfly".to_string(),
+        artist: "Floral Garden".to_string(),
         width,
         height,
         palette,

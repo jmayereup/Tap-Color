@@ -463,7 +463,7 @@ class TapColorApp {
     this.currentArtworkId = 'starry_night_diamond';
     this.activeNumber = 1;
     this.hintCount = 5;
-    this.activeCategory = 'diamond'; // 'diamond', 'classic', 'custom'
+    this.activeCategory = 'classic'; // 'classic', 'diamond', 'saved', 'custom'
 
     // Multi-touch & touchscreen controls
     this.touchPinchDist = 0;
@@ -529,7 +529,7 @@ class TapColorApp {
         pieces: 784,
         desc: 'Shimmering twin golden koi fish dancing around a sacred pink lotus in a tranquil jade pond'
       },
-      // Classic Vector Stained-Glass & Origami
+      // Classic Paint by Number & Origami
       {
         id: 'hummingbird',
         title: 'Origami Hummingbird & Blossoms',
@@ -548,11 +548,11 @@ class TapColorApp {
       },
       {
         id: 'stained_butterfly',
-        title: 'Stained Glass Monarch',
-        artist: 'Prism Sanctuary',
+        title: 'Monarch Butterfly',
+        artist: 'Floral Garden',
         category: 'classic',
         pieces: 25,
-        desc: 'Monarch butterfly on botanical lotus'
+        desc: 'Monarch butterfly resting on a blooming lotus flower'
       },
       {
         id: 'sunset_landscape',
@@ -742,6 +742,7 @@ class TapColorApp {
           grid.style.display = 'none';
           if (emptyPanel) emptyPanel.classList.add('hidden');
           customPanel.classList.remove('hidden');
+          if (this.updateStudioPreview) this.updateStudioPreview();
         } else if (this.activeCategory === 'saved') {
           customPanel.classList.add('hidden');
           await this.renderSavedGallery();
@@ -1295,7 +1296,7 @@ class TapColorApp {
         <div class="artwork-thumb-wrap">
           <canvas class="artwork-thumb-canvas" width="280" height="200"></canvas>
           <span class="artwork-badge ${isDiamond ? 'diamond' : 'classic'}">
-            ${isDiamond ? '💎 Diamond Art' : '🎨 Stained Glass'}
+            ${isDiamond ? '💎 Diamond Painting' : '🎨 Paint by Number'}
           </span>
         </div>
         <div class="artwork-info">
@@ -1304,9 +1305,9 @@ class TapColorApp {
           <p>${meta.desc}</p>
           <div class="artwork-footer">
             <span class="artwork-pieces-count">
-              ${isDiamond ? '💎' : '🧩'} ${meta.pieces} Pieces
+              ${isDiamond ? '💎' : '🎨'} ${meta.pieces} Pieces
             </span>
-            <span class="btn-play-artwork">Color Now</span>
+            <span class="btn-play-artwork">Start Coloring</span>
           </div>
         </div>
       `;
@@ -1373,7 +1374,7 @@ class TapColorApp {
         card.dataset.category = 'saved';
 
         const isDiamond = record.artworkData && record.artworkData.id && record.artworkData.id.includes('diamond');
-        const badgeText = isDiamond ? '💎 Saved Diamond' : '🖼️ Imported Vector';
+        const badgeText = isDiamond ? '💎 Diamond Painting' : '🎨 Paint by Number';
         const thumbUrl = record.thumbnailBlob ? URL.createObjectURL(record.thumbnailBlob) : '';
         const dateStr = new Date(record.createdAt || Date.now()).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
 
@@ -1384,15 +1385,15 @@ class TapColorApp {
           </div>
           <div class="artwork-info">
             <h4>${record.title}</h4>
-            <span class="artwork-artist-tag">${record.artist || 'My Photo Studio'} • ${dateStr}</span>
+            <span class="artwork-artist-tag">${record.artist || 'My Custom Art'} • ${dateStr}</span>
             <p>${record.completed ? '🎉 Masterpiece Completed!' : `${record.filledCount || 0} / ${record.pieces} pieces colored`}</p>
             <div class="artwork-footer">
               <span class="artwork-pieces-count">
-                ${isDiamond ? '💎' : '🧩'} ${record.pieces} Pieces • ${record.colors} Tones
+                ${isDiamond ? '💎' : '🎨'} ${record.pieces} Pieces • ${record.colors} Colors
               </span>
               <div class="artwork-card-actions">
                 <button class="btn-delete-saved" title="Delete Artwork">🗑️</button>
-                <span class="btn-play-artwork">Color Now</span>
+                <span class="btn-play-artwork">Start Coloring</span>
               </div>
             </div>
           </div>
@@ -1408,7 +1409,7 @@ class TapColorApp {
         if (deleteBtn) {
           deleteBtn.addEventListener('click', async (e) => {
             e.stopPropagation();
-            if (confirm(`Remove "${record.title}" from your on-device gallery?`)) {
+            if (confirm(`Remove "${record.title}" from your saved pictures?`)) {
               await storage.deleteArtwork(record.id);
               await this.renderSavedGallery();
             }
@@ -1514,6 +1515,35 @@ class TapColorApp {
     let customImg = null;
     let selectedPreset = 'sunflower';
 
+    const previewCanvas = document.getElementById('studio-preview-canvas');
+    const previewCaption = document.getElementById('preview-caption');
+
+    const updateStudioPreview = () => {
+      if (!previewCanvas) return;
+      const pCtx = previewCanvas.getContext('2d');
+      pCtx.clearRect(0, 0, previewCanvas.width, previewCanvas.height);
+      if (customImg) {
+        pCtx.fillStyle = '#0f172a';
+        pCtx.fillRect(0, 0, previewCanvas.width, previewCanvas.height);
+        const bounds = detectContentBounds(customImg);
+        const scale = Math.min(previewCanvas.width / bounds.sw, previewCanvas.height / bounds.sh);
+        const dw = bounds.sw * scale;
+        const dh = bounds.sh * scale;
+        const dx = (previewCanvas.width - dw) / 2;
+        const dy = (previewCanvas.height - dh) / 2;
+        pCtx.drawImage(customImg, bounds.sx, bounds.sy, bounds.sw, bounds.sh, dx, dy, dw, dh);
+        if (previewCaption) previewCaption.textContent = 'Custom Photo Preview';
+      } else {
+        this.drawPresetScene(pCtx, selectedPreset, Math.min(previewCanvas.width, previewCanvas.height));
+        const activeBtn = document.querySelector('.btn-preset.active');
+        if (previewCaption && activeBtn) {
+          previewCaption.textContent = activeBtn.textContent.trim();
+        }
+      }
+    };
+    this.updateStudioPreview = updateStudioPreview;
+    setTimeout(() => updateStudioPreview(), 50);
+
     const presetButtons = document.querySelectorAll('.btn-preset');
     presetButtons.forEach(btn => {
       btn.addEventListener('click', () => {
@@ -1521,7 +1551,8 @@ class TapColorApp {
         btn.classList.add('active');
         selectedPreset = btn.dataset.preset;
         customImg = null;
-        document.getElementById('upload-filename').textContent = 'Preset selected: ' + btn.textContent.trim();
+        document.getElementById('upload-filename').textContent = 'Selected: ' + btn.textContent.trim();
+        updateStudioPreview();
       });
     });
 
@@ -1534,11 +1565,42 @@ class TapColorApp {
         const reader = new FileReader();
         reader.onload = (event) => {
           const img = new Image();
-          img.onload = () => { customImg = img; };
+          img.onload = () => {
+            customImg = img;
+            updateStudioPreview();
+          };
           img.src = event.target.result;
         };
         reader.readAsDataURL(file);
       }
+    });
+
+    // Difficulty chips for Paint by Number
+    document.querySelectorAll('#difficulty-chips-vector .btn-diff-chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        document.querySelectorAll('#difficulty-chips-vector .btn-diff-chip').forEach(c => c.classList.remove('active'));
+        chip.classList.add('active');
+        const comp = chip.dataset.complexity;
+        const col = chip.dataset.colors;
+        const selectComp = document.getElementById('select-vector-complexity');
+        const selectCol = document.getElementById('select-vector-colors');
+        if (selectComp) selectComp.value = comp;
+        if (selectCol) selectCol.value = col;
+      });
+    });
+
+    // Difficulty chips for Diamond Painting
+    document.querySelectorAll('#difficulty-chips-diamond .btn-diff-chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        document.querySelectorAll('#difficulty-chips-diamond .btn-diff-chip').forEach(c => c.classList.remove('active'));
+        chip.classList.add('active');
+        const grid = chip.dataset.grid;
+        const col = chip.dataset.colors;
+        const selectGrid = document.getElementById('select-custom-grid');
+        const selectCol = document.getElementById('select-custom-colors');
+        if (selectGrid) selectGrid.value = grid;
+        if (selectCol) selectCol.value = col;
+      });
     });
 
     // Studio Mode Switcher
@@ -1562,7 +1624,7 @@ class TapColorApp {
       });
     }
 
-    // Vector Paint-by-Number conversion
+    // Paint-by-Number conversion
     const btnConvertVector = document.getElementById('btn-convert-vector');
     if (btnConvertVector) {
       btnConvertVector.addEventListener('click', async () => {
@@ -1570,14 +1632,14 @@ class TapColorApp {
         const statusEl = document.getElementById('conversion-status');
         const fillEl = document.getElementById('conversion-progress-fill');
         const titleInput = document.getElementById('input-custom-title');
-        const customTitle = (titleInput && titleInput.value.trim()) || (customImg ? 'Custom Photo Vector Art' : `Vector Art (${selectedPreset})`);
+        const customTitle = (titleInput && titleInput.value.trim()) || (customImg ? 'My Photo Painting' : `My Artwork (${selectedPreset})`);
 
         const complexity = document.getElementById('select-vector-complexity').value || 'balanced';
         const customPaletteSize = parseInt(document.getElementById('select-vector-colors').value, 10) || 14;
 
         modalConv.classList.remove('hidden');
         fillEl.style.width = '10%';
-        statusEl.textContent = 'Preparing image processing...';
+        statusEl.textContent = 'Preparing your picture...';
 
         try {
           let source = customImg;
@@ -1602,7 +1664,7 @@ class TapColorApp {
             onProgress,
           });
 
-          onProgress('Saving artwork to on-device gallery...', 96);
+          onProgress('Saving to your collection...', 96);
           const savedId = await storage.saveArtwork(artwork, thumbnailBlob, customTitle);
           await this.updateSavedBadge();
 
@@ -1612,7 +1674,7 @@ class TapColorApp {
           this.loadImportedArtwork({
             id: savedId,
             title: customTitle,
-            artist: 'My Photo Studio',
+            artist: 'My Custom Art',
             category: 'imported',
             createdAt: Date.now(),
             thumbnailBlob,
@@ -1623,16 +1685,16 @@ class TapColorApp {
             completed: false,
           });
         } catch (err) {
-          console.error('Vectorization failed:', err);
-          alert('Failed to vectorize image: ' + err.message);
+          console.error('Art creation failed:', err);
+          alert('Could not create coloring page: ' + err.message);
           modalConv.classList.add('hidden');
         }
       });
     }
 
     document.getElementById('btn-convert-diamond').addEventListener('click', () => {
-      const N = parseInt(document.getElementById('select-custom-grid').value, 10) || 28;
-      const K = parseInt(document.getElementById('select-custom-colors').value, 10) || 12;
+      const N = parseInt(document.getElementById('select-custom-grid').value, 10) || 48;
+      const K = parseInt(document.getElementById('select-custom-colors').value, 10) || 16;
 
       this.convertImageToDiamondArt(customImg, selectedPreset, N, K);
       document.getElementById('modal-gallery').classList.add('hidden');
@@ -2006,10 +2068,10 @@ class FallbackJsController {
         regions,
       };
     } else {
-      // Classic vector artwork representation
+      // Classic Paint by Number artwork representation
       this.artwork = {
         id,
-        title: id === 'cosmic_whale' ? 'Cosmic Whale & Stars' : (id === 'stained_butterfly' ? 'Stained Glass Monarch' : 'Origami Hummingbird'),
+        title: id === 'cosmic_whale' ? 'Cosmic Whale & Stars' : (id === 'stained_butterfly' ? 'Monarch Butterfly' : 'Origami Hummingbird'),
         artist: 'Geometric Fauna',
         width: 800,
         height: 800,

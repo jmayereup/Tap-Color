@@ -144,10 +144,10 @@
 
         <!-- Gallery Category Tabs -->
         <div class="gallery-tabs">
-          <button class="gallery-tab active" data-tab="diamond">💎 Diamond Art</button>
-          <button class="gallery-tab" data-tab="classic">🎨 Stained Glass</button>
-          <button class="gallery-tab" data-tab="saved" id="tab-saved-btn">🖼️ My Gallery <span class="tab-badge" id="saved-badge">0</span></button>
-          <button class="gallery-tab" data-tab="custom">✨ Photo Studio</button>
+          <button class="gallery-tab active" data-tab="classic">🎨 Paint by Number</button>
+          <button class="gallery-tab" data-tab="diamond">💎 Diamond Painting</button>
+          <button class="gallery-tab" data-tab="saved" id="tab-saved-btn">🖼️ My Pictures <span class="tab-badge" id="saved-badge">0</span></button>
+          <button class="gallery-tab" data-tab="custom">📸 Make from Photo</button>
         </div>
 
         <div class="artwork-grid" id="artwork-grid">
@@ -156,128 +156,174 @@
 
         <!-- Saved On-Device Gallery Empty State Container -->
         <div id="saved-gallery-empty" class="saved-empty-panel hidden">
-          <div class="empty-gallery-icon">🖼️</div>
-          <h3>Your On-Device Gallery is Empty</h3>
-          <p>Import your own photos or camera shots in the Photo Studio to transform them into vector Paint-by-Number artworks saved directly to your device.</p>
-          <button class="btn-primary" id="btn-open-studio-from-empty">✨ Open Photo Studio</button>
+          <div class="empty-gallery-icon">🌸</div>
+          <h3>Your Picture Collection is Empty</h3>
+          <p>Turn your favorite photos of family, pets, or flowers into custom Paint by Number pages saved right here on your device!</p>
+          <button class="btn-primary" id="btn-open-studio-from-empty">📸 Make Art from a Photo</button>
         </div>
 
         <!-- Photo to Paint-by-Number / Diamond Art Studio Tab Panel -->
         <div id="tab-custom-panel" class="custom-panel hidden">
           <div class="custom-studio-intro">
-            <h3>Photo to Art Studio</h3>
-            <p class="subtitle">Convert any photo, camera upload, or sample preset into a custom Paint-by-Number masterpiece:</p>
+            <h3>Turn Any Photo into Art</h3>
+            <p class="subtitle">Pick a picture below or choose one from your device to create your own coloring page:</p>
           </div>
 
-          <!-- Studio Mode Switcher -->
-          <div class="studio-mode-toggle">
-            <button class="btn-studio-mode active" data-mode="vector" id="btn-mode-vector">
-              🎨 Vector Paint-by-Number (Organic Contours)
-            </button>
-            <button class="btn-studio-mode" data-mode="diamond" id="btn-mode-diamond">
-              💎 Diamond Art (Gem Grid)
-            </button>
-          </div>
-
-          <div class="custom-studio-grid">
-            <div class="preset-pickers">
-              <label class="section-label">Select Sample Picture:</label>
-              <div class="preset-buttons">
-                <button class="btn-preset active" data-preset="sunflower">🌻 Sunlit Sunflower</button>
-                <button class="btn-preset" data-preset="cat">🐱 Starlight Kitty</button>
-                <button class="btn-preset" data-preset="island">🏝️ Emerald Island</button>
-                <button class="btn-preset" data-preset="aurora">🌌 Polar Aurora</button>
-              </div>
-              <div class="upload-box">
-                <label for="input-custom-photo" class="btn-secondary upload-btn">
-                  📁 Or Upload Custom Image...
-                </label>
-                <input type="file" id="input-custom-photo" accept="image/*" style="display:none">
-                <span id="upload-filename" class="upload-filename">No file selected</span>
-              </div>
-              <div class="setting-item title-input-wrap">
-                <label for="input-custom-title">Artwork Title (Optional):</label>
-                <input type="text" id="input-custom-title" class="styled-input" placeholder="e.g. Sunny Garden, My Pet, Vacation">
-              </div>
+          <!-- Step 1: Studio Mode Switcher -->
+          <div class="studio-step-section">
+            <div class="studio-step-header">
+              <span class="step-num">1</span>
+              <span class="step-title">Choose Your Art Style</span>
             </div>
-
-            <!-- Vector Mode Settings -->
-            <div class="custom-settings" id="settings-vector-panel">
-              <div class="setting-item">
-                <label>Detail & Complexity:</label>
-                <select id="select-vector-complexity" class="styled-select">
-                  <option value="cozy">Cozy (Relaxing • ~60-90 pieces)</option>
-                  <option value="balanced" selected>Balanced (Standard • ~140-220 pieces)</option>
-                  <option value="detailed">Detailed (Masterpiece • ~280-400 pieces)</option>
-                </select>
-              </div>
-              <div class="setting-item">
-                <label>Color Palette Size:</label>
-                <select id="select-vector-colors" class="styled-select">
-                  <option value="10">10 Harmonious Tones</option>
-                  <option value="14" selected>14 Harmonious Tones</option>
-                  <option value="18">18 Harmonious Tones</option>
-                  <option value="24">24 Rich Vibrant Tones</option>
-                  <option value="32">32 Masterpiece Tones</option>
-                </select>
-              </div>
-              <button id="btn-convert-vector" class="btn-primary btn-sparkle">
-                ✨ Vectorize, Save to My Gallery & Play
+            <div class="studio-mode-toggle">
+              <button class="btn-studio-mode active" data-mode="vector" id="btn-mode-vector">
+                🎨 Paint by Number (Smooth lines)
               </button>
-            </div>
-
-            <!-- Diamond Art Grid Settings -->
-            <div class="custom-settings hidden" id="settings-diamond-panel">
-              <div class="setting-item">
-                <label>Diamond Grid Scale:</label>
-                <select id="select-custom-grid" class="styled-select">
-                  <option value="28">28 × 28 (784 Drills • Quick)</option>
-                  <option value="36">36 × 36 (1,296 Drills • Cozy)</option>
-                  <option value="48">48 × 48 (2,304 Drills • Detailed)</option>
-                  <option value="64">64 × 64 (4,096 Drills • High Res)</option>
-                  <option value="100">100 × 100 (10,000 Drills • Super Res)</option>
-                  <option value="150">150 × 150 (22,500 Drills • Mega Res)</option>
-                  <option value="224" selected>224 × 224 (50,176 Drills • 50K Masterpiece ✨)</option>
-                </select>
-              </div>
-              <div class="setting-item">
-                <label>Color Palette Size:</label>
-                <select id="select-custom-colors" class="styled-select">
-                  <option value="8">8 Gemstone Colors</option>
-                  <option value="12">12 Gemstone Colors</option>
-                  <option value="16">16 Gemstone Colors</option>
-                  <option value="20">20 Gemstone Colors</option>
-                  <option value="24">24 Gemstone Colors</option>
-                  <option value="32" selected>32 Gemstone Colors (Full Spectrum)</option>
-                </select>
-              </div>
-              <button id="btn-convert-diamond" class="btn-primary btn-sparkle">
-                💎 Convert to Diamond Art & Play
+              <button class="btn-studio-mode" data-mode="diamond" id="btn-mode-diamond">
+                💎 Diamond Painting (Sparkly gems)
               </button>
             </div>
           </div>
 
+          <!-- Step 2: Picture Selection -->
+          <div class="studio-step-section">
+            <div class="studio-step-header">
+              <span class="step-num">2</span>
+              <span class="step-title">Pick a Picture</span>
+            </div>
+            <div class="custom-studio-grid">
+              <div class="preset-pickers">
+                <div class="preset-buttons">
+                  <button class="btn-preset active" data-preset="sunflower">🌻 Sunlit Sunflower</button>
+                  <button class="btn-preset" data-preset="cat">🐱 Starlight Kitty</button>
+                  <button class="btn-preset" data-preset="island">🏝️ Emerald Island</button>
+                  <button class="btn-preset" data-preset="aurora">🌌 Polar Aurora</button>
+                </div>
+                <div class="upload-box">
+                  <label for="input-custom-photo" class="btn-secondary upload-btn">
+                    📁 Choose a Photo from My Device...
+                  </label>
+                  <input type="file" id="input-custom-photo" accept="image/*" style="display:none">
+                  <span id="upload-filename" class="upload-filename">No photo chosen yet</span>
+                </div>
+
+                <!-- Live Preview Box -->
+                <div id="studio-preview-box" class="studio-preview-box">
+                  <canvas id="studio-preview-canvas" class="studio-preview-canvas" width="280" height="200"></canvas>
+                  <div class="preview-caption" id="preview-caption">Sunlit Sunflower</div>
+                </div>
+
+                <div class="setting-item title-input-wrap">
+                  <label for="input-custom-title">Name your picture (Optional):</label>
+                  <input type="text" id="input-custom-title" class="styled-input" placeholder="e.g. Bella the Cat, Sunny Garden">
+                </div>
+              </div>
+
+              <!-- Step 3: Difficulty & Settings for Paint by Number -->
+              <div class="custom-settings" id="settings-vector-panel">
+                <div class="studio-step-header">
+                  <span class="step-num">3</span>
+                  <span class="step-title">Choose Difficulty</span>
+                </div>
+                <div class="difficulty-picker" id="difficulty-chips-vector">
+                  <button type="button" class="btn-diff-chip" data-complexity="cozy" data-colors="10">
+                    <span class="diff-icon">🟢</span>
+                    <span class="diff-name">Easy & Relaxing</span>
+                    <span class="diff-desc">Bigger spaces • 10 colors</span>
+                  </button>
+                  <button type="button" class="btn-diff-chip active" data-complexity="balanced" data-colors="14">
+                    <span class="diff-icon">🟡</span>
+                    <span class="diff-name">Standard</span>
+                    <span class="diff-desc">Recommended • 14 colors</span>
+                  </button>
+                  <button type="button" class="btn-diff-chip" data-complexity="detailed" data-colors="24">
+                    <span class="diff-icon">🟣</span>
+                    <span class="diff-name">Detailed</span>
+                    <span class="diff-desc">Finer areas • 24 colors</span>
+                  </button>
+                </div>
+
+                <select id="select-vector-complexity" class="styled-select" style="display:none">
+                  <option value="cozy">Cozy</option>
+                  <option value="balanced" selected>Balanced</option>
+                  <option value="detailed">Detailed</option>
+                </select>
+                <select id="select-vector-colors" class="styled-select" style="display:none">
+                  <option value="10">10</option>
+                  <option value="14" selected>14</option>
+                  <option value="24">24</option>
+                </select>
+
+                <button id="btn-convert-vector" class="btn-primary btn-sparkle btn-large-action">
+                  ✨ Create Coloring Page & Start Coloring
+                </button>
+              </div>
+
+              <!-- Step 3: Difficulty & Settings for Diamond Painting -->
+              <div class="custom-settings hidden" id="settings-diamond-panel">
+                <div class="studio-step-header">
+                  <span class="step-num">3</span>
+                  <span class="step-title">Choose Canvas Size</span>
+                </div>
+                <div class="difficulty-picker" id="difficulty-chips-diamond">
+                  <button type="button" class="btn-diff-chip" data-grid="28" data-colors="12">
+                    <span class="diff-icon">🟢</span>
+                    <span class="diff-name">Quick & Cozy</span>
+                    <span class="diff-desc">Larger gems • Quick finish</span>
+                  </button>
+                  <button type="button" class="btn-diff-chip active" data-grid="48" data-colors="16">
+                    <span class="diff-icon">🟡</span>
+                    <span class="diff-name">Standard</span>
+                    <span class="diff-desc">Recommended • Beautiful shine</span>
+                  </button>
+                  <button type="button" class="btn-diff-chip" data-grid="64" data-colors="24">
+                    <span class="diff-icon">🟣</span>
+                    <span class="diff-name">Masterpiece</span>
+                    <span class="diff-desc">Finer gems • Rich colors</span>
+                  </button>
+                </div>
+
+                <select id="select-custom-grid" class="styled-select" style="display:none">
+                  <option value="28">28</option>
+                  <option value="48" selected>48</option>
+                  <option value="64">64</option>
+                </select>
+                <select id="select-custom-colors" class="styled-select" style="display:none">
+                  <option value="12">12</option>
+                  <option value="16" selected>16</option>
+                  <option value="24">24</option>
+                </select>
+
+                <button id="btn-convert-diamond" class="btn-primary btn-sparkle btn-large-action">
+                  💎 Create Diamond Painting & Start Coloring
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bonus: Surprise Mosaic Generator -->
           <div class="generator-section">
-            <h4>Procedural Voronoi Mosaic Generator</h4>
+            <h4>🎲 Surprise Me with a Mosaic Pattern</h4>
+            <p class="generator-subtitle">Create a fun, colorful abstract mosaic pattern to color right now:</p>
             <div class="generator-controls">
               <select id="select-mosaic-palette" class="styled-select">
-                <option value="sunset">Sunset Glow (Warm Hues)</option>
-                <option value="emerald">Emerald Forest (Cool Hues)</option>
-                <option value="neon">Neon Cyber (Vivid Hues)</option>
+                <option value="sunset">Sunset Glow (Warm Sunset)</option>
+                <option value="emerald">Emerald Garden (Fresh Greens)</option>
+                <option value="neon">Rainbow Bloom (Bright & Cheerful)</option>
               </select>
-              <button id="btn-generate-mosaic" class="btn-secondary">Generate Mosaic</button>
+              <button id="btn-generate-mosaic" class="btn-secondary">✨ Create Surprise Mosaic</button>
             </div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Real-time Vector Conversion Progress Modal -->
+    <!-- Real-time Conversion Progress Modal -->
     <div id="modal-conversion" class="modal-overlay hidden">
       <div class="modal-card conversion-card">
         <div class="conversion-spinner"></div>
-        <h3 id="conversion-title">Vectorizing Your Picture</h3>
-        <p id="conversion-status" class="conversion-status">Smoothing textures & preserving outlines...</p>
+        <h3 id="conversion-title">Creating Your Coloring Page...</h3>
+        <p id="conversion-status" class="conversion-status">Smoothing your picture & drawing outlines...</p>
         <div class="conversion-progress-bar">
           <div id="conversion-progress-fill" class="conversion-progress-fill" style="width: 15%"></div>
         </div>

@@ -316,7 +316,7 @@ export async function vectorizeImage(sourceImage, options = {}) {
   const W = preset.workingSize;
   const H = preset.workingSize;
 
-  progress('Preparing canvas & preserving aspect ratio...', 10);
+  progress('Opening your picture...', 10);
   await new Promise(r => setTimeout(r, 20));
 
   // 1. Draw image onto working canvas maintaining aspect ratio, auto-framing subject
@@ -339,14 +339,14 @@ export async function vectorizeImage(sourceImage, options = {}) {
   const rawImgData = workCtx.getImageData(0, 0, W, H);
 
   // 2. Preprocess with bilateral edge-preserving filter
-  progress('Smoothing textures & sharpening lines...', 25);
+  progress('Smoothing textures & lines...', 25);
   await new Promise(r => setTimeout(r, 20));
 
   const smoothed = applyBilateralFilter(rawImgData, 2, 2.5, 30.0);
   const sData = smoothed.data;
 
   // 3. Subsample pixels for K-Means color clustering
-  progress('Extracting harmonious color palette...', 45);
+  progress('Picking pretty paint colors...', 45);
   await new Promise(r => setTimeout(r, 20));
 
   const samples = [];
@@ -373,7 +373,7 @@ export async function vectorizeImage(sourceImage, options = {}) {
   });
 
   // 4. Map every pixel to color index
-  progress('Segmenting clean color regions...', 60);
+  progress('Creating color sections...', 60);
   await new Promise(r => setTimeout(r, 20));
 
   const grid = new Int32Array(W * H);
@@ -424,7 +424,7 @@ export async function vectorizeImage(sourceImage, options = {}) {
   }
 
   // 6. Connected Component Labeling (CCL)
-  progress('Tracing planar contour boundaries...', 75);
+  progress('Drawing clean outlines...', 75);
   await new Promise(r => setTimeout(r, 20));
 
   const labels = new Int32Array(W * H).fill(-1);
@@ -490,7 +490,7 @@ export async function vectorizeImage(sourceImage, options = {}) {
   const validComponents = components.filter(c => c.pixels.length >= minPixels);
 
   // 8. Build ArtworkData structures (scaled to 800x800)
-  progress('Generating vector shapes & numbers...', 90);
+  progress('Adding numbers to coloring areas...', 90);
   await new Promise(r => setTimeout(r, 20));
 
   const artworkWidth = 800;
@@ -505,7 +505,7 @@ export async function vectorizeImage(sourceImage, options = {}) {
   const palette = centers.map((c, idx) => ({
     number: idx + 1,
     hex: rgbToHex(c[0], c[1], c[2]),
-    name: `Tone #${idx + 1}`,
+    name: `Color #${idx + 1}`,
     total_count: 0,
     filled_count: 0,
     is_completed: false,
@@ -566,11 +566,11 @@ export async function vectorizeImage(sourceImage, options = {}) {
     }
   });
 
-  const artworkId = `custom_vector_${Date.now()}`;
+  const artworkId = `custom_art_${Date.now()}`;
   const artwork = {
     id: artworkId,
-    title: options.title || 'Custom Photo Art',
-    artist: 'My Photo Studio',
+    title: options.title || 'My Photo Painting',
+    artist: 'My Custom Art',
     category: 'imported',
     width: artworkWidth,
     height: artworkHeight,
@@ -578,10 +578,10 @@ export async function vectorizeImage(sourceImage, options = {}) {
     regions,
   };
 
-  progress('Generating on-device preview thumbnail...', 96);
+  progress('Saving picture preview...', 96);
   const thumbnailBlob = await generateThumbnailBlob(artwork);
 
-  progress('Complete!', 100);
+  progress('Ready to color! ✨', 100);
   return { artwork, thumbnailBlob };
 }
 

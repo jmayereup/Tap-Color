@@ -1160,6 +1160,133 @@ html, body {
   margin-top: 10px;
 }
 
+/* Guided Studio Steps */
+.studio-step-section {
+  margin-bottom: 16px;
+}
+
+.studio-step-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.step-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #6366f1, #ec4899);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.step-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-main);
+  letter-spacing: -0.01em;
+}
+
+/* Studio Live Photo Preview */
+.studio-preview-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: rgba(15, 23, 42, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: var(--radius-md);
+  padding: 10px;
+  margin: 12px 0 6px 0;
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.3);
+}
+
+.studio-preview-canvas {
+  max-width: 100%;
+  max-height: 180px;
+  border-radius: var(--radius-sm);
+  background: #0f172a;
+  object-fit: contain;
+}
+
+.preview-caption {
+  margin-top: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+/* Difficulty Chips Picker */
+.difficulty-picker {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.btn-diff-chip {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-md);
+  color: var(--text-main);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: left;
+}
+
+.btn-diff-chip:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.btn-diff-chip.active {
+  background: rgba(99, 102, 241, 0.15);
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 12px rgba(99, 102, 241, 0.25);
+}
+
+.diff-icon {
+  font-size: 16px;
+}
+
+.diff-name {
+  font-size: 14px;
+  font-weight: 700;
+  color: #fff;
+  flex: 1;
+}
+
+.diff-desc {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.btn-large-action {
+  width: 100%;
+  padding: 14px 20px;
+  font-size: 15px;
+  font-weight: 700;
+  border-radius: var(--radius-md);
+  box-shadow: 0 4px 16px rgba(99, 102, 241, 0.35);
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+.generator-subtitle {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-bottom: 10px;
+}
+
 /* Conversion Progress Modal */
 .conversion-card {
   max-width: 440px;
@@ -1211,4 +1338,5 @@ html, body {
   border-radius: var(--radius-full);
   transition: width 0.3s ease;
 }
+
 
