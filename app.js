@@ -1,4 +1,6 @@
 // Tap Color • WebAssembly & Diamond Art Studio Engine
+import { storage } from './storage.js';
+import { vectorizeImage, generateThumbnailBlob } from './vectorizer.js';
 
 class SoundController {
   constructor() {
@@ -483,6 +485,7 @@ class TapColorApp {
     this.startTime = Date.now();
     this.totalTaps = 0;
     this.successfulTaps = 0;
+    this.activeImportedRecord = null;
 
     this.artworksMeta = [
       // 5 Curated Fine-Scale Diamond Art Paintings
@@ -566,6 +569,7 @@ class TapColorApp {
     this.setupCanvasDpi();
     this.bindEvents();
     this.populateGalleryModal();
+    await this.updateSavedBadge();
 
     // Attempt to load compiled Rust WebAssembly module
     try {
@@ -725,24 +729,39 @@ class TapColorApp {
 
     // Gallery Tabs
     document.querySelectorAll('.gallery-tab').forEach(tab => {
-      tab.addEventListener('click', () => {
+      tab.addEventListener('click', async () => {
         document.querySelectorAll('.gallery-tab').forEach(t => t.classList.remove('active'));
         tab.classList.add('active');
         this.activeCategory = tab.dataset.tab;
 
         const grid = document.getElementById('artwork-grid');
         const customPanel = document.getElementById('tab-custom-panel');
+        const emptyPanel = document.getElementById('saved-gallery-empty');
 
         if (this.activeCategory === 'custom') {
           grid.style.display = 'none';
+          if (emptyPanel) emptyPanel.classList.add('hidden');
           customPanel.classList.remove('hidden');
-        } else {
-          grid.style.display = 'grid';
+        } else if (this.activeCategory === 'saved') {
           customPanel.classList.add('hidden');
+          await this.renderSavedGallery();
+        } else {
+          customPanel.classList.add('hidden');
+          if (emptyPanel) emptyPanel.classList.add('hidden');
+          grid.style.display = 'grid';
+          this.populateGalleryModal();
           this.filterGalleryCards();
         }
       });
     });
+
+    const btnOpenStudioEmpty = document.getElementById('btn-open-studio-from-empty');
+    if (btnOpenStudioEmpty) {
+      btnOpenStudioEmpty.addEventListener('click', () => {
+        const studioTab = document.querySelector('.gallery-tab[data-tab="custom"]');
+        if (studioTab) studioTab.click();
+      });
+    }
 
     // Procedural Mosaic button
     document.getElementById('btn-generate-mosaic').addEventListener('click', () => {
@@ -1147,6 +1166,14 @@ class TapColorApp {
 
     this.refreshPaletteUI();
 
+    if (this.activeImportedRecord) {
+      storage.updateArtworkProgress(
+        this.activeImportedRecord.id,
+        res.total_filled || 0,
+        !!res.artwork_completed
+      ).catch(e => console.warn('Could not persist progress to IndexedDB:', e));
+    }
+
     if (res.color_completed && !res.artwork_completed) {
       this.sound.playColorComplete();
     }
@@ -1311,6 +1338,114 @@ class TapColorApp {
     });
   }
 
+  async updateSavedBadge() {
+    try {
+      const artworks = await storage.getAllArtworks();
+      const badge = document.getElementById('saved-badge');
+      if (badge) badge.textContent = artworks.length;
+    } catch (e) {
+      console.warn('Could not update saved badge:', e);
+    }
+  }
+
+  async renderSavedGallery() {
+    const grid = document.getElementById('artwork-grid');
+    const emptyPanel = document.getElementById('saved-gallery-empty');
+    if (!grid) return;
+    grid.innerHTML = '';
+
+    try {
+      const savedList = await storage.getAllArtworks();
+      await this.updateSavedBadge();
+
+      if (savedList.length === 0) {
+        grid.style.display = 'none';
+        if (emptyPanel) emptyPanel.classList.remove('hidden');
+        return;
+      }
+
+      if (emptyPanel) emptyPanel.classList.add('hidden');
+      grid.style.display = 'grid';
+
+      savedList.forEach(record => {
+        const card = document.createElement('div');
+        card.className = 'artwork-card';
+        card.dataset.category = 'saved';
+
+        const isDiamond = record.artworkData && record.artworkData.id && record.artworkData.id.includes('diamond');
+        const badgeText = isDiamond ? '💎 Saved Diamond' : '🖼️ Imported Vector';
+        const thumbUrl = record.thumbnailBlob ? URL.createObjectURL(record.thumbnailBlob) : '';
+        const dateStr = new Date(record.createdAt || Date.now()).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+
+        card.innerHTML = `
+          <div class="artwork-thumb-wrap">
+            ${thumbUrl ? `<img class="artwork-thumb-img" src="${thumbUrl}" alt="${record.title}">` : '<canvas class="artwork-thumb-canvas" width="280" height="200"></canvas>'}
+            <span class="artwork-badge imported">${badgeText}</span>
+          </div>
+          <div class="artwork-info">
+            <h4>${record.title}</h4>
+            <span class="artwork-artist-tag">${record.artist || 'My Photo Studio'} • ${dateStr}</span>
+            <p>${record.completed ? '🎉 Masterpiece Completed!' : `${record.filledCount || 0} / ${record.pieces} pieces colored`}</p>
+            <div class="artwork-footer">
+              <span class="artwork-pieces-count">
+                ${isDiamond ? '💎' : '🧩'} ${record.pieces} Pieces • ${record.colors} Tones
+              </span>
+              <div class="artwork-card-actions">
+                <button class="btn-delete-saved" title="Delete Artwork">🗑️</button>
+                <span class="btn-play-artwork">Color Now</span>
+              </div>
+            </div>
+          </div>
+        `;
+
+        card.addEventListener('click', (e) => {
+          if (e.target.closest('.btn-delete-saved')) return;
+          this.loadImportedArtwork(record);
+          document.getElementById('modal-gallery').classList.add('hidden');
+        });
+
+        const deleteBtn = card.querySelector('.btn-delete-saved');
+        if (deleteBtn) {
+          deleteBtn.addEventListener('click', async (e) => {
+            e.stopPropagation();
+            if (confirm(`Remove "${record.title}" from your on-device gallery?`)) {
+              await storage.deleteArtwork(record.id);
+              await this.renderSavedGallery();
+            }
+          });
+        }
+
+        grid.appendChild(card);
+      });
+    } catch (err) {
+      console.error('Failed to load saved gallery:', err);
+    }
+  }
+
+  loadImportedArtwork(record) {
+    const artwork = record.artworkData;
+    this.currentArtworkId = artwork.id;
+    this.activeImportedRecord = record;
+    this.highlightMatching = false;
+    const btnHint = document.getElementById('btn-hint');
+    const badge = document.getElementById('hint-badge');
+    if (btnHint) btnHint.classList.remove('active');
+    if (badge) badge.textContent = 'OFF';
+
+    if (this.controller && this.controller.load_artwork_json) {
+      this.controller.load_artwork_json(JSON.stringify(artwork));
+    } else if (this.controller) {
+      this.controller.artwork = artwork;
+      this.controller.fit_to_screen();
+    }
+
+    this.startTime = Date.now();
+    this.totalTaps = 0;
+    this.successfulTaps = 0;
+    this.updateArtworkUI();
+    this.refreshPaletteUI();
+  }
+
   renderThumbnail(canvas, meta) {
     const ctx = canvas.getContext('2d');
     const w = canvas.width;
@@ -1405,6 +1540,95 @@ class TapColorApp {
         reader.readAsDataURL(file);
       }
     });
+
+    // Studio Mode Switcher
+    const btnModeVector = document.getElementById('btn-mode-vector');
+    const btnModeDiamond = document.getElementById('btn-mode-diamond');
+    const settingsVector = document.getElementById('settings-vector-panel');
+    const settingsDiamond = document.getElementById('settings-diamond-panel');
+
+    if (btnModeVector && btnModeDiamond) {
+      btnModeVector.addEventListener('click', () => {
+        btnModeVector.classList.add('active');
+        btnModeDiamond.classList.remove('active');
+        if (settingsVector) settingsVector.classList.remove('hidden');
+        if (settingsDiamond) settingsDiamond.classList.add('hidden');
+      });
+      btnModeDiamond.addEventListener('click', () => {
+        btnModeDiamond.classList.add('active');
+        btnModeVector.classList.remove('active');
+        if (settingsDiamond) settingsDiamond.classList.remove('hidden');
+        if (settingsVector) settingsVector.classList.add('hidden');
+      });
+    }
+
+    // Vector Paint-by-Number conversion
+    const btnConvertVector = document.getElementById('btn-convert-vector');
+    if (btnConvertVector) {
+      btnConvertVector.addEventListener('click', async () => {
+        const modalConv = document.getElementById('modal-conversion');
+        const statusEl = document.getElementById('conversion-status');
+        const fillEl = document.getElementById('conversion-progress-fill');
+        const titleInput = document.getElementById('input-custom-title');
+        const customTitle = (titleInput && titleInput.value.trim()) || (customImg ? 'Custom Photo Vector Art' : `Vector Art (${selectedPreset})`);
+
+        const complexity = document.getElementById('select-vector-complexity').value || 'balanced';
+        const customPaletteSize = parseInt(document.getElementById('select-vector-colors').value, 10) || 14;
+
+        modalConv.classList.remove('hidden');
+        fillEl.style.width = '10%';
+        statusEl.textContent = 'Preparing image processing...';
+
+        try {
+          let source = customImg;
+          if (!source) {
+            const presetCanvas = document.createElement('canvas');
+            presetCanvas.width = 400;
+            presetCanvas.height = 400;
+            const pCtx = presetCanvas.getContext('2d');
+            this.drawPresetScene(pCtx, selectedPreset, 400);
+            source = presetCanvas;
+          }
+
+          const onProgress = (msg, pct) => {
+            statusEl.textContent = msg;
+            fillEl.style.width = `${pct}%`;
+          };
+
+          const { artwork, thumbnailBlob } = await vectorizeImage(source, {
+            title: customTitle,
+            complexity,
+            customPaletteSize,
+            onProgress,
+          });
+
+          onProgress('Saving artwork to on-device gallery...', 96);
+          const savedId = await storage.saveArtwork(artwork, thumbnailBlob, customTitle);
+          await this.updateSavedBadge();
+
+          modalConv.classList.add('hidden');
+          document.getElementById('modal-gallery').classList.add('hidden');
+
+          this.loadImportedArtwork({
+            id: savedId,
+            title: customTitle,
+            artist: 'My Photo Studio',
+            category: 'imported',
+            createdAt: Date.now(),
+            thumbnailBlob,
+            artworkData: artwork,
+            pieces: artwork.regions.length,
+            colors: artwork.palette.length,
+            filledCount: 0,
+            completed: false,
+          });
+        } catch (err) {
+          console.error('Vectorization failed:', err);
+          alert('Failed to vectorize image: ' + err.message);
+          modalConv.classList.add('hidden');
+        }
+      });
+    }
 
     document.getElementById('btn-convert-diamond').addEventListener('click', () => {
       const N = parseInt(document.getElementById('select-custom-grid').value, 10) || 28;
@@ -1539,6 +1763,25 @@ class TapColorApp {
       regions,
     };
 
+    generateThumbnailBlob(artwork).then(blob => {
+      storage.saveArtwork(artwork, blob, artwork.title).then(savedId => {
+        this.activeImportedRecord = {
+          id: savedId,
+          title: artwork.title,
+          artist: artwork.artist,
+          category: 'imported',
+          createdAt: Date.now(),
+          thumbnailBlob: blob,
+          artworkData: artwork,
+          pieces: artwork.regions.length,
+          colors: artwork.palette.length,
+          filledCount: 0,
+          completed: false,
+        };
+        this.updateSavedBadge();
+      });
+    }).catch(e => console.warn('Could not save diamond artwork to IndexedDB:', e));
+
     this.currentArtworkId = artwork.id;
     if (this.controller && this.controller.load_artwork_json) {
       this.controller.load_artwork_json(JSON.stringify(artwork));
@@ -1637,6 +1880,7 @@ class TapColorApp {
 
   selectArtwork(id) {
     this.currentArtworkId = id;
+    this.activeImportedRecord = null;
     this.highlightMatching = false;
     const btnHint = document.getElementById('btn-hint');
     const badge = document.getElementById('hint-badge');

@@ -24,5 +24,9 @@
   "license": "MIT",
   "devDependencies": {
     "vite": "^8.3.2"
+  },
+  "dependencies": {
+    "imagetracerjs": "^1.2.6",
+    "ml-kmeans": "^7.0.1"
   }
 }
