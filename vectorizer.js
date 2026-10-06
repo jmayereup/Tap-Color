@@ -1,100 +1,203 @@
 /**
- * Tap Color - Photo-to-Vector Paint-by-Number Pipeline
- * Converts user photos into organic vector artworks matching the Rust WASM engine.
+ * Tap Color - Planar Vector Paint-by-Number Pipeline
+ * Generates true non-overlapping planar vector regions from photos & drawings.
+ * Every piece is an independent, non-overlapping puzzle piece matching the Rust WASM engine.
  */
 
-import ImageTracer from 'imagetracerjs';
 import { kmeans } from 'ml-kmeans';
-import { preprocessImageForVectorization } from './filters.js';
+import { applyBilateralFilter } from './filters.js';
+
+export { kmeans };
 
 export const COMPLEXITY_PRESETS = {
   cozy: {
     name: 'Cozy (Relaxing)',
     paletteSize: 10,
-    pathOmit: 26,
-    minArea: 48,
-    ltres: 1.5,
-    qtres: 1.5,
-    workingSize: 360,
+    minPixels: 36,
+    workingSize: 300,
+    simplifyEpsilon: 1.4,
   },
   balanced: {
     name: 'Balanced (Standard)',
     paletteSize: 14,
-    pathOmit: 15,
-    minArea: 24,
-    ltres: 1.0,
-    qtres: 1.0,
-    workingSize: 420,
+    minPixels: 22,
+    workingSize: 340,
+    simplifyEpsilon: 1.1,
   },
   detailed: {
     name: 'Detailed (Masterpiece)',
     paletteSize: 18,
-    pathOmit: 8,
-    minArea: 14,
-    ltres: 0.6,
-    qtres: 0.6,
-    workingSize: 480,
+    minPixels: 14,
+    workingSize: 380,
+    simplifyEpsilon: 0.9,
   },
 };
 
 /**
- * Calculates the polygon centroid using the area-weighted cross-product formula,
- * matching src/models.rs calculate_centroid.
- *
- * @param {Array<{x: number, y: number}>} points
- * @returns {{x: number, y: number}}
+ * Detects the bounding box of non-background content in an image.
+ * If the image has uniform borders (e.g. transparent or pure white borders common in drawings & stickers),
+ * this trims the empty borders so the main subject fills the canvas.
  */
-export function calculatePolygonCentroid(points) {
-  const n = points.length;
-  if (n === 0) return { x: 0, y: 0 };
-  if (n === 1) return { x: points[0].x, y: points[0].y };
-  if (n === 2) return { x: (points[0].x + points[1].x) * 0.5, y: (points[0].y + points[1].y) * 0.5 };
+export function detectContentBounds(sourceImage) {
+  const srcW = sourceImage.naturalWidth || sourceImage.videoWidth || sourceImage.width;
+  const srcH = sourceImage.naturalHeight || sourceImage.videoHeight || sourceImage.height;
+  if (!srcW || !srcH) return { sx: 0, sy: 0, sw: 100, sh: 100 };
 
-  let area = 0.0;
-  let cx = 0.0;
-  let cy = 0.0;
+  const sampleSize = 200;
+  const canvas = document.createElement('canvas');
+  canvas.width = sampleSize;
+  canvas.height = sampleSize;
+  const ctx = canvas.getContext('2d');
+  ctx.drawImage(sourceImage, 0, 0, sampleSize, sampleSize);
 
-  for (let i = 0; i < n; i++) {
-    const j = (i + 1) % n;
-    const p1 = points[i];
-    const p2 = points[j];
-    const cross = p1.x * p2.y - p2.x * p1.y;
-    area += cross;
-    cx += (p1.x + p2.x) * cross;
-    cy += (p1.y + p2.y) * cross;
+  const imgData = ctx.getImageData(0, 0, sampleSize, sampleSize);
+  const data = imgData.data;
+
+  const getCornerPixel = (x, y) => {
+    const idx = (y * sampleSize + x) * 4;
+    return [data[idx], data[idx + 1], data[idx + 2], data[idx + 3]];
+  };
+
+  const corners = [
+    getCornerPixel(1, 1),
+    getCornerPixel(sampleSize - 2, 1),
+    getCornerPixel(1, sampleSize - 2),
+    getCornerPixel(sampleSize - 2, sampleSize - 2),
+  ];
+
+  const isBgPixel = (p) => {
+    if (p[3] < 30) return true;
+    if (p[0] > 240 && p[1] > 240 && p[2] > 240) return true;
+    return false;
+  };
+
+  const cornersAreBg = corners.every(c => isBgPixel(c));
+  if (!cornersAreBg) {
+    return { sx: 0, sy: 0, sw: srcW, sh: srcH };
   }
 
-  area *= 0.5;
-  if (Math.abs(area) > 1e-4) {
-    cx /= 6.0 * area;
-    cy /= 6.0 * area;
-    return { x: cx, y: cy };
+  let minX = sampleSize, maxX = 0, minY = sampleSize, maxY = 0;
+  let nonBgCount = 0;
+
+  for (let y = 0; y < sampleSize; y++) {
+    for (let x = 0; x < sampleSize; x++) {
+      const idx = (y * sampleSize + x) * 4;
+      const r = data[idx], g = data[idx + 1], b = data[idx + 2], a = data[idx + 3];
+      if (a > 30 && (r < 240 || g < 240 || b < 240)) {
+        if (x < minX) minX = x;
+        if (x > maxX) maxX = x;
+        if (y < minY) minY = y;
+        if (y > maxY) maxY = y;
+        nonBgCount++;
+      }
+    }
   }
 
-  // Fallback to arithmetic mean
-  let sumX = 0;
-  let sumY = 0;
-  for (let i = 0; i < n; i++) {
-    sumX += points[i].x;
-    sumY += points[i].y;
+  if (nonBgCount < 50 || maxX <= minX || maxY <= minY) {
+    return { sx: 0, sy: 0, sw: srcW, sh: srcH };
   }
-  return { x: sumX / n, y: sumY / n };
+
+  const scaleX = srcW / sampleSize;
+  const scaleY = srcH / sampleSize;
+
+  const realMinX = minX * scaleX;
+  const realMaxX = maxX * scaleX;
+  const realMinY = minY * scaleY;
+  const realMaxY = maxY * scaleY;
+
+  const contentW = realMaxX - realMinX;
+  const contentH = realMaxY - realMinY;
+
+  const padX = contentW * 0.04;
+  const padY = contentH * 0.04;
+
+  const sx = Math.max(0, Math.floor(realMinX - padX));
+  const sy = Math.max(0, Math.floor(realMinY - padY));
+  const sw = Math.min(srcW - sx, Math.ceil(contentW + padX * 2));
+  const sh = Math.min(srcH - sy, Math.ceil(contentH + padY * 2));
+
+  return { sx, sy, sw, sh };
 }
 
 /**
- * Calculates absolute polygon area using the shoelace formula.
- * @param {Array<{x: number, y: number}>} points
- * @returns {number}
+ * Chaikin's corner smoothing algorithm to convert jagged staircase pixel steps into smooth organic curves.
  */
-export function calculatePolygonArea(points) {
-  const n = points.length;
-  if (n < 3) return 0;
-  let area = 0;
-  for (let i = 0; i < n; i++) {
-    const j = (i + 1) % n;
-    area += points[i].x * points[j].y - points[j].x * points[i].y;
+function chaikinSmooth(points, iterations = 1) {
+  if (points.length < 3) return points;
+  let curr = points;
+  for (let it = 0; it < iterations; it++) {
+    const next = [];
+    const len = curr.length;
+    for (let i = 0; i < len; i++) {
+      const p1 = curr[i];
+      const p2 = curr[(i + 1) % len];
+      next.push({
+        x: p1.x * 0.75 + p2.x * 0.25,
+        y: p1.y * 0.75 + p2.y * 0.25,
+      });
+      next.push({
+        x: p1.x * 0.25 + p2.x * 0.75,
+        y: p1.y * 0.25 + p2.y * 0.75,
+      });
+    }
+    curr = next;
   }
-  return Math.abs(area * 0.5);
+  return curr;
+}
+
+/**
+ * Douglas-Peucker polygon simplification.
+ */
+function getSqDist(p1, p2) {
+  const dx = p1.x - p2.x;
+  const dy = p1.y - p2.y;
+  return dx * dx + dy * dy;
+}
+
+function getSqSegDist(p, p1, p2) {
+  let x = p1.x;
+  let y = p1.y;
+  let dx = p2.x - x;
+  let dy = p2.y - y;
+
+  if (dx !== 0 || dy !== 0) {
+    const t = ((p.x - x) * dx + (p.y - y) * dy) / (dx * dx + dy * dy);
+    if (t > 1) {
+      x = p2.x;
+      y = p2.y;
+    } else if (t > 0) {
+      x += dx * t;
+      y += dy * t;
+    }
+  }
+
+  dx = p.x - x;
+  dy = p.y - y;
+  return dx * dx + dy * dy;
+}
+
+function simplifyDouglasPeucker(points, sqTol) {
+  if (points.length <= 2) return points;
+  let maxSqDist = 0;
+  let index = 0;
+  const p1 = points[0];
+  const p2 = points[points.length - 1];
+
+  for (let i = 1; i < points.length - 1; i++) {
+    const sqDist = getSqSegDist(points[i], p1, p2);
+    if (sqDist > maxSqDist) {
+      index = i;
+      maxSqDist = sqDist;
+    }
+  }
+
+  if (maxSqDist > sqTol) {
+    const left = simplifyDouglasPeucker(points.slice(0, index + 1), sqTol);
+    const right = simplifyDouglasPeucker(points.slice(index), sqTol);
+    return left.slice(0, left.length - 1).concat(right);
+  } else {
+    return [p1, p2];
+  }
 }
 
 /**
@@ -105,14 +208,104 @@ function rgbToHex(r, g, b) {
 }
 
 /**
- * Generates an organic vector Paint-by-Number artwork from an image element or canvas.
+ * Traces the exterior boundary of a pixel component into an ordered polygon loop.
+ */
+function traceComponentBoundary(compPixels, W, H) {
+  const pixSet = new Set(compPixels);
+  const edgeMap = new Map();
+  let firstEdge = null;
+
+  for (const p of compPixels) {
+    const px = p % W;
+    const py = Math.floor(p / W);
+
+    // Top edge (clockwise: [px, py] -> [px+1, py])
+    if (!pixSet.has(p - W)) {
+      edgeMap.set(`${px},${py}`, [px + 1, py]);
+      if (!firstEdge) firstEdge = [[px, py], [px + 1, py]];
+    }
+    // Right edge (clockwise: [px+1, py] -> [px+1, py+1])
+    if (!pixSet.has(p + 1)) {
+      edgeMap.set(`${px + 1},${py}`, [px + 1, py + 1]);
+      if (!firstEdge) firstEdge = [[px + 1, py], [px + 1, py + 1]];
+    }
+    // Bottom edge (clockwise: [px+1, py+1] -> [px, py+1])
+    if (!pixSet.has(p + W)) {
+      edgeMap.set(`${px + 1},${py + 1}`, [px, py + 1]);
+      if (!firstEdge) firstEdge = [[px + 1, py + 1], [px, py + 1]];
+    }
+    // Left edge (clockwise: [px, py+1] -> [px, py])
+    if (!pixSet.has(p - 1)) {
+      edgeMap.set(`${px},${py + 1}`, [px, py]);
+      if (!firstEdge) firstEdge = [[px, py + 1], [px, py]];
+    }
+  }
+
+  if (!firstEdge) return [];
+
+  // Chain edges into loop
+  const poly = [];
+  let curr = firstEdge[0];
+  const startKey = `${curr[0]},${curr[1]}`;
+  let key = startKey;
+  let loops = 0;
+  const maxLoops = compPixels.length * 4 + 100;
+
+  while (loops++ < maxLoops) {
+    poly.push({ x: curr[0], y: curr[1] });
+    const next = edgeMap.get(key);
+    if (!next) break;
+    key = `${next[0]},${next[1]}`;
+    curr = next;
+    if (key === startKey) break;
+  }
+
+  return poly;
+}
+
+/**
+ * Finds a centroid that is strictly inside the component's pixel mass.
+ */
+function calculateInternalCentroid(compPixels, W) {
+  let sumX = 0, sumY = 0;
+  for (const p of compPixels) {
+    sumX += p % W;
+    sumY += Math.floor(p / W);
+  }
+  const meanX = Math.round(sumX / compPixels.length);
+  const meanY = Math.round(sumY / compPixels.length);
+
+  // Check if mean is inside the component
+  const meanIdx = meanY * W + meanX;
+  const pixSet = new Set(compPixels);
+  if (pixSet.has(meanIdx)) {
+    return { x: meanX, y: meanY };
+  }
+
+  // Find pixel in compPixels closest to mean
+  let bestDist = Infinity;
+  let bestX = compPixels[0] % W;
+  let bestY = Math.floor(compPixels[0] / W);
+
+  for (const p of compPixels) {
+    const px = p % W;
+    const py = Math.floor(p / W);
+    const d = (px - meanX) * (px - meanX) + (py - meanY) * (py - meanY);
+    if (d < bestDist) {
+      bestDist = d;
+      bestX = px;
+      bestY = py;
+    }
+  }
+
+  return { x: bestX, y: bestY };
+}
+
+/**
+ * Converts any photo or drawing into a clean, planar non-overlapping Paint-by-Number artwork.
  *
  * @param {HTMLImageElement|HTMLCanvasElement} sourceImage
  * @param {Object} options
- * @param {string} [options.title] - Name of the artwork
- * @param {'cozy'|'balanced'|'detailed'} [options.complexity='balanced'] - Complexity preset
- * @param {number} [options.customPaletteSize] - Optional override for palette color count
- * @param {Function} [options.onProgress] - Progress callback (message: string, percent: number)
  * @returns {Promise<{artwork: Object, thumbnailBlob: Blob}>}
  */
 export async function vectorizeImage(sourceImage, options = {}) {
@@ -123,106 +316,192 @@ export async function vectorizeImage(sourceImage, options = {}) {
   const W = preset.workingSize;
   const H = preset.workingSize;
 
-  progress('Preparing canvas & scaling image...', 10);
+  progress('Preparing canvas & preserving aspect ratio...', 10);
   await new Promise(r => setTimeout(r, 20));
 
-  // 1. Draw source image onto a square working canvas
+  // 1. Draw image onto working canvas maintaining aspect ratio, auto-framing subject
   const workCanvas = document.createElement('canvas');
   workCanvas.width = W;
   workCanvas.height = H;
   const workCtx = workCanvas.getContext('2d');
 
-  // Fill neutral background in case source has transparency
   workCtx.fillStyle = '#FFFFFF';
   workCtx.fillRect(0, 0, W, H);
 
-  // Contain / cover aspect ratio fitting into square canvas
-  const srcW = sourceImage.naturalWidth || sourceImage.videoWidth || sourceImage.width;
-  const srcH = sourceImage.naturalHeight || sourceImage.videoHeight || sourceImage.height;
-  const scale = Math.max(W / srcW, H / srcH);
-  const dw = srcW * scale;
-  const dh = srcH * scale;
+  const bounds = detectContentBounds(sourceImage);
+  const scale = Math.min(W / bounds.sw, H / bounds.sh);
+  const dw = bounds.sw * scale;
+  const dh = bounds.sh * scale;
   const dx = (W - dw) / 2;
   const dy = (H - dh) / 2;
-  workCtx.drawImage(sourceImage, dx, dy, dw, dh);
+  workCtx.drawImage(sourceImage, bounds.sx, bounds.sy, bounds.sw, bounds.sh, dx, dy, dw, dh);
 
   const rawImgData = workCtx.getImageData(0, 0, W, H);
 
-  // 2. Preprocess with bilateral and median filters
-  progress('Smoothing textures & preserving outlines...', 25);
+  // 2. Preprocess with bilateral edge-preserving filter
+  progress('Smoothing textures & sharpening lines...', 25);
   await new Promise(r => setTimeout(r, 20));
 
-  const smoothedImgData = preprocessImageForVectorization(rawImgData, {
-    radius: 2,
-    sigmaSpace: 2.5,
-    sigmaColor: 30.0,
-    useMedian: true,
-  });
+  const smoothed = applyBilateralFilter(rawImgData, 2, 2.5, 30.0);
+  const sData = smoothed.data;
 
-  // 3. Subsample pixels for fast K-Means clustering
-  progress('Quantizing harmonious color palette...', 45);
+  // 3. Subsample pixels for K-Means color clustering
+  progress('Extracting harmonious color palette...', 45);
   await new Promise(r => setTimeout(r, 20));
 
-  const dataPoints = [];
-  const pixels = smoothedImgData.data;
-  const sampleStride = Math.max(1, Math.floor((W * H) / 12000)); // ~12k sample points is plenty
-  for (let i = 0; i < pixels.length; i += sampleStride * 4) {
-    dataPoints.push([pixels[i], pixels[i + 1], pixels[i + 2]]);
+  const samples = [];
+  for (let i = 0; i < sData.length; i += 16) {
+    samples.push([sData[i], sData[i + 1], sData[i + 2]]);
   }
 
-  const kResult = kmeans(dataPoints, K, {
+  const km = kmeans(samples, K, {
     initialization: 'kmeans++',
-    maxIterations: 15,
+    maxIterations: 12,
   });
 
-  // Sort palette colors by perceived brightness for intuitive numbering
-  const centers = kResult.centroids.map(c => [
+  const centers = km.centroids.map(c => [
     Math.min(255, Math.max(0, Math.round(c[0]))),
     Math.min(255, Math.max(0, Math.round(c[1]))),
     Math.min(255, Math.max(0, Math.round(c[2]))),
   ]);
 
+  // Sort palette by perceived brightness
   centers.sort((a, b) => {
     const lumA = 0.299 * a[0] + 0.587 * a[1] + 0.114 * a[2];
     const lumB = 0.299 * b[0] + 0.587 * b[1] + 0.114 * b[2];
     return lumB - lumA; // Lightest to darkest
   });
 
-  // ImageTracer palette format
-  const itPal = centers.map(c => ({ r: c[0], g: c[1], b: c[2], a: 255 }));
-
-  // 4. Trace quantized layers into vector paths
-  progress('Tracing organic vector contours...', 70);
+  // 4. Map every pixel to color index
+  progress('Segmenting clean color regions...', 60);
   await new Promise(r => setTimeout(r, 20));
 
-  const tracerOptions = {
-    corsenabled: false,
-    ltres: preset.ltres,
-    qtres: preset.qtres,
-    pathomit: preset.pathOmit,
-    rightangleenhance: false,
-    colorsampling: 0,
-    numberofcolors: K,
-    pal: itPal,
-    scale: 1,
-    roundcoords: 1,
-    linefilter: true,
-  };
+  const grid = new Int32Array(W * H);
+  for (let i = 0; i < W * H; i++) {
+    const r = sData[i * 4];
+    const g = sData[i * 4 + 1];
+    const b = sData[i * 4 + 2];
 
-  const traceData = ImageTracer.imagedataToTracedata(smoothedImgData, tracerOptions);
+    let bestDist = Infinity;
+    let bestK = 0;
+    for (let k = 0; k < K; k++) {
+      const dr = r - centers[k][0];
+      const dg = g - centers[k][1];
+      const db = b - centers[k][2];
+      const d = dr * dr + dg * dg + db * db;
+      if (d < bestDist) {
+        bestDist = d;
+        bestK = k;
+      }
+    }
+    grid[i] = bestK;
+  }
 
-  // 5. Convert ImageTracer paths into ArtworkData regions
-  progress('Optimizing geometry & placing number pins...', 85);
+  // 5. Clean up single-pixel speckle noise with 2 passes of majority filter
+  for (let pass = 0; pass < 2; pass++) {
+    for (let y = 1; y < H - 1; y++) {
+      for (let x = 1; x < W - 1; x++) {
+        const idx = y * W + x;
+        const cur = grid[idx];
+        const counts = {};
+        let maxCount = 0;
+        let dominant = cur;
+        for (let dy = -1; dy <= 1; dy++) {
+          for (let dx = -1; dx <= 1; dx++) {
+            const val = grid[(y + dy) * W + (x + dx)];
+            counts[val] = (counts[val] || 0) + 1;
+            if (counts[val] > maxCount) {
+              maxCount = counts[val];
+              dominant = val;
+            }
+          }
+        }
+        if (maxCount >= 6 && dominant !== cur) {
+          grid[idx] = dominant;
+        }
+      }
+    }
+  }
+
+  // 6. Connected Component Labeling (CCL)
+  progress('Tracing planar contour boundaries...', 75);
+  await new Promise(r => setTimeout(r, 20));
+
+  const labels = new Int32Array(W * H).fill(-1);
+  let nextLabel = 0;
+  const components = [];
+  const q = new Int32Array(W * H);
+
+  for (let y = 0; y < H; y++) {
+    for (let x = 0; x < W; x++) {
+      const idx = y * W + x;
+      if (labels[idx] !== -1) continue;
+      const color = grid[idx];
+      const label = nextLabel++;
+      labels[idx] = label;
+
+      let head = 0;
+      let tail = 0;
+      q[tail++] = idx;
+      const pixels = [];
+
+      while (head < tail) {
+        const curr = q[head++];
+        pixels.push(curr);
+        const cx = curr % W;
+        const cy = Math.floor(curr / W);
+
+        if (cx > 0) {
+          const left = curr - 1;
+          if (labels[left] === -1 && grid[left] === color) {
+            labels[left] = label;
+            q[tail++] = left;
+          }
+        }
+        if (cx < W - 1) {
+          const right = curr + 1;
+          if (labels[right] === -1 && grid[right] === color) {
+            labels[right] = label;
+            q[tail++] = right;
+          }
+        }
+        if (cy > 0) {
+          const up = curr - W;
+          if (labels[up] === -1 && grid[up] === color) {
+            labels[up] = label;
+            q[tail++] = up;
+          }
+        }
+        if (cy < H - 1) {
+          const down = curr + W;
+          if (labels[down] === -1 && grid[down] === color) {
+            labels[down] = label;
+            q[tail++] = down;
+          }
+        }
+      }
+
+      components.push({ label, color, pixels });
+    }
+  }
+
+  // 7. Filter out micro-regions (< minPixels)
+  const minPixels = preset.minPixels;
+  const validComponents = components.filter(c => c.pixels.length >= minPixels);
+
+  // 8. Build ArtworkData structures (scaled to 800x800)
+  progress('Generating vector shapes & numbers...', 90);
   await new Promise(r => setTimeout(r, 20));
 
   const artworkWidth = 800;
   const artworkHeight = 800;
   const margin = 20;
-  const targetArea = artworkWidth - margin * 2;
-  const scaleX = targetArea / W;
-  const scaleY = targetArea / H;
+  const availW = artworkWidth - margin * 2;
+  const availH = artworkHeight - margin * 2;
+  const scaleX = availW / W;
+  const scaleY = availH / H;
 
-  // Build Palette Items
+  // Build Palette
   const palette = centers.map((c, idx) => ({
     number: idx + 1,
     hex: rgbToHex(c[0], c[1], c[2]),
@@ -234,56 +513,48 @@ export async function vectorizeImage(sourceImage, options = {}) {
 
   const regions = [];
   let regId = 0;
+  const sqTol = preset.simplifyEpsilon * preset.simplifyEpsilon;
 
-  // Process each color layer
-  traceData.layers.forEach((layerPaths, colorIdx) => {
-    if (colorIdx >= palette.length) return;
-    const colorNum = colorIdx + 1;
-    const colorHex = palette[colorIdx].hex;
+  for (const comp of validComponents) {
+    const rawPoly = traceComponentBoundary(comp.pixels, W, H);
+    if (rawPoly.length < 3) continue;
 
-    layerPaths.forEach(pathObj => {
-      if (!pathObj.segments || pathObj.segments.length < 3) return;
+    // Simplify polygon
+    const simplified = simplifyDouglasPeucker(rawPoly, sqTol);
+    if (simplified.length < 3) continue;
 
-      const polygon = [];
-      pathObj.segments.forEach(seg => {
-        const px = margin + seg.x1 * scaleX;
-        const py = margin + seg.y1 * scaleY;
-        polygon.push({ x: Math.round(px * 10) / 10, y: Math.round(py * 10) / 10 });
+    // Apply corner smoothing to eliminate staircase pixel artifacts
+    const smoothedPoly = chaikinSmooth(simplified, 1);
 
-        // If quadratic curve, sample intermediate point for smooth curves
-        if (seg.type === 'Q') {
-          const midX = margin + (0.25 * seg.x1 + 0.5 * seg.x2 + 0.25 * seg.x3) * scaleX;
-          const midY = margin + (0.25 * seg.y1 + 0.5 * seg.y2 + 0.25 * seg.y3) * scaleY;
-          polygon.push({ x: Math.round(midX * 10) / 10, y: Math.round(midY * 10) / 10 });
-        }
-      });
+    // Scale to 800x800 world coordinates
+    const worldPoly = smoothedPoly.map(pt => ({
+      x: Math.round((margin + pt.x * scaleX) * 10) / 10,
+      y: Math.round((margin + pt.y * scaleY) * 10) / 10,
+    }));
 
-      // Filter out degenerate or tiny speckles
-      if (polygon.length < 3) return;
-      const area = calculatePolygonArea(polygon);
-      if (area < preset.minArea) return;
+    // Calculate centroid strictly inside the component
+    const internalC = calculateInternalCentroid(comp.pixels, W);
+    const worldCentroid = {
+      x: Math.round((margin + internalC.x * scaleX) * 10) / 10,
+      y: Math.round((margin + internalC.y * scaleY) * 10) / 10,
+    };
 
-      const centroid = calculatePolygonCentroid(polygon);
-      palette[colorIdx].total_count++;
+    const colorNum = comp.color + 1;
+    palette[comp.color].total_count++;
 
-      regions.push({
-        id: regId++,
-        number: colorNum,
-        polygon,
-        centroid: {
-          x: Math.round(centroid.x * 10) / 10,
-          y: Math.round(centroid.y * 10) / 10,
-        },
-        color_hex: colorHex,
-        is_filled: false,
-        fill_anim: 0.0,
-      });
+    regions.push({
+      id: regId++,
+      number: colorNum,
+      polygon: worldPoly,
+      centroid: worldCentroid,
+      color_hex: palette[comp.color].hex,
+      is_filled: false,
+      fill_anim: 0.0,
     });
-  });
+  }
 
-  // Filter out any empty palette colors that ended up with 0 regions
+  // Filter out any unused palette colors and renumber sequentially
   const activePalette = palette.filter(p => p.total_count > 0);
-  // Re-index palette numbers sequentially if any were dropped
   activePalette.forEach((p, idx) => {
     const oldNum = p.number;
     const newNum = idx + 1;
@@ -307,8 +578,7 @@ export async function vectorizeImage(sourceImage, options = {}) {
     regions,
   };
 
-  // 6. Generate crisp thumbnail preview Blob
-  progress('Generating on-device thumbnail preview...', 95);
+  progress('Generating on-device preview thumbnail...', 96);
   const thumbnailBlob = await generateThumbnailBlob(artwork);
 
   progress('Complete!', 100);
@@ -317,8 +587,6 @@ export async function vectorizeImage(sourceImage, options = {}) {
 
 /**
  * Renders an ArtworkData object to a 280x200 canvas and exports as a PNG Blob.
- * @param {Object} artwork
- * @returns {Promise<Blob>}
  */
 export async function generateThumbnailBlob(artwork) {
   const canvas = document.createElement('canvas');
@@ -341,24 +609,33 @@ export async function generateThumbnailBlob(artwork) {
   ctx.translate(ox, oy);
   ctx.scale(fitScale, fitScale);
 
-  // Background white card
   ctx.fillStyle = '#FFFFFF';
   ctx.fillRect(0, 0, artwork.width, artwork.height);
 
+  const isHighRes = artwork.regions.length > 500;
   artwork.regions.forEach(reg => {
     if (!reg.polygon || reg.polygon.length < 3) return;
-    ctx.beginPath();
-    ctx.moveTo(reg.polygon[0].x, reg.polygon[0].y);
-    for (let i = 1; i < reg.polygon.length; i++) {
-      ctx.lineTo(reg.polygon[i].x, reg.polygon[i].y);
-    }
-    ctx.closePath();
-    ctx.fillStyle = reg.color_hex;
-    ctx.fill();
+    if (reg.polygon.length === 4) {
+      const p0 = reg.polygon[0];
+      const p2 = reg.polygon[2];
+      ctx.fillStyle = reg.color_hex;
+      ctx.fillRect(p0.x, p0.y, p2.x - p0.x, p2.y - p0.y);
+    } else {
+      ctx.beginPath();
+      ctx.moveTo(reg.polygon[0].x, reg.polygon[0].y);
+      for (let i = 1; i < reg.polygon.length; i++) {
+        ctx.lineTo(reg.polygon[i].x, reg.polygon[i].y);
+      }
+      ctx.closePath();
+      ctx.fillStyle = reg.color_hex;
+      ctx.fill();
 
-    ctx.strokeStyle = 'rgba(0, 0, 0, 0.2)';
-    ctx.lineWidth = 1.0;
-    ctx.stroke();
+      if (!isHighRes) {
+        ctx.strokeStyle = 'rgba(0, 0, 0, 0.2)';
+        ctx.lineWidth = 1.0;
+        ctx.stroke();
+      }
+    }
   });
 
   ctx.restore();

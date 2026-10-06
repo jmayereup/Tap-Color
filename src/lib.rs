@@ -79,6 +79,16 @@ impl GameController {
         self.engine.fit_to_screen(w, h);
     }
 
+    pub fn world_to_screen(&self, world_x: f64, world_y: f64) -> String {
+        let pt = self.engine.world_to_screen(world_x, world_y);
+        serde_json::to_string(&pt).unwrap_or_else(|_| "{}".to_string())
+    }
+
+    pub fn screen_to_world(&self, screen_x: f64, screen_y: f64) -> String {
+        let pt = self.engine.screen_to_world(screen_x, screen_y);
+        serde_json::to_string(&pt).unwrap_or_else(|_| "{}".to_string())
+    }
+
     pub fn trigger_hint(&mut self) -> String {
         let w = self.canvas.width() as f64;
         let h = self.canvas.height() as f64;

@@ -1,6 +1,6 @@
 // Tap Color • WebAssembly & Diamond Art Studio Engine
 import { storage } from './storage.js';
-import { vectorizeImage, generateThumbnailBlob } from './vectorizer.js';
+import { vectorizeImage, generateThumbnailBlob, kmeans, detectContentBounds } from './vectorizer.js';
 
 class SoundController {
   constructor() {
@@ -1646,7 +1646,15 @@ class TapColorApp {
     const ctx = offCanvas.getContext('2d');
 
     if (img) {
-      ctx.drawImage(img, 0, 0, N, N);
+      ctx.fillStyle = '#FFFFFF';
+      ctx.fillRect(0, 0, N, N);
+      const bounds = detectContentBounds(img);
+      const scale = Math.min(N / bounds.sw, N / bounds.sh);
+      const dw = bounds.sw * scale;
+      const dh = bounds.sh * scale;
+      const dx = (N - dw) / 2;
+      const dy = (N - dh) / 2;
+      ctx.drawImage(img, bounds.sx, bounds.sy, bounds.sw, bounds.sh, dx, dy, dw, dh);
     } else {
       // Draw procedural preset scene
       this.drawPresetScene(ctx, presetName, N);
@@ -1655,46 +1663,27 @@ class TapColorApp {
     const imgData = ctx.getImageData(0, 0, N, N);
     const pixels = imgData.data;
 
-    // Palette quantization (K-means color clustering)
-    const colors = [];
-    for (let i = 0; i < pixels.length; i += 4) {
-      colors.push([pixels[i], pixels[i+1], pixels[i+2]]);
+    // Palette quantization using kmeans (subsampled for instantaneous execution up to 50K pieces)
+    const totalDrills = N * N;
+    const samples = [];
+    const sampleStep = Math.max(1, Math.floor(totalDrills / 2800));
+    for (let i = 0; i < totalDrills; i += sampleStep) {
+      const pIdx = i * 4;
+      samples.push([pixels[pIdx], pixels[pIdx + 1], pixels[pIdx + 2]]);
     }
 
-    // Pick K initial centers evenly spaced
-    const step = Math.floor(colors.length / K);
-    let centers = [];
-    for (let k = 0; k < K; k++) {
-      centers.push([...colors[k * step]]);
-    }
+    const km = kmeans(samples, K, { initialization: 'kmeans++', maxIterations: 12 });
+    const centers = km.centroids.map(c => [
+      Math.min(255, Math.max(0, Math.round(c[0]))),
+      Math.min(255, Math.max(0, Math.round(c[1]))),
+      Math.min(255, Math.max(0, Math.round(c[2]))),
+    ]);
 
-    // 4 iterations of K-means
-    for (let iter = 0; iter < 4; iter++) {
-      const clusters = Array.from({ length: K }, () => []);
-      for (const c of colors) {
-        let bestDist = Infinity;
-        let bestK = 0;
-        for (let k = 0; k < K; k++) {
-          const d = Math.hypot(c[0] - centers[k][0], c[1] - centers[k][1], c[2] - centers[k][2]);
-          if (d < bestDist) {
-            bestDist = d;
-            bestK = k;
-          }
-        }
-        clusters[bestK].push(c);
-      }
-
-      for (let k = 0; k < K; k++) {
-        if (clusters[k].length > 0) {
-          const avg = clusters[k].reduce((acc, val) => [acc[0] + val[0], acc[1] + val[1], acc[2] + val[2]], [0, 0, 0]);
-          centers[k] = [
-            Math.round(avg[0] / clusters[k].length),
-            Math.round(avg[1] / clusters[k].length),
-            Math.round(avg[2] / clusters[k].length),
-          ];
-        }
-      }
-    }
+    centers.sort((a, b) => {
+      const lumA = 0.299 * a[0] + 0.587 * a[1] + 0.114 * a[2];
+      const lumB = 0.299 * b[0] + 0.587 * b[1] + 0.114 * b[2];
+      return lumB - lumA;
+    });
 
     // Build Palette
     const palette = centers.map((c, idx) => {
@@ -1709,24 +1698,38 @@ class TapColorApp {
       };
     });
 
-    // Build Regions
+    // Build Regions with fast squared Euclidean distance
     const width = 800;
     const height = 800;
     const margin = 28;
     const avail = width - margin * 2;
     const cellSize = avail / N;
-    const regions = [];
+    const regions = new Array(totalDrills);
     let regId = 0;
 
+    const cR = centers.map(c => c[0]);
+    const cG = centers.map(c => c[1]);
+    const cB = centers.map(c => c[2]);
+
     for (let r = 0; r < N; r++) {
+      const y0 = margin + r * cellSize;
+      const y1 = y0 + cellSize;
+      const cy = (y0 + y1) * 0.5;
+      const rOffset = r * N;
+
       for (let c = 0; c < N; c++) {
-        const pIdx = (r * N + c) * 4;
-        const rgb = [pixels[pIdx], pixels[pIdx+1], pixels[pIdx+2]];
+        const pIdx = (rOffset + c) * 4;
+        const pr = pixels[pIdx];
+        const pg = pixels[pIdx + 1];
+        const pb = pixels[pIdx + 2];
 
         let bestDist = Infinity;
         let bestK = 0;
         for (let k = 0; k < K; k++) {
-          const d = Math.hypot(rgb[0] - centers[k][0], rgb[1] - centers[k][1], rgb[2] - centers[k][2]);
+          const dr = pr - cR[k];
+          const dg = pg - cG[k];
+          const db = pb - cB[k];
+          const d = dr * dr + dg * dg + db * db;
           if (d < bestDist) {
             bestDist = d;
             bestK = k;
@@ -1737,19 +1740,19 @@ class TapColorApp {
         palette[bestK].total_count++;
 
         const x0 = margin + c * cellSize;
-        const y0 = margin + r * cellSize;
         const x1 = x0 + cellSize;
-        const y1 = y0 + cellSize;
+        const cx = (x0 + x1) * 0.5;
 
-        regions.push({
-          id: regId++,
+        regions[regId] = {
+          id: regId,
           number: num,
           polygon: [{ x: x0, y: y0 }, { x: x1, y: y0 }, { x: x1, y: y1 }, { x: x0, y: y1 }],
-          centroid: { x: (x0 + x1) * 0.5, y: (y0 + y1) * 0.5 },
+          centroid: { x: cx, y: cy },
           color_hex: palette[bestK].hex,
           is_filled: false,
           fill_anim: 0.0,
-        });
+        };
+        regId++;
       }
     }
 
@@ -2211,17 +2214,41 @@ class FallbackJsController {
     const wx = (sx - this.panX) / this.scale;
     const wy = (sy - this.panY) / this.scale;
 
-    // Fast bounding box check
-    const idx = this.artwork.regions.findLastIndex(r => {
-      const p0 = r.polygon[0];
-      const p2 = r.polygon[2] || p0;
-      const minX = Math.min(p0.x, p2.x) - 1;
-      const maxX = Math.max(p0.x, p2.x) + 1;
-      const minY = Math.min(p0.y, p2.y) - 1;
-      const maxY = Math.max(p0.y, p2.y) + 1;
-      if (wx < minX || wx > maxX || wy < minY || wy > maxY) return false;
-      return this.pointInPoly(wx, wy, r.polygon);
-    });
+    // Fast O(1) grid check for Diamond Art, fallback to bounding box + poly check
+    let idx = -1;
+    const isDiamond = this.artwork.id && this.artwork.id.includes('diamond');
+    const totalReg = this.artwork.regions.length;
+    if (isDiamond && totalReg >= 100) {
+      const nSide = Math.round(Math.sqrt(totalReg));
+      if (nSide * nSide === totalReg && this.artwork.regions[0].polygon) {
+        const margin = this.artwork.regions[0].polygon[0].x;
+        const cellSize = (this.artwork.width - margin * 2) / nSide;
+        if (wx >= margin && wx < this.artwork.width - margin && wy >= margin && wy < this.artwork.height - margin) {
+          const c = Math.floor((wx - margin) / cellSize);
+          const r = Math.floor((wy - margin) / cellSize);
+          if (c >= 0 && c < nSide && r >= 0 && r < nSide) {
+            const probeIdx = r * nSide + c;
+            if (probeIdx < totalReg) idx = probeIdx;
+          }
+        }
+      }
+    }
+
+    if (idx === -1) {
+      idx = this.artwork.regions.findLastIndex(r => {
+        if (!r.polygon || r.polygon.length < 3) return false;
+        let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+        for (let i = 0; i < r.polygon.length; i++) {
+          const pt = r.polygon[i];
+          if (pt.x < minX) minX = pt.x;
+          if (pt.x > maxX) maxX = pt.x;
+          if (pt.y < minY) minY = pt.y;
+          if (pt.y > maxY) maxY = pt.y;
+        }
+        if (wx < minX - 1 || wx > maxX + 1 || wy < minY - 1 || wy > maxY + 1) return false;
+        return this.pointInPoly(wx, wy, r.polygon);
+      });
+    }
 
     if (idx !== -1) {
       const reg = this.artwork.regions[idx];
