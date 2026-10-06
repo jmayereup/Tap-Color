@@ -62,7 +62,7 @@ impl GameController {
 
     pub fn update_pan_zoom(&mut self, delta_x: f64, delta_y: f64, zoom_factor: f64, anchor_x: f64, anchor_y: f64) {
         let old_scale = self.engine.target_scale;
-        let new_scale = (old_scale * zoom_factor).clamp(0.35, 10.0);
+        let new_scale = (old_scale * zoom_factor).clamp(0.1, 10.0);
 
         // Zoom relative to anchor
         let wx = (anchor_x - self.engine.target_pan_x) / old_scale;
@@ -177,5 +177,13 @@ impl GameController {
             "filled_regions": self.engine.artwork.regions.iter().filter(|r| r.is_filled).count(),
         }))
         .unwrap_or_else(|_| "{}".to_string())
+    }
+
+    pub fn get_artwork_json(&self) -> String {
+        serde_json::to_string(&self.engine.artwork).unwrap_or_else(|_| "{}".to_string())
+    }
+
+    pub fn render_export(&self, ctx: &CanvasRenderingContext2d, width: f64, height: f64, force_all_filled: bool) {
+        self.engine.render_export(ctx, width, height, force_all_filled);
     }
 }

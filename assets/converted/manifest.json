@@ -1,0 +1,342 @@
+[
+  {
+    "key": "country_chapel",
+    "title": "Country Chapel in Meadow",
+    "artist": "Heartland Faith Studio",
+    "desc": "Little white country chapel with steeple & cross, grazing sheep, sunflowers, and split-rail fence bathed in morning rays",
+    "originalAsset": "assets/country_chapel.jpg",
+    "diamondVariants": [
+      {
+        "id": "country_chapel_diamond_80",
+        "resolution": "Cozy (6.4k)",
+        "label": "80\u00d780",
+        "grid": 80,
+        "pieces": 6400,
+        "colors": 18,
+        "jsonFile": "assets/converted/country_chapel_diamond_80.json",
+        "thumbnailUrl": "assets/converted/country_chapel_diamond_80_thumb.png"
+      },
+      {
+        "id": "country_chapel_diamond_120",
+        "resolution": "Standard (14.4k)",
+        "label": "120\u00d7120",
+        "grid": 120,
+        "pieces": 14400,
+        "colors": 26,
+        "jsonFile": "assets/converted/country_chapel_diamond_120.json",
+        "thumbnailUrl": "assets/converted/country_chapel_diamond_120_thumb.png"
+      },
+      {
+        "id": "country_chapel_diamond_160",
+        "resolution": "Masterpiece (25.6k)",
+        "label": "160\u00d7160",
+        "grid": 160,
+        "pieces": 25600,
+        "colors": 36,
+        "jsonFile": "assets/converted/country_chapel_diamond_160.json",
+        "thumbnailUrl": "assets/converted/country_chapel_diamond_160_thumb.png"
+      }
+    ],
+    "pbnVariants": [
+      {
+        "id": "country_chapel_pbn_detailed",
+        "resolution": "Detailed (800+)",
+        "complexity": "detailed",
+        "pieces": 833,
+        "colors": 20,
+        "jsonFile": "assets/converted/country_chapel_pbn_detailed.json",
+        "thumbnailUrl": "assets/converted/country_chapel_pbn_detailed_thumb.png"
+      },
+      {
+        "id": "country_chapel_pbn_intricate",
+        "resolution": "Intricate (2,000+)",
+        "complexity": "intricate",
+        "pieces": 1965,
+        "colors": 28,
+        "jsonFile": "assets/converted/country_chapel_pbn_intricate.json",
+        "thumbnailUrl": "assets/converted/country_chapel_pbn_intricate_thumb.png"
+      },
+      {
+        "id": "country_chapel_pbn_masterpiece",
+        "resolution": "Masterpiece (4,000+)",
+        "complexity": "masterpiece",
+        "pieces": 4316,
+        "colors": 36,
+        "jsonFile": "assets/converted/country_chapel_pbn_masterpiece.json",
+        "thumbnailUrl": "assets/converted/country_chapel_pbn_masterpiece_thumb.png"
+      }
+    ]
+  },
+  {
+    "key": "good_shepherd",
+    "title": "The Lord is My Shepherd",
+    "artist": "Psalm 23 Heritage",
+    "desc": "Peaceful rolling pasture with mother sheep and lambs resting beside still waters and stone bridge",
+    "originalAsset": "assets/good_shepherd.jpg",
+    "diamondVariants": [
+      {
+        "id": "good_shepherd_diamond_80",
+        "resolution": "Cozy (6.4k)",
+        "label": "80\u00d780",
+        "grid": 80,
+        "pieces": 6400,
+        "colors": 18,
+        "jsonFile": "assets/converted/good_shepherd_diamond_80.json",
+        "thumbnailUrl": "assets/converted/good_shepherd_diamond_80_thumb.png"
+      },
+      {
+        "id": "good_shepherd_diamond_120",
+        "resolution": "Standard (14.4k)",
+        "label": "120\u00d7120",
+        "grid": 120,
+        "pieces": 14400,
+        "colors": 26,
+        "jsonFile": "assets/converted/good_shepherd_diamond_120.json",
+        "thumbnailUrl": "assets/converted/good_shepherd_diamond_120_thumb.png"
+      },
+      {
+        "id": "good_shepherd_diamond_160",
+        "resolution": "Masterpiece (25.6k)",
+        "label": "160\u00d7160",
+        "grid": 160,
+        "pieces": 25600,
+        "colors": 36,
+        "jsonFile": "assets/converted/good_shepherd_diamond_160.json",
+        "thumbnailUrl": "assets/converted/good_shepherd_diamond_160_thumb.png"
+      }
+    ],
+    "pbnVariants": [
+      {
+        "id": "good_shepherd_pbn_detailed",
+        "resolution": "Detailed (800+)",
+        "complexity": "detailed",
+        "pieces": 896,
+        "colors": 20,
+        "jsonFile": "assets/converted/good_shepherd_pbn_detailed.json",
+        "thumbnailUrl": "assets/converted/good_shepherd_pbn_detailed_thumb.png"
+      },
+      {
+        "id": "good_shepherd_pbn_intricate",
+        "resolution": "Intricate (2,000+)",
+        "complexity": "intricate",
+        "pieces": 2195,
+        "colors": 28,
+        "jsonFile": "assets/converted/good_shepherd_pbn_intricate.json",
+        "thumbnailUrl": "assets/converted/good_shepherd_pbn_intricate_thumb.png"
+      },
+      {
+        "id": "good_shepherd_pbn_masterpiece",
+        "resolution": "Masterpiece (4,000+)",
+        "complexity": "masterpiece",
+        "pieces": 4620,
+        "colors": 36,
+        "jsonFile": "assets/converted/good_shepherd_pbn_masterpiece.json",
+        "thumbnailUrl": "assets/converted/good_shepherd_pbn_masterpiece_thumb.png"
+      }
+    ]
+  },
+  {
+    "key": "country_porch_bible",
+    "title": "Devotions on the Porch",
+    "artist": "Country Cottage Morning",
+    "desc": "Open Holy Bible, reading glasses, wild garden bouquet, and quilt on a rustic rocking chair overlooking red barn",
+    "originalAsset": "assets/country_porch_bible.jpg",
+    "diamondVariants": [
+      {
+        "id": "country_porch_bible_diamond_80",
+        "resolution": "Cozy (6.4k)",
+        "label": "80\u00d780",
+        "grid": 80,
+        "pieces": 6400,
+        "colors": 18,
+        "jsonFile": "assets/converted/country_porch_bible_diamond_80.json",
+        "thumbnailUrl": "assets/converted/country_porch_bible_diamond_80_thumb.png"
+      },
+      {
+        "id": "country_porch_bible_diamond_120",
+        "resolution": "Standard (14.4k)",
+        "label": "120\u00d7120",
+        "grid": 120,
+        "pieces": 14400,
+        "colors": 26,
+        "jsonFile": "assets/converted/country_porch_bible_diamond_120.json",
+        "thumbnailUrl": "assets/converted/country_porch_bible_diamond_120_thumb.png"
+      },
+      {
+        "id": "country_porch_bible_diamond_160",
+        "resolution": "Masterpiece (25.6k)",
+        "label": "160\u00d7160",
+        "grid": 160,
+        "pieces": 25600,
+        "colors": 36,
+        "jsonFile": "assets/converted/country_porch_bible_diamond_160.json",
+        "thumbnailUrl": "assets/converted/country_porch_bible_diamond_160_thumb.png"
+      }
+    ],
+    "pbnVariants": [
+      {
+        "id": "country_porch_bible_pbn_detailed",
+        "resolution": "Detailed (800+)",
+        "complexity": "detailed",
+        "pieces": 831,
+        "colors": 20,
+        "jsonFile": "assets/converted/country_porch_bible_pbn_detailed.json",
+        "thumbnailUrl": "assets/converted/country_porch_bible_pbn_detailed_thumb.png"
+      },
+      {
+        "id": "country_porch_bible_pbn_intricate",
+        "resolution": "Intricate (2,000+)",
+        "complexity": "intricate",
+        "pieces": 2005,
+        "colors": 28,
+        "jsonFile": "assets/converted/country_porch_bible_pbn_intricate.json",
+        "thumbnailUrl": "assets/converted/country_porch_bible_pbn_intricate_thumb.png"
+      },
+      {
+        "id": "country_porch_bible_pbn_masterpiece",
+        "resolution": "Masterpiece (4,000+)",
+        "complexity": "masterpiece",
+        "pieces": 4137,
+        "colors": 36,
+        "jsonFile": "assets/converted/country_porch_bible_pbn_masterpiece.json",
+        "thumbnailUrl": "assets/converted/country_porch_bible_pbn_masterpiece_thumb.png"
+      }
+    ]
+  },
+  {
+    "key": "cross_and_dogwood",
+    "title": "Old Rugged Cross & Dogwoods",
+    "artist": "Grace & Glory Studio",
+    "desc": "Handcrafted timber cross adorned with blooming dogwoods and wild roses overlooking tranquil valley at sunrise",
+    "originalAsset": "assets/cross_and_dogwood.jpg",
+    "diamondVariants": [
+      {
+        "id": "cross_and_dogwood_diamond_80",
+        "resolution": "Cozy (6.4k)",
+        "label": "80\u00d780",
+        "grid": 80,
+        "pieces": 6400,
+        "colors": 18,
+        "jsonFile": "assets/converted/cross_and_dogwood_diamond_80.json",
+        "thumbnailUrl": "assets/converted/cross_and_dogwood_diamond_80_thumb.png"
+      },
+      {
+        "id": "cross_and_dogwood_diamond_120",
+        "resolution": "Standard (14.4k)",
+        "label": "120\u00d7120",
+        "grid": 120,
+        "pieces": 14400,
+        "colors": 26,
+        "jsonFile": "assets/converted/cross_and_dogwood_diamond_120.json",
+        "thumbnailUrl": "assets/converted/cross_and_dogwood_diamond_120_thumb.png"
+      },
+      {
+        "id": "cross_and_dogwood_diamond_160",
+        "resolution": "Masterpiece (25.6k)",
+        "label": "160\u00d7160",
+        "grid": 160,
+        "pieces": 25600,
+        "colors": 36,
+        "jsonFile": "assets/converted/cross_and_dogwood_diamond_160.json",
+        "thumbnailUrl": "assets/converted/cross_and_dogwood_diamond_160_thumb.png"
+      }
+    ],
+    "pbnVariants": [
+      {
+        "id": "cross_and_dogwood_pbn_detailed",
+        "resolution": "Detailed (800+)",
+        "complexity": "detailed",
+        "pieces": 731,
+        "colors": 20,
+        "jsonFile": "assets/converted/cross_and_dogwood_pbn_detailed.json",
+        "thumbnailUrl": "assets/converted/cross_and_dogwood_pbn_detailed_thumb.png"
+      },
+      {
+        "id": "cross_and_dogwood_pbn_intricate",
+        "resolution": "Intricate (2,000+)",
+        "complexity": "intricate",
+        "pieces": 1765,
+        "colors": 28,
+        "jsonFile": "assets/converted/cross_and_dogwood_pbn_intricate.json",
+        "thumbnailUrl": "assets/converted/cross_and_dogwood_pbn_intricate_thumb.png"
+      },
+      {
+        "id": "cross_and_dogwood_pbn_masterpiece",
+        "resolution": "Masterpiece (4,000+)",
+        "complexity": "masterpiece",
+        "pieces": 3653,
+        "colors": 36,
+        "jsonFile": "assets/converted/cross_and_dogwood_pbn_masterpiece.json",
+        "thumbnailUrl": "assets/converted/cross_and_dogwood_pbn_masterpiece_thumb.png"
+      }
+    ]
+  },
+  {
+    "key": "fluffy_cow",
+    "title": "Sweet Highland Calf",
+    "artist": "Country Homestead",
+    "desc": "Gentle fluffy highland cow calf surrounded by meadow wildflowers and rustic wooden pasture",
+    "originalAsset": "assets/fluffy-cow-3.jpeg",
+    "diamondVariants": [
+      {
+        "id": "fluffy_cow_diamond_80",
+        "resolution": "Cozy (6.4k)",
+        "label": "80\u00d780",
+        "grid": 80,
+        "pieces": 6400,
+        "colors": 18,
+        "jsonFile": "assets/converted/fluffy_cow_diamond_80.json",
+        "thumbnailUrl": "assets/converted/fluffy_cow_diamond_80_thumb.png"
+      },
+      {
+        "id": "fluffy_cow_diamond_120",
+        "resolution": "Standard (14.4k)",
+        "label": "120\u00d7120",
+        "grid": 120,
+        "pieces": 14400,
+        "colors": 26,
+        "jsonFile": "assets/converted/fluffy_cow_diamond_120.json",
+        "thumbnailUrl": "assets/converted/fluffy_cow_diamond_120_thumb.png"
+      },
+      {
+        "id": "fluffy_cow_diamond_160",
+        "resolution": "Masterpiece (25.6k)",
+        "label": "160\u00d7160",
+        "grid": 160,
+        "pieces": 25600,
+        "colors": 36,
+        "jsonFile": "assets/converted/fluffy_cow_diamond_160.json",
+        "thumbnailUrl": "assets/converted/fluffy_cow_diamond_160_thumb.png"
+      }
+    ],
+    "pbnVariants": [
+      {
+        "id": "fluffy_cow_pbn_detailed",
+        "resolution": "Detailed (800+)",
+        "complexity": "detailed",
+        "pieces": 357,
+        "colors": 18,
+        "jsonFile": "assets/converted/fluffy_cow_pbn_detailed.json",
+        "thumbnailUrl": "assets/converted/fluffy_cow_pbn_detailed_thumb.png"
+      },
+      {
+        "id": "fluffy_cow_pbn_intricate",
+        "resolution": "Intricate (2,000+)",
+        "complexity": "intricate",
+        "pieces": 743,
+        "colors": 26,
+        "jsonFile": "assets/converted/fluffy_cow_pbn_intricate.json",
+        "thumbnailUrl": "assets/converted/fluffy_cow_pbn_intricate_thumb.png"
+      },
+      {
+        "id": "fluffy_cow_pbn_masterpiece",
+        "resolution": "Masterpiece (4,000+)",
+        "complexity": "masterpiece",
+        "pieces": 1665,
+        "colors": 34,
+        "jsonFile": "assets/converted/fluffy_cow_pbn_masterpiece.json",
+        "thumbnailUrl": "assets/converted/fluffy_cow_pbn_masterpiece_thumb.png"
+      }
+    ]
+  }
+]

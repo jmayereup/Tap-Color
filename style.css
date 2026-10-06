@@ -112,6 +112,20 @@ html, body {
   border: 1px solid var(--border-subtle);
   padding: 6px 14px;
   border-radius: var(--radius-full);
+  transition: all 0.25s ease;
+}
+
+.progress-pill.completed {
+  cursor: pointer;
+  border-color: rgba(245, 158, 11, 0.6);
+  background: rgba(245, 158, 11, 0.12);
+  box-shadow: 0 0 14px rgba(245, 158, 11, 0.35);
+}
+
+.progress-pill.completed:hover {
+  transform: translateY(-1px);
+  background: rgba(245, 158, 11, 0.2);
+  box-shadow: 0 0 18px rgba(245, 158, 11, 0.5);
 }
 
 .progress-track {
@@ -922,9 +936,32 @@ html, body {
 
 /* Celebration Card */
 .celebration-card {
+  position: relative;
   text-align: center;
   align-items: center;
-  max-width: 440px;
+  max-width: 480px;
+}
+
+.celebration-close-btn {
+  position: absolute;
+  top: 14px;
+  right: 18px;
+  font-size: 26px;
+  line-height: 1;
+  color: var(--text-muted);
+  cursor: pointer;
+  background: transparent;
+  border: none;
+  padding: 4px;
+  border-radius: var(--radius-sm);
+  transition: all 0.2s ease;
+  z-index: 10;
+}
+
+.celebration-close-btn:hover {
+  color: #FFFFFF;
+  background: rgba(255, 255, 255, 0.1);
+  transform: scale(1.15);
 }
 
 .confetti-burst-icon {
@@ -1338,5 +1375,248 @@ html, body {
   border-radius: var(--radius-full);
   transition: width 0.3s ease;
 }
+
+/* ========================================================
+   Header Resolution Pill & Dropdown
+   ======================================================== */
+.btn-res-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(99, 102, 241, 0.15);
+  border: 1px solid rgba(99, 102, 241, 0.35);
+  color: #c7d2fe;
+  padding: 6px 12px;
+  border-radius: var(--radius-full);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-left: 8px;
+}
+
+.btn-res-pill:hover {
+  background: rgba(99, 102, 241, 0.28);
+  border-color: #818cf8;
+  color: #ffffff;
+  transform: translateY(-1px);
+}
+
+.btn-res-pill .res-icon {
+  font-size: 13px;
+}
+
+.btn-res-pill .res-caret {
+  font-size: 11px;
+  opacity: 0.7;
+}
+
+/* ========================================================
+   Gallery Card Resolution Selector
+   ======================================================== */
+.artwork-resolution-selector {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px dashed rgba(255, 255, 255, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.resolution-title {
+  font-size: 11px;
+  font-weight: 600;
+  color: #94a3b8;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+}
+
+.resolution-pills {
+  display: flex;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+
+.res-pill {
+  flex: 1;
+  min-width: 68px;
+  text-align: center;
+  padding: 5px 6px;
+  font-size: 11px;
+  font-weight: 600;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #cbd5e1;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.res-pill:hover {
+  background: rgba(99, 102, 241, 0.15);
+  border-color: rgba(99, 102, 241, 0.4);
+  color: #ffffff;
+}
+
+.res-pill.active {
+  background: linear-gradient(135deg, #4f46e5, #7c3aed);
+  border-color: #a5b4fc;
+  color: #ffffff;
+  box-shadow: 0 2px 8px rgba(79, 70, 229, 0.4);
+}
+
+.res-pill-count {
+  font-size: 10px;
+  opacity: 0.85;
+  font-weight: 500;
+  display: block;
+  margin-top: 1px;
+}
+
+/* ========================================================
+   Faith & Country Life Preset Studio Section
+   ======================================================== */
+.asset-collection-header {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  margin-bottom: 8px;
+  padding: 8px 12px;
+  background: linear-gradient(135deg, rgba(234, 179, 8, 0.1), rgba(99, 102, 241, 0.1));
+  border: 1px solid rgba(234, 179, 8, 0.25);
+  border-radius: 8px;
+}
+
+.collection-tag {
+  font-size: 13px;
+  font-weight: 700;
+  color: #fde047;
+}
+
+.collection-hint {
+  font-size: 11px;
+  color: #cbd5e1;
+}
+
+.asset-preset-buttons {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.asset-preset-buttons .btn-preset {
+  font-size: 12px;
+  padding: 8px 10px;
+  text-align: left;
+  border: 1px solid rgba(234, 179, 8, 0.2);
+  background: rgba(30, 41, 59, 0.85);
+  border-radius: 8px;
+  white-space: normal;
+  line-height: 1.3;
+}
+
+.asset-preset-buttons .btn-preset.active {
+  border-color: #facc15;
+  background: linear-gradient(135deg, rgba(234, 179, 8, 0.25), rgba(99, 102, 241, 0.25));
+  color: #fff;
+  box-shadow: 0 0 12px rgba(234, 179, 8, 0.3);
+}
+
+.preset-sub-header {
+  font-size: 11px;
+  color: #94a3b8;
+  margin: 6px 0 4px 0;
+  font-weight: 600;
+}
+
+.secondary-presets {
+  margin-bottom: 12px;
+}
+
+/* ========================================================
+   Resolution Switcher Modal
+   ======================================================== */
+.res-picker-card {
+  max-width: 480px;
+  width: 90%;
+  background: #111827;
+  border: 1px solid rgba(99, 102, 241, 0.3);
+  border-radius: 16px;
+  padding: 24px;
+}
+
+.res-picker-subtitle {
+  font-size: 13px;
+  color: #94a3b8;
+  margin: 8px 0 16px 0;
+}
+
+.res-picker-options {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.res-picker-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.res-picker-item:hover {
+  background: rgba(99, 102, 241, 0.15);
+  border-color: #818cf8;
+  transform: translateY(-2px);
+}
+
+.res-picker-item.active {
+  background: linear-gradient(135deg, rgba(79, 70, 229, 0.25), rgba(168, 85, 247, 0.25));
+  border-color: #a5b4fc;
+  box-shadow: 0 4px 14px rgba(99, 102, 241, 0.3);
+}
+
+.res-item-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.res-item-icon {
+  font-size: 22px;
+}
+
+.res-item-name {
+  font-size: 15px;
+  font-weight: 700;
+  color: #fff;
+}
+
+.res-item-desc {
+  font-size: 12px;
+  color: #94a3b8;
+  margin-top: 2px;
+}
+
+.res-item-badge {
+  font-size: 12px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+  background: rgba(255, 255, 255, 0.08);
+  color: #e2e8f0;
+}
+
+.res-picker-item.active .res-item-badge {
+  background: #4f46e5;
+  color: #fff;
+}
+
 
 

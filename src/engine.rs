@@ -274,8 +274,36 @@ impl GameEngine {
             self.hint_region_id = Some(reg.id);
             self.hint_timer = 5.0; // 5 seconds highlight
 
-            // Smoothly pan camera to center this region
-            let target_s = 1.35;
+            // Smoothly pan camera to center this region with zoom scaled to drill size
+            let is_diamond_art = self.artwork.id.contains("diamond") || (self.artwork.regions.len() > 300 && self.artwork.regions.get(0).map_or(false, |r| r.polygon.len() == 4));
+            let drill_world_size = if is_diamond_art && !self.artwork.regions.is_empty() {
+                let p0 = self.artwork.regions[0].polygon.first();
+                let p1 = self.artwork.regions[0].polygon.get(1);
+                if let (Some(a), Some(b)) = (p0, p1) {
+                    let dx = (b.x - a.x).abs();
+                    if dx > 0.01 { dx } else { 16.0 }
+                } else {
+                    16.0
+                }
+            } else {
+                16.0
+            };
+            let target_s = if is_diamond_art {
+                (24.0 / drill_world_size).clamp(1.8, 5.0)
+            } else {
+                let mut min_x = f64::INFINITY;
+                let mut max_x = f64::NEG_INFINITY;
+                let mut min_y = f64::INFINITY;
+                let mut max_y = f64::NEG_INFINITY;
+                for p in &reg.polygon {
+                    if p.x < min_x { min_x = p.x; }
+                    if p.x > max_x { max_x = p.x; }
+                    if p.y < min_y { min_y = p.y; }
+                    if p.y > max_y { max_y = p.y; }
+                }
+                let span = (max_x - min_x).min(max_y - min_y).max(4.0);
+                (32.0 / span).clamp(1.35, 4.5)
+            };
             self.target_scale = target_s;
             self.target_pan_x = canvas_w / 2.0 - reg.centroid.x * target_s;
             self.target_pan_y = canvas_h / 2.0 - reg.centroid.y * target_s;
@@ -471,6 +499,142 @@ impl GameEngine {
         self.target_pan_y = py;
     }
 
+    /// Render complete high-resolution artwork to canvas context without viewport panning, zooming, numbers, or UI overlays
+    pub fn render_export(&self, ctx: &CanvasRenderingContext2d, width: f64, height: f64, force_all_filled: bool) {
+        ctx.clear_rect(0.0, 0.0, width, height);
+        ctx.set_fill_style_str("#FFFFFF");
+        ctx.fill_rect(0.0, 0.0, width, height);
+
+        let scale_x = width / self.artwork.width;
+        let scale_y = height / self.artwork.height;
+        let s = scale_x.min(scale_y);
+        let ox = (width - self.artwork.width * s) / 2.0;
+        let oy = (height - self.artwork.height * s) / 2.0;
+
+        ctx.save();
+        let _ = ctx.translate(ox, oy);
+        let _ = ctx.scale(s, s);
+
+        let is_diamond_art = self.artwork.id.contains("diamond") || self.artwork.regions.len() > 200;
+        let drill_screen_size = if is_diamond_art && !self.artwork.regions.is_empty() {
+            let p0 = self.artwork.regions[0].polygon.first();
+            let p1 = self.artwork.regions[0].polygon.get(1);
+            if let (Some(a), Some(b)) = (p0, p1) {
+                (b.x - a.x).abs() * s
+            } else {
+                16.0 * s
+            }
+        } else {
+            16.0 * s
+        };
+        let can_draw_facets = is_diamond_art && drill_screen_size >= 8.0;
+
+        for region in &self.artwork.regions {
+            let n = region.polygon.len();
+            if n < 3 {
+                continue;
+            }
+
+            let is_filled = region.is_filled || force_all_filled;
+            let is_quad = is_diamond_art && n == 4;
+            let (p0, p1, p2, p3) = if is_quad {
+                (region.polygon[0], region.polygon[1], region.polygon[2], region.polygon[3])
+            } else {
+                (Point::new(0.0, 0.0), Point::new(0.0, 0.0), Point::new(0.0, 0.0), Point::new(0.0, 0.0))
+            };
+            let cell_w = p1.x - p0.x;
+            let cell_h = p2.y - p1.y;
+            let cx = region.centroid.x;
+            let cy = region.centroid.y;
+
+            if is_filled {
+                ctx.set_fill_style_str(&region.color_hex);
+                if is_quad {
+                    ctx.fill_rect(p0.x, p0.y, cell_w, cell_h);
+                } else {
+                    ctx.begin_path();
+                    ctx.move_to(region.polygon[0].x, region.polygon[0].y);
+                    for pt in region.polygon.iter().skip(1) {
+                        ctx.line_to(pt.x, pt.y);
+                    }
+                    ctx.close_path();
+                    ctx.fill();
+                }
+
+                if is_quad && can_draw_facets {
+                    // Top-left diagonal highlight
+                    ctx.begin_path();
+                    ctx.move_to(p0.x, p0.y);
+                    ctx.line_to(p1.x, p1.y);
+                    ctx.line_to(p3.x, p3.y);
+                    ctx.close_path();
+                    ctx.set_fill_style_str("rgba(255, 255, 255, 0.18)");
+                    ctx.fill();
+
+                    // Bottom-right diagonal shadow
+                    ctx.begin_path();
+                    ctx.move_to(p1.x, p1.y);
+                    ctx.line_to(p2.x, p2.y);
+                    ctx.line_to(p3.x, p3.y);
+                    ctx.close_path();
+                    ctx.set_fill_style_str("rgba(0, 0, 0, 0.16)");
+                    ctx.fill();
+
+                    // Center table facet
+                    let hw = cell_w.abs() * 0.28;
+                    let hh = cell_h.abs() * 0.28;
+
+                    ctx.begin_path();
+                    ctx.move_to(cx, cy - hh);
+                    ctx.line_to(cx + hw, cy);
+                    ctx.line_to(cx, cy + hh);
+                    ctx.line_to(cx - hw, cy);
+                    ctx.close_path();
+                    ctx.set_fill_style_str("rgba(255, 255, 255, 0.12)");
+                    ctx.fill();
+
+                    if drill_screen_size >= 12.0 {
+                        let s_dot = (1.6 / s).max(1.0);
+                        ctx.set_fill_style_str("rgba(255, 255, 255, 0.75)");
+                        ctx.fill_rect(cx - hw * 0.4, cy - hh * 0.4, s_dot, s_dot);
+                    }
+                }
+            } else {
+                ctx.set_fill_style_str("#F8FAFC");
+                if is_quad {
+                    ctx.fill_rect(p0.x, p0.y, cell_w, cell_h);
+                } else {
+                    ctx.begin_path();
+                    ctx.move_to(region.polygon[0].x, region.polygon[0].y);
+                    for pt in region.polygon.iter().skip(1) {
+                        ctx.line_to(pt.x, pt.y);
+                    }
+                    ctx.close_path();
+                    ctx.fill();
+                }
+            }
+
+            // Outline strokes
+            if self.show_outlines {
+                if is_diamond_art {
+                    ctx.set_stroke_style_str("rgba(148, 163, 184, 0.35)");
+                    ctx.set_line_width((0.7 / s).max(0.5));
+                } else {
+                    ctx.set_stroke_style_str("rgba(30, 41, 59, 0.35)");
+                    ctx.set_line_width((1.0 / s).max(0.6));
+                }
+
+                if is_quad {
+                    ctx.stroke_rect(p0.x, p0.y, cell_w, cell_h);
+                } else {
+                    ctx.stroke();
+                }
+            }
+        }
+
+        ctx.restore();
+    }
+
     pub fn spawn_burst(&mut self, x: f64, y: f64, color: &str, count: usize) {
         for i in 0..count {
             let angle = (i as f64 / count as f64) * 2.0 * PI + (x * 0.01);
@@ -534,7 +698,7 @@ impl GameEngine {
         ctx.set_shadow_color("transparent");
 
         let active_pulse = self.pulse_phase.sin() * 0.5 + 0.5; // 0.0 to 1.0
-        let is_diamond_art = self.artwork.id.contains("diamond") || self.artwork.regions.len() > 200;
+        let is_diamond_art = self.artwork.id.contains("diamond") || (self.artwork.regions.len() > 300 && self.artwork.regions.get(0).map_or(false, |r| r.polygon.len() == 4));
 
         // Viewport Frustum Culling in world coordinates
         let pad = 24.0 / self.scale.max(0.1);
@@ -543,18 +707,20 @@ impl GameEngine {
         let view_min_y = -self.pan_y / self.scale - pad;
         let view_max_y = (height - self.pan_y) / self.scale + pad;
 
-        // Drill screen size in actual pixels for Level-of-Detail (LOD)
-        let drill_screen_size = if is_diamond_art && !self.artwork.regions.is_empty() {
+        // Drill world size and screen size in actual pixels for Level-of-Detail (LOD)
+        let drill_world_size = if is_diamond_art && !self.artwork.regions.is_empty() {
             let p0 = self.artwork.regions[0].polygon.first();
             let p1 = self.artwork.regions[0].polygon.get(1);
             if let (Some(a), Some(b)) = (p0, p1) {
-                (b.x - a.x).abs() * self.scale
+                let dx = (b.x - a.x).abs();
+                if dx > 0.01 { dx } else { 16.0 }
             } else {
-                16.0 * self.scale
+                16.0
             }
         } else {
-            16.0 * self.scale
+            16.0
         };
+        let drill_screen_size = drill_world_size * self.scale;
         let can_draw_facets = is_diamond_art && drill_screen_size >= 10.0;
         let can_draw_outlines = self.show_outlines && (!is_diamond_art || drill_screen_size >= 3.5);
 
@@ -693,7 +859,6 @@ impl GameEngine {
         }
 
         // 3. Render Number Labels on uncolored regions
-        let font_base_size = (14.0 / self.scale).clamp(8.0, 24.0);
         ctx.set_text_align("center");
         ctx.set_text_baseline("middle");
 
@@ -711,36 +876,82 @@ impl GameEngine {
             let is_hinted = Some(region.id) == self.hint_region_id;
             let is_active_target = self.highlight_matching_tiles && (region.number == self.active_number);
 
+            let (region_world_size, region_screen_size) = if is_diamond_art {
+                (drill_world_size, drill_screen_size)
+            } else {
+                let mut min_x = f64::INFINITY;
+                let mut max_x = f64::NEG_INFINITY;
+                let mut min_y = f64::INFINITY;
+                let mut max_y = f64::NEG_INFINITY;
+                for p in &region.polygon {
+                    if p.x < min_x { min_x = p.x; }
+                    if p.x > max_x { max_x = p.x; }
+                    if p.y < min_y { min_y = p.y; }
+                    if p.y > max_y { max_y = p.y; }
+                }
+                let span_w = (max_x - min_x).max(1.0);
+                let span_h = (max_y - min_y).max(1.0);
+                let rw = span_w.min(span_h).max(span_w.max(span_h) * 0.45);
+                (rw, rw * self.scale)
+            };
+
             if is_hinted {
                 // Prominent hint halo
-                let ring_r = (18.0 + active_pulse * 6.0) / self.scale;
+                let ring_r = if is_diamond_art {
+                    (drill_world_size * (0.85 + active_pulse * 0.25)).max(12.0 / self.scale)
+                } else {
+                    (region_world_size * 0.75).clamp(10.0 / self.scale, 28.0 / self.scale)
+                };
+                let ring_w = if is_diamond_art {
+                    (2.2 / self.scale).min(drill_world_size * 0.22)
+                } else {
+                    (2.4 / self.scale).min(region_world_size * 0.2)
+                };
                 ctx.begin_path();
                 let _ = ctx.arc(cx, cy, ring_r, 0.0, 2.0 * PI);
                 ctx.set_stroke_style_str("#F59E0B");
-                ctx.set_line_width(3.0 / self.scale);
+                ctx.set_line_width(ring_w);
                 ctx.stroke();
             }
 
-            // Level of Detail: when zoomed out on high-res diamond art, only draw indicator dots
-            if is_diamond_art && drill_screen_size < 13.0 {
+            // Level of Detail: when zoomed out on high-res artworks, only draw indicator dots on tiny regions
+            if region_screen_size < 13.0 {
                 if is_hinted || is_active_target {
-                    let dot_r = (drill_screen_size * 0.3).clamp(1.2, 3.5);
+                    let dot_r = (region_world_size * 0.35).min(3.5 / self.scale).max(1.2 / self.scale);
                     ctx.begin_path();
                     let _ = ctx.arc(cx, cy, dot_r, 0.0, 2.0 * PI);
                     ctx.set_fill_style_str(if is_hinted { "#F59E0B" } else { "rgba(99, 102, 241, 0.85)" });
                     ctx.fill();
                 }
-            } else if is_hinted || drill_screen_size >= 13.0 || !is_diamond_art {
+            } else {
                 let num_str = region.number.to_string();
-                let font_size = if is_hinted {
-                    if is_diamond_art { 11.0 } else { font_base_size * 1.25 }
-                } else if is_diamond_art {
-                    (drill_screen_size * 0.65 / self.scale).clamp(7.0, 12.0)
+                let digits = if region.number >= 100 {
+                    3
+                } else if region.number >= 10 {
+                    2
                 } else {
-                    font_base_size
+                    1
+                };
+                let font_scale = if digits >= 3 {
+                    0.34
+                } else if digits == 2 {
+                    0.44
+                } else {
+                    0.56
+                };
+                let max_font_world = 18.0 / self.scale;
+                let font_size = if is_diamond_art {
+                    if is_hinted {
+                        (drill_world_size * font_scale * 1.15).min(drill_world_size * 0.68)
+                    } else {
+                        drill_world_size * font_scale
+                    }
+                } else {
+                    let base = (region_world_size * font_scale).min(max_font_world);
+                    if is_hinted { base * 1.15 } else { base }
                 };
                 let font_weight = if is_hinted || is_active_target { "bold" } else { "600" };
-                ctx.set_font(&format!("{} {}px 'Outfit', sans-serif", font_weight, font_size));
+                ctx.set_font(&format!("{} {:.2}px 'Outfit', sans-serif", font_weight, font_size));
 
                 if is_hinted {
                     ctx.set_fill_style_str("#B45309");

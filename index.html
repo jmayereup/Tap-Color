@@ -27,6 +27,11 @@
           <h1 id="artwork-title" class="artwork-title">Origami Hummingbird</h1>
           <span id="artwork-artist" class="artwork-artist">Geometric Fauna</span>
         </div>
+        <button id="btn-resolution-switcher" class="btn-res-pill hidden" title="Change Resolution / Difficulty">
+          <span class="res-icon">✨</span>
+          <span id="label-current-resolution">Standard</span>
+          <span class="res-caret">▾</span>
+        </button>
       </div>
 
       <!-- Center Progress Indicator -->
@@ -76,6 +81,15 @@
             <line x1="14" y1="11" x2="14" y2="17"/>
           </svg>
           <span class="btn-label">Clear</span>
+        </button>
+
+        <button id="btn-export-header" class="btn-icon" title="Export Full Artwork Image (PNG)">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="7 10 12 15 17 10"/>
+            <line x1="12" y1="15" x2="12" y2="3"/>
+          </svg>
+          <span class="btn-label">Export</span>
         </button>
 
         <button id="btn-sound" class="btn-icon" title="Toggle Sound">
@@ -193,11 +207,25 @@
             </div>
             <div class="custom-studio-grid">
               <div class="preset-pickers">
-                <div class="preset-buttons">
-                  <button class="btn-preset active" data-preset="sunflower">🌻 Sunlit Sunflower</button>
+                <div class="asset-collection-header">
+                  <span class="collection-tag">🕊️ Faith & Country Life Collection</span>
+                  <span class="collection-hint">Original gallery images (Assets) — regenerate at any resolution:</span>
+                </div>
+                <div class="preset-buttons asset-preset-buttons">
+                  <button class="btn-preset active" data-preset="asset:country_chapel" data-asset="assets/country_chapel.jpg" data-key="country_chapel" data-title="Country Chapel in Meadow">⛪ Country Chapel</button>
+                  <button class="btn-preset" data-preset="asset:good_shepherd" data-asset="assets/good_shepherd.jpg" data-key="good_shepherd" data-title="The Lord is My Shepherd">🐑 Good Shepherd</button>
+                  <button class="btn-preset" data-preset="asset:country_porch_bible" data-asset="assets/country_porch_bible.jpg" data-key="country_porch_bible" data-title="Devotions on the Porch">📖 Porch & Bible</button>
+                  <button class="btn-preset" data-preset="asset:cross_and_dogwood" data-asset="assets/cross_and_dogwood.jpg" data-key="cross_and_dogwood" data-title="Old Rugged Cross & Dogwoods">✝️ Rugged Cross</button>
+                  <button class="btn-preset" data-preset="asset:fluffy_cow" data-asset="assets/fluffy-cow-3.jpeg" data-key="fluffy_cow" data-title="Sweet Highland Calf">🐮 Highland Calf</button>
+                </div>
+                <div class="preset-sub-header">
+                  <span>Drawings & Presets:</span>
+                </div>
+                <div class="preset-buttons secondary-presets">
+                  <button class="btn-preset" data-preset="sunflower">🌻 Sunflower</button>
                   <button class="btn-preset" data-preset="cat">🐱 Starlight Kitty</button>
                   <button class="btn-preset" data-preset="island">🏝️ Emerald Island</button>
-                  <button class="btn-preset" data-preset="aurora">🌌 Polar Aurora</button>
+                  <button class="btn-preset" data-preset="aurora">🌌 Aurora</button>
                 </div>
                 <div class="upload-box">
                   <label for="input-custom-photo" class="btn-secondary upload-btn">
@@ -266,32 +294,32 @@
                   <span class="step-title">Choose Canvas Size</span>
                 </div>
                 <div class="difficulty-picker" id="difficulty-chips-diamond">
-                  <button type="button" class="btn-diff-chip" data-grid="28" data-colors="12">
+                  <button type="button" class="btn-diff-chip" data-grid="80" data-colors="18">
                     <span class="diff-icon">🟢</span>
-                    <span class="diff-name">Quick & Cozy</span>
-                    <span class="diff-desc">Larger gems • Quick finish</span>
+                    <span class="diff-name">Cozy Canvas</span>
+                    <span class="diff-desc">80×80 (6,400 gems) • 18 colors</span>
                   </button>
-                  <button type="button" class="btn-diff-chip active" data-grid="48" data-colors="16">
+                  <button type="button" class="btn-diff-chip active" data-grid="120" data-colors="26">
                     <span class="diff-icon">🟡</span>
-                    <span class="diff-name">Standard</span>
-                    <span class="diff-desc">Recommended • Beautiful shine</span>
+                    <span class="diff-name">Standard Kit</span>
+                    <span class="diff-desc">120×120 (14,400 gems) • 26 colors</span>
                   </button>
-                  <button type="button" class="btn-diff-chip" data-grid="64" data-colors="24">
+                  <button type="button" class="btn-diff-chip" data-grid="160" data-colors="36">
                     <span class="diff-icon">🟣</span>
-                    <span class="diff-name">Masterpiece</span>
-                    <span class="diff-desc">Finer gems • Rich colors</span>
+                    <span class="diff-name">Masterpiece Ultra</span>
+                    <span class="diff-desc">160×160 (25,600 gems) • 36 colors</span>
                   </button>
                 </div>
 
                 <select id="select-custom-grid" class="styled-select" style="display:none">
-                  <option value="28">28</option>
-                  <option value="48" selected>48</option>
-                  <option value="64">64</option>
+                  <option value="80">80</option>
+                  <option value="120" selected>120</option>
+                  <option value="160">160</option>
                 </select>
                 <select id="select-custom-colors" class="styled-select" style="display:none">
-                  <option value="12">12</option>
-                  <option value="16" selected>16</option>
-                  <option value="24">24</option>
+                  <option value="18">18</option>
+                  <option value="26" selected>26</option>
+                  <option value="36">36</option>
                 </select>
 
                 <button id="btn-convert-diamond" class="btn-primary btn-sparkle btn-large-action">
@@ -333,6 +361,7 @@
     <!-- Victory / Completion Celebration Modal -->
     <div id="modal-victory" class="modal-overlay hidden">
       <div class="modal-card celebration-card">
+        <button id="btn-close-victory" class="btn-close celebration-close-btn" aria-label="Close modal" title="Close and view picture">&times;</button>
         <div class="confetti-burst-icon">🎉</div>
         <h2 class="celebration-title">Masterpiece Complete!</h2>
         <p class="celebration-subtitle">You brought this artwork to life with vibrant colors.</p>
@@ -353,7 +382,14 @@
         </div>
 
         <div class="modal-actions">
-          <button id="btn-export-png" class="btn-secondary">
+          <button id="btn-view-picture" class="btn-secondary" title="Close modal and view full artwork">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="3"/>
+              <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z"/>
+            </svg>
+            View Picture
+          </button>
+          <button id="btn-export-png" class="btn-secondary" title="Export high-resolution image of full picture">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
               <polyline points="7 10 12 15 17 10"/>
@@ -362,6 +398,20 @@
             Export Image
           </button>
           <button id="btn-next-artwork" class="btn-primary">Next Picture</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Resolution / Difficulty Switcher Modal -->
+    <div id="modal-resolution-picker" class="modal-overlay hidden">
+      <div class="modal-card res-picker-card">
+        <div class="modal-header">
+          <h3 id="res-picker-title">Switch Difficulty / Resolution</h3>
+          <button id="btn-close-res-picker" class="btn-close">&times;</button>
+        </div>
+        <p class="res-picker-subtitle" id="res-picker-subtitle">Select a resolution for this picture. You can color it at any detail level:</p>
+        <div id="res-picker-options" class="res-picker-options">
+          <!-- Dynamically populated options for Cozy / Standard / Detailed -->
         </div>
       </div>
     </div>
