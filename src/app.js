@@ -881,34 +881,58 @@ class TapColorApp {
     // Quick Style & Detail Dropdown
     const btnResSwitcher = document.getElementById('btn-resolution-switcher');
     const dropdownQuick = document.getElementById('quick-style-dropdown');
+    const backdropQuick = document.getElementById('quick-dropdown-backdrop');
+    const btnCloseQuick = document.getElementById('btn-close-quick-dropdown');
     const togglePbn = document.getElementById('quick-toggle-pbn');
     const toggleDiamond = document.getElementById('quick-toggle-diamond');
+
+    const openQuickDropdown = () => {
+      this.renderQuickStyleDropdown();
+      dropdownQuick.classList.remove('hidden');
+      btnResSwitcher.classList.add('active');
+      if (backdropQuick) backdropQuick.classList.remove('hidden');
+    };
+
+    const closeQuickDropdown = () => {
+      dropdownQuick.classList.add('hidden');
+      btnResSwitcher.classList.remove('active');
+      if (backdropQuick) backdropQuick.classList.add('hidden');
+    };
 
     if (btnResSwitcher && dropdownQuick) {
       btnResSwitcher.addEventListener('click', (e) => {
         e.stopPropagation();
         const isHidden = dropdownQuick.classList.contains('hidden');
         if (isHidden) {
-          this.renderQuickStyleDropdown();
-          dropdownQuick.classList.remove('hidden');
-          btnResSwitcher.classList.add('active');
+          openQuickDropdown();
         } else {
-          dropdownQuick.classList.add('hidden');
-          btnResSwitcher.classList.remove('active');
+          closeQuickDropdown();
         }
       });
 
+      if (btnCloseQuick) {
+        btnCloseQuick.addEventListener('click', (e) => {
+          e.stopPropagation();
+          closeQuickDropdown();
+        });
+      }
+
+      if (backdropQuick) {
+        backdropQuick.addEventListener('click', (e) => {
+          e.stopPropagation();
+          closeQuickDropdown();
+        });
+      }
+
       document.addEventListener('click', (e) => {
         if (!dropdownQuick.classList.contains('hidden') && !dropdownQuick.contains(e.target) && e.target !== btnResSwitcher) {
-          dropdownQuick.classList.add('hidden');
-          btnResSwitcher.classList.remove('active');
+          closeQuickDropdown();
         }
       });
 
       document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape' && !dropdownQuick.classList.contains('hidden')) {
-          dropdownQuick.classList.add('hidden');
-          btnResSwitcher.classList.remove('active');
+          closeQuickDropdown();
         }
       });
     }
@@ -2774,8 +2798,10 @@ class TapColorApp {
     const closeDropdown = () => {
       const dropdown = document.getElementById('quick-style-dropdown');
       const btn = document.getElementById('btn-resolution-switcher');
+      const backdrop = document.getElementById('quick-dropdown-backdrop');
       if (dropdown) dropdown.classList.add('hidden');
       if (btn) btn.classList.remove('active');
+      if (backdrop) backdrop.classList.add('hidden');
     };
 
     // Case 1: Gallery Artwork
@@ -2941,6 +2967,8 @@ class TapColorApp {
       if (counterpartMeta) {
         if (dropdownQuick) dropdownQuick.classList.add('hidden');
         if (btnResSwitcher) btnResSwitcher.classList.remove('active');
+        const backdropQuick = document.getElementById('quick-dropdown-backdrop');
+        if (backdropQuick) backdropQuick.classList.add('hidden');
         await this.selectArtwork(counterpartMeta.id);
         return;
       }

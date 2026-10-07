@@ -1065,30 +1065,7 @@ html, body {
   justify-content: center;
 }
 
-/* ==========================================================================
-   Responsive Adaptations
-   ========================================================================== */
-@media (max-width: 768px) {
-  .header-bar {
-    padding: 10px 12px;
-  }
-  .btn-label {
-    display: none;
-  }
-  .header-center {
-    max-width: 160px;
-  }
-  .artwork-artist {
-    display: none;
-  }
-  .swatch-circle {
-    width: 44px;
-    height: 44px;
-  }
-  .swatch-number {
-    font-size: 13px;
-  }
-}
+/* Responsive adaptations consolidated at end of stylesheet */
 
 /* ==========================================================================
    My Gallery (IndexedDB) & Vector Studio Extensions
@@ -1987,15 +1964,47 @@ html, body {
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
+.quick-dropdown-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
 .quick-dropdown-title {
   font-size: 13px;
   font-weight: 700;
   color: #f1f5f9;
 }
 
+.btn-close-quick {
+  display: none;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #cbd5e1;
+  width: 26px;
+  height: 26px;
+  border-radius: var(--radius-full);
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  cursor: pointer;
+  line-height: 1;
+  transition: all 0.2s;
+}
+
+.btn-close-quick:hover {
+  background: rgba(255, 255, 255, 0.18);
+  color: #fff;
+}
+
 .quick-dropdown-subtitle {
   font-size: 11px;
   color: #94a3b8;
+}
+
+.quick-dropdown-backdrop {
+  display: none;
 }
 
 /* Segmented Art Style Switcher */
@@ -2345,6 +2354,569 @@ html, body {
 .res-picker-item.active .res-item-badge {
   background: #4f46e5;
   color: #fff;
+}
+
+/* ==========================================================================
+   Comprehensive Responsive Adaptations for Mobile Devices
+   ========================================================================== */
+
+@media (max-width: 768px) {
+  /* ------------------------------------------------------------------------
+     1. Top Header Bar & Action Menus
+     ------------------------------------------------------------------------ */
+  .header-bar {
+    flex-wrap: wrap;
+    padding: 8px 12px 6px;
+    gap: 6px 8px;
+    background: rgba(15, 23, 42, 0.96);
+  }
+
+  /* Row 1: Left Navigation/Info & Center Progress */
+  .header-left {
+    order: 1;
+    flex: 1 1 auto;
+    min-width: 0;
+    gap: 8px;
+  }
+
+  .header-center {
+    order: 2;
+    flex: 0 0 auto;
+    max-width: 85px;
+    min-width: 65px;
+    justify-content: flex-end;
+  }
+
+  /* Row 2: Tool Modes & Action Buttons Strip */
+  .header-right {
+    order: 3;
+    width: 100%;
+    flex: 0 0 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 4px;
+    padding-top: 6px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .header-right::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Compact button styling on mobile */
+  .btn-label {
+    display: none !important;
+  }
+
+  #btn-gallery {
+    height: 32px;
+    padding: 0 8px;
+    border-radius: 8px;
+    flex-shrink: 0;
+  }
+
+  .artwork-meta {
+    min-width: 0;
+    flex-shrink: 1;
+  }
+
+  .artwork-title {
+    font-size: 13px;
+    font-weight: 700;
+    max-width: 125px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .artwork-artist {
+    display: none;
+  }
+
+  /* Compact Resolution Switcher Pill */
+  .header-res-dropdown-wrap {
+    flex-shrink: 0;
+    min-width: 0;
+  }
+
+  .btn-res-pill {
+    height: 30px;
+    padding: 0 8px;
+    font-size: 11px;
+    gap: 4px;
+    max-width: 130px;
+  }
+
+  #label-current-resolution {
+    max-width: 75px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 11px;
+  }
+
+  .btn-res-pill .res-icon {
+    font-size: 13px;
+  }
+
+  .btn-res-pill .res-caret {
+    font-size: 9px;
+  }
+
+  /* Compact Progress Pill */
+  .progress-pill {
+    padding: 3px 8px;
+    height: 28px;
+    gap: 6px;
+  }
+
+  .progress-track {
+    height: 4px;
+    width: 32px;
+  }
+
+  .progress-text {
+    font-size: 11px;
+    min-width: 24px;
+  }
+
+  /* Coloring Mode Tools (Pen, Erase, Pan) */
+  .tool-mode-group {
+    display: inline-flex;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.45);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: var(--radius-full);
+    padding: 2px;
+    flex-shrink: 0;
+    gap: 2px;
+  }
+
+  .tool-mode-group .btn-icon {
+    width: 32px;
+    height: 30px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-full);
+  }
+
+  /* Header action buttons */
+  .header-right > .btn-icon {
+    height: 30px;
+    min-width: 30px;
+    padding: 0 6px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    border-radius: 8px;
+  }
+
+  .header-right .btn-icon svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  /* Hint button badge on mobile */
+  #btn-hint {
+    position: relative;
+  }
+
+  #hint-badge {
+    position: absolute;
+    top: -3px;
+    right: -3px;
+    font-size: 8px;
+    min-width: 14px;
+    height: 14px;
+    padding: 0 2px;
+    line-height: 14px;
+  }
+
+  /* ------------------------------------------------------------------------
+     2. Quick Style & Detail Dropdown Menu -> Mobile Bottom Sheet
+     ------------------------------------------------------------------------ */
+  .quick-dropdown-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.65);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    z-index: 998;
+    animation: fadeInBackdrop 0.2s ease;
+  }
+
+  .quick-dropdown-backdrop.hidden {
+    display: none !important;
+  }
+
+  @keyframes fadeInBackdrop {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  .header-res-dropdown-wrap {
+    position: static;
+  }
+
+  .quick-style-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 8px;
+    right: 8px;
+    width: auto;
+    min-width: 0;
+    max-width: calc(100vw - 16px);
+    max-height: calc(85dvh - 100px);
+    overflow-y: auto;
+    border-radius: 16px;
+    border: 1px solid rgba(99, 102, 241, 0.45);
+    padding: 16px 16px calc(16px + env(safe-area-inset-bottom, 0px));
+    z-index: 999;
+    background: linear-gradient(160deg, #0f172a 0%, #1e1b4b 100%);
+    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.08);
+    animation: dropdownPop 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  /* Sheet handle bar */
+  .quick-style-dropdown::before {
+    content: '';
+    display: block;
+    width: 40px;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.28);
+    border-radius: 4px;
+    margin: 0 auto 12px auto;
+  }
+
+  .btn-close-quick {
+    display: inline-flex;
+  }
+
+  .btn-quick-style-toggle {
+    padding: 10px 8px;
+    font-size: 13px;
+  }
+
+  .quick-dropdown-item {
+    padding: 10px 14px;
+    min-height: 50px;
+  }
+
+  /* ------------------------------------------------------------------------
+     3. Artwork Library Modal Menu
+     ------------------------------------------------------------------------ */
+  .modal-overlay {
+    padding: 8px;
+    padding-bottom: calc(8px + env(safe-area-inset-bottom, 0px));
+  }
+
+  .modal-card {
+    padding: 16px 14px;
+    max-height: 95vh;
+    max-height: 95dvh;
+    border-radius: 16px;
+    gap: 14px;
+    overflow-x: hidden;
+  }
+
+  .modal-header-titles h2 {
+    font-size: 20px;
+  }
+
+  .modal-header-subtitle {
+    font-size: 12px;
+  }
+
+  .btn-close {
+    width: 32px;
+    height: 32px;
+    font-size: 20px;
+  }
+
+  /* Gallery Tabs Menu */
+  .gallery-tabs {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    flex-wrap: nowrap;
+    padding-bottom: 8px;
+    flex-shrink: 0;
+    width: 100%;
+  }
+
+  .gallery-tab {
+    flex: 0 0 auto;
+    height: 38px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 14px;
+    font-size: 12px;
+    font-weight: 700;
+    white-space: nowrap;
+    border-radius: var(--radius-full);
+  }
+
+  /* Artwork Cards Grid */
+  .artwork-grid {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .artwork-card .artwork-thumb-wrap {
+    height: 160px;
+  }
+
+  .res-pill {
+    padding: 6px 4px;
+    font-size: 11px;
+    min-width: 0;
+  }
+
+  /* ------------------------------------------------------------------------
+     4. My Pictures & Autosave Tab Menu
+     ------------------------------------------------------------------------ */
+  .saved-subsection {
+    padding: 14px 12px;
+    gap: 10px;
+    border-radius: 14px;
+  }
+
+  .saved-subsection-header {
+    gap: 8px;
+  }
+
+  .saved-empty-panel {
+    padding: 32px 16px;
+  }
+
+  .saved-empty-actions {
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+  }
+
+  .saved-empty-actions button {
+    width: 100%;
+    justify-content: center;
+  }
+
+  /* ------------------------------------------------------------------------
+     5. Make from Photo Studio Menu
+     ------------------------------------------------------------------------ */
+  .custom-studio-intro h3 {
+    font-size: 17px;
+  }
+
+  .custom-studio-intro .subtitle {
+    font-size: 12px;
+  }
+
+  .studio-mode-toggle {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .btn-studio-mode {
+    padding: 10px 8px;
+    gap: 8px;
+  }
+
+  .btn-studio-mode .mode-icon {
+    font-size: 20px;
+  }
+
+  .btn-studio-mode .mode-name {
+    font-size: 12px;
+    font-weight: 700;
+  }
+
+  .btn-studio-mode .mode-desc {
+    font-size: 10px;
+  }
+
+  .studio-mode-banner {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+    padding: 8px 12px;
+  }
+
+  .mode-banner-text {
+    font-size: 11px;
+  }
+
+  /* Stack Step 2 and Step 3 vertically on mobile! */
+  .custom-studio-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+    padding: 12px;
+  }
+
+  .preset-buttons {
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+  }
+
+  .btn-preset {
+    padding: 8px 10px;
+    font-size: 11px;
+  }
+
+  .studio-preview-box {
+    max-width: 100%;
+    margin-top: 6px;
+  }
+
+  .studio-preview-canvas {
+    max-width: 100%;
+    height: auto;
+  }
+
+  .btn-diff-chip {
+    padding: 10px 12px;
+  }
+
+  .diff-name {
+    font-size: 13px;
+  }
+
+  .diff-desc {
+    font-size: 11px;
+  }
+
+  .btn-large-action {
+    padding: 12px 14px;
+    font-size: 13px;
+  }
+
+  .generator-controls {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .generator-controls .btn-secondary {
+    width: 100%;
+  }
+
+  /* ------------------------------------------------------------------------
+     6. Canvas Floating Controls & Palette Tray
+     ------------------------------------------------------------------------ */
+  .floating-controls {
+    right: 12px;
+    top: 12px;
+    gap: 6px;
+  }
+
+  .btn-float {
+    width: 36px;
+    height: 36px;
+    font-size: 16px;
+  }
+
+  .palette-container {
+    padding: 8px 10px;
+    padding-bottom: calc(8px + env(safe-area-inset-bottom, 0px));
+  }
+
+  .swatch-circle {
+    width: 44px;
+    height: 44px;
+  }
+
+  .swatch-number {
+    font-size: 13px;
+  }
+
+  /* ------------------------------------------------------------------------
+     7. Other Modals (Resolution Picker, Victory Celebration, Conversion)
+     ------------------------------------------------------------------------ */
+  .res-picker-card {
+    width: 95%;
+    max-width: 400px;
+    padding: 18px 14px;
+  }
+
+  .res-picker-item {
+    padding: 10px 12px;
+  }
+
+  .res-item-name {
+    font-size: 13px;
+  }
+
+  .res-item-desc {
+    font-size: 11px;
+  }
+
+  .celebration-card {
+    width: 95%;
+    max-width: 380px;
+    padding: 20px 16px;
+  }
+
+  .celebration-title {
+    font-size: 20px;
+  }
+
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+  }
+
+  .stat-item {
+    padding: 8px 4px;
+  }
+
+  .stat-val {
+    font-size: 16px;
+  }
+
+  .modal-actions {
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+  }
+
+  .modal-actions button {
+    width: 100%;
+    justify-content: center;
+    height: 40px;
+  }
+}
+
+/* Extra small mobile screens (<= 380px) */
+@media (max-width: 380px) {
+  .artwork-title {
+    max-width: 85px;
+  }
+  .btn-res-pill {
+    max-width: 105px;
+  }
+  #label-current-resolution {
+    max-width: 55px;
+  }
+  .header-center {
+    max-width: 70px;
+  }
+  .studio-mode-toggle {
+    grid-template-columns: 1fr;
+  }
+  .preset-buttons {
+    grid-template-columns: 1fr;
+  }
 }
 
 

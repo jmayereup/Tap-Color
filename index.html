@@ -34,9 +34,13 @@
             <span class="res-caret">▾</span>
           </button>
           
+          <div id="quick-dropdown-backdrop" class="quick-dropdown-backdrop hidden"></div>
           <div id="quick-style-dropdown" class="quick-style-dropdown hidden" role="menu">
             <div class="quick-dropdown-header">
-              <span class="quick-dropdown-title" id="quick-dropdown-art-title">Art Style & Detail Level</span>
+              <div class="quick-dropdown-title-row">
+                <span class="quick-dropdown-title" id="quick-dropdown-art-title">Art Style & Detail Level</span>
+                <button type="button" id="btn-close-quick-dropdown" class="btn-close-quick" aria-label="Close menu">&times;</button>
+              </div>
               <span class="quick-dropdown-subtitle">Switch style or detail without leaving canvas</span>
             </div>
 
