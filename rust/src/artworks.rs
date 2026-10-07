@@ -717,16 +717,15 @@ pub fn generate_starry_night_diamond() -> ArtworkData {
             let u = c as f64 / (n - 1) as f64;
             let v = r as f64 / (n - 1) as f64;
 
-            let mut col = 1;
-            if v < 0.25 {
-                col = if c % 3 == 0 { 2 } else { 1 };
+            let mut col = if v < 0.25 {
+                if c % 3 == 0 { 2 } else { 1 }
             } else if v < 0.6 {
-                col = 2;
+                2
             } else if v < 0.72 {
-                col = 1;
+                1
             } else {
-                col = 12; // river
-            }
+                12 // river
+            };
 
             // Cosmic swirl wave 1
             let wave1 = (u * std::f64::consts::PI * 2.2 + 0.5).sin() * 0.15 + 0.38;
