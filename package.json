@@ -8,7 +8,8 @@
     "dev": "vite",
     "build": "npm run build:wasm && vite build",
     "preview": "vite preview",
-    "serve": "npx serve -l 8080 ."
+    "serve": "npx serve -l 8080 .",
+    "deploy": "npm run build && npx wrangler pages deploy dist"
   },
   "keywords": [
     "rust",

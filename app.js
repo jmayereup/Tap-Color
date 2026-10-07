@@ -705,7 +705,7 @@ class TapColorApp {
 
     // Attempt to load compiled Rust WebAssembly module
     try {
-      const wasmPath = './pkg/tap_color.js';
+      const wasmPath = `${import.meta.env.BASE_URL || '/'}pkg/tap_color.js`;
       const wasmModule = await import(/* @vite-ignore */ wasmPath);
       await wasmModule.default();
       this.controller = new wasmModule.GameController('game-canvas', this.currentArtworkId);

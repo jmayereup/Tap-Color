@@ -1,4 +1,5 @@
 import { defineConfig } from 'vite';
+import fs from 'node:fs';
 
 export default defineConfig({
   server: {
@@ -9,5 +10,16 @@ export default defineConfig({
     fs: {
       allow: ['.']
     }
-  }
+  },
+  plugins: [
+    {
+      name: 'copy-wasm-pkg',
+      closeBundle() {
+        if (fs.existsSync('pkg')) {
+          fs.cpSync('pkg', 'dist/pkg', { recursive: true });
+        }
+      }
+    }
+  ]
 });
+
