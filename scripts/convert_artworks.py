@@ -638,6 +638,34 @@ def main():
             "title": "Porch Golden Puppy",
             "artist": "Cottage Companions",
             "desc": "Adorable golden retriever puppy in a red bandana enjoying a sunny farm morning"
+        },
+        {
+            "key": "yorky_teacup",
+            "file": "yorky_teacup.jpeg",
+            "title": "Teacup Yorkie Ribbon",
+            "artist": "Petite Paws Studio",
+            "desc": "Adorable teacup Yorkshire Terrier puppy with pink bow nestled in vintage porcelain"
+        },
+        {
+            "key": "yorky_garden",
+            "file": "yorky_garden.jpeg",
+            "title": "Garden Blossom Yorkie",
+            "artist": "Cottage Petals",
+            "desc": "Cheerful Yorkshire Terrier puppy surrounded by blooming pansies and meadow lavender"
+        },
+        {
+            "key": "yorky_autumn",
+            "file": "yorky_autumn.jpeg",
+            "title": "Cozy Autumn Yorkie",
+            "artist": "Harvest Hearth",
+            "desc": "Sweet Yorkshire Terrier in a cozy red knit sweater among autumn maple leaves and pumpkins"
+        },
+        {
+            "key": "yorky_playful",
+            "file": "yorky_playful.jpeg",
+            "title": "Playful Meadow Yorkie",
+            "artist": "Sunny Pastures",
+            "desc": "Joyful Yorkshire Terrier puppy in a polka dot bandana playing with a ball in buttercups"
         }
     ]
     

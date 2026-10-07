@@ -406,5 +406,277 @@
         "thumbnailUrl": "assets/converted/country_puppy_pbn_masterpiece_thumb.png"
       }
     ]
+  },
+  {
+    "key": "yorky_teacup",
+    "title": "Teacup Yorkie Ribbon",
+    "artist": "Petite Paws Studio",
+    "desc": "Adorable teacup Yorkshire Terrier puppy with pink bow nestled in vintage porcelain",
+    "originalAsset": "assets/yorky_teacup.jpeg",
+    "diamondVariants": [
+      {
+        "id": "yorky_teacup_diamond_80",
+        "resolution": "Cozy (6.4k)",
+        "label": "80\u00d780",
+        "grid": 80,
+        "pieces": 6400,
+        "colors": 18,
+        "jsonFile": "assets/converted/yorky_teacup_diamond_80.json",
+        "thumbnailUrl": "assets/converted/yorky_teacup_diamond_80_thumb.png"
+      },
+      {
+        "id": "yorky_teacup_diamond_120",
+        "resolution": "Standard (14.4k)",
+        "label": "120\u00d7120",
+        "grid": 120,
+        "pieces": 14400,
+        "colors": 26,
+        "jsonFile": "assets/converted/yorky_teacup_diamond_120.json",
+        "thumbnailUrl": "assets/converted/yorky_teacup_diamond_120_thumb.png"
+      },
+      {
+        "id": "yorky_teacup_diamond_160",
+        "resolution": "Masterpiece (25.6k)",
+        "label": "160\u00d7160",
+        "grid": 160,
+        "pieces": 25600,
+        "colors": 36,
+        "jsonFile": "assets/converted/yorky_teacup_diamond_160.json",
+        "thumbnailUrl": "assets/converted/yorky_teacup_diamond_160_thumb.png"
+      }
+    ],
+    "pbnVariants": [
+      {
+        "id": "yorky_teacup_pbn_detailed",
+        "resolution": "Detailed (800+)",
+        "complexity": "detailed",
+        "pieces": 287,
+        "colors": 16,
+        "jsonFile": "assets/converted/yorky_teacup_pbn_detailed.json",
+        "thumbnailUrl": "assets/converted/yorky_teacup_pbn_detailed_thumb.png"
+      },
+      {
+        "id": "yorky_teacup_pbn_intricate",
+        "resolution": "Intricate (2,000+)",
+        "complexity": "intricate",
+        "pieces": 549,
+        "colors": 24,
+        "jsonFile": "assets/converted/yorky_teacup_pbn_intricate.json",
+        "thumbnailUrl": "assets/converted/yorky_teacup_pbn_intricate_thumb.png"
+      },
+      {
+        "id": "yorky_teacup_pbn_masterpiece",
+        "resolution": "Masterpiece (4,000+)",
+        "complexity": "masterpiece",
+        "pieces": 850,
+        "colors": 31,
+        "jsonFile": "assets/converted/yorky_teacup_pbn_masterpiece.json",
+        "thumbnailUrl": "assets/converted/yorky_teacup_pbn_masterpiece_thumb.png"
+      }
+    ]
+  },
+  {
+    "key": "yorky_garden",
+    "title": "Garden Blossom Yorkie",
+    "artist": "Cottage Petals",
+    "desc": "Cheerful Yorkshire Terrier puppy surrounded by blooming pansies and meadow lavender",
+    "originalAsset": "assets/yorky_garden.jpeg",
+    "diamondVariants": [
+      {
+        "id": "yorky_garden_diamond_80",
+        "resolution": "Cozy (6.4k)",
+        "label": "80\u00d780",
+        "grid": 80,
+        "pieces": 6400,
+        "colors": 18,
+        "jsonFile": "assets/converted/yorky_garden_diamond_80.json",
+        "thumbnailUrl": "assets/converted/yorky_garden_diamond_80_thumb.png"
+      },
+      {
+        "id": "yorky_garden_diamond_120",
+        "resolution": "Standard (14.4k)",
+        "label": "120\u00d7120",
+        "grid": 120,
+        "pieces": 14400,
+        "colors": 26,
+        "jsonFile": "assets/converted/yorky_garden_diamond_120.json",
+        "thumbnailUrl": "assets/converted/yorky_garden_diamond_120_thumb.png"
+      },
+      {
+        "id": "yorky_garden_diamond_160",
+        "resolution": "Masterpiece (25.6k)",
+        "label": "160\u00d7160",
+        "grid": 160,
+        "pieces": 25600,
+        "colors": 36,
+        "jsonFile": "assets/converted/yorky_garden_diamond_160.json",
+        "thumbnailUrl": "assets/converted/yorky_garden_diamond_160_thumb.png"
+      }
+    ],
+    "pbnVariants": [
+      {
+        "id": "yorky_garden_pbn_detailed",
+        "resolution": "Detailed (800+)",
+        "complexity": "detailed",
+        "pieces": 243,
+        "colors": 16,
+        "jsonFile": "assets/converted/yorky_garden_pbn_detailed.json",
+        "thumbnailUrl": "assets/converted/yorky_garden_pbn_detailed_thumb.png"
+      },
+      {
+        "id": "yorky_garden_pbn_intricate",
+        "resolution": "Intricate (2,000+)",
+        "complexity": "intricate",
+        "pieces": 601,
+        "colors": 24,
+        "jsonFile": "assets/converted/yorky_garden_pbn_intricate.json",
+        "thumbnailUrl": "assets/converted/yorky_garden_pbn_intricate_thumb.png"
+      },
+      {
+        "id": "yorky_garden_pbn_masterpiece",
+        "resolution": "Masterpiece (4,000+)",
+        "complexity": "masterpiece",
+        "pieces": 1119,
+        "colors": 32,
+        "jsonFile": "assets/converted/yorky_garden_pbn_masterpiece.json",
+        "thumbnailUrl": "assets/converted/yorky_garden_pbn_masterpiece_thumb.png"
+      }
+    ]
+  },
+  {
+    "key": "yorky_autumn",
+    "title": "Cozy Autumn Yorkie",
+    "artist": "Harvest Hearth",
+    "desc": "Sweet Yorkshire Terrier in a cozy red knit sweater among autumn maple leaves and pumpkins",
+    "originalAsset": "assets/yorky_autumn.jpeg",
+    "diamondVariants": [
+      {
+        "id": "yorky_autumn_diamond_80",
+        "resolution": "Cozy (6.4k)",
+        "label": "80\u00d780",
+        "grid": 80,
+        "pieces": 6400,
+        "colors": 18,
+        "jsonFile": "assets/converted/yorky_autumn_diamond_80.json",
+        "thumbnailUrl": "assets/converted/yorky_autumn_diamond_80_thumb.png"
+      },
+      {
+        "id": "yorky_autumn_diamond_120",
+        "resolution": "Standard (14.4k)",
+        "label": "120\u00d7120",
+        "grid": 120,
+        "pieces": 14400,
+        "colors": 26,
+        "jsonFile": "assets/converted/yorky_autumn_diamond_120.json",
+        "thumbnailUrl": "assets/converted/yorky_autumn_diamond_120_thumb.png"
+      },
+      {
+        "id": "yorky_autumn_diamond_160",
+        "resolution": "Masterpiece (25.6k)",
+        "label": "160\u00d7160",
+        "grid": 160,
+        "pieces": 25600,
+        "colors": 36,
+        "jsonFile": "assets/converted/yorky_autumn_diamond_160.json",
+        "thumbnailUrl": "assets/converted/yorky_autumn_diamond_160_thumb.png"
+      }
+    ],
+    "pbnVariants": [
+      {
+        "id": "yorky_autumn_pbn_detailed",
+        "resolution": "Detailed (800+)",
+        "complexity": "detailed",
+        "pieces": 139,
+        "colors": 15,
+        "jsonFile": "assets/converted/yorky_autumn_pbn_detailed.json",
+        "thumbnailUrl": "assets/converted/yorky_autumn_pbn_detailed_thumb.png"
+      },
+      {
+        "id": "yorky_autumn_pbn_intricate",
+        "resolution": "Intricate (2,000+)",
+        "complexity": "intricate",
+        "pieces": 432,
+        "colors": 24,
+        "jsonFile": "assets/converted/yorky_autumn_pbn_intricate.json",
+        "thumbnailUrl": "assets/converted/yorky_autumn_pbn_intricate_thumb.png"
+      },
+      {
+        "id": "yorky_autumn_pbn_masterpiece",
+        "resolution": "Masterpiece (4,000+)",
+        "complexity": "masterpiece",
+        "pieces": 816,
+        "colors": 32,
+        "jsonFile": "assets/converted/yorky_autumn_pbn_masterpiece.json",
+        "thumbnailUrl": "assets/converted/yorky_autumn_pbn_masterpiece_thumb.png"
+      }
+    ]
+  },
+  {
+    "key": "yorky_playful",
+    "title": "Playful Meadow Yorkie",
+    "artist": "Sunny Pastures",
+    "desc": "Joyful Yorkshire Terrier puppy in a polka dot bandana playing with a ball in buttercups",
+    "originalAsset": "assets/yorky_playful.jpeg",
+    "diamondVariants": [
+      {
+        "id": "yorky_playful_diamond_80",
+        "resolution": "Cozy (6.4k)",
+        "label": "80\u00d780",
+        "grid": 80,
+        "pieces": 6400,
+        "colors": 18,
+        "jsonFile": "assets/converted/yorky_playful_diamond_80.json",
+        "thumbnailUrl": "assets/converted/yorky_playful_diamond_80_thumb.png"
+      },
+      {
+        "id": "yorky_playful_diamond_120",
+        "resolution": "Standard (14.4k)",
+        "label": "120\u00d7120",
+        "grid": 120,
+        "pieces": 14400,
+        "colors": 26,
+        "jsonFile": "assets/converted/yorky_playful_diamond_120.json",
+        "thumbnailUrl": "assets/converted/yorky_playful_diamond_120_thumb.png"
+      },
+      {
+        "id": "yorky_playful_diamond_160",
+        "resolution": "Masterpiece (25.6k)",
+        "label": "160\u00d7160",
+        "grid": 160,
+        "pieces": 25600,
+        "colors": 36,
+        "jsonFile": "assets/converted/yorky_playful_diamond_160.json",
+        "thumbnailUrl": "assets/converted/yorky_playful_diamond_160_thumb.png"
+      }
+    ],
+    "pbnVariants": [
+      {
+        "id": "yorky_playful_pbn_detailed",
+        "resolution": "Detailed (800+)",
+        "complexity": "detailed",
+        "pieces": 181,
+        "colors": 15,
+        "jsonFile": "assets/converted/yorky_playful_pbn_detailed.json",
+        "thumbnailUrl": "assets/converted/yorky_playful_pbn_detailed_thumb.png"
+      },
+      {
+        "id": "yorky_playful_pbn_intricate",
+        "resolution": "Intricate (2,000+)",
+        "complexity": "intricate",
+        "pieces": 363,
+        "colors": 24,
+        "jsonFile": "assets/converted/yorky_playful_pbn_intricate.json",
+        "thumbnailUrl": "assets/converted/yorky_playful_pbn_intricate_thumb.png"
+      },
+      {
+        "id": "yorky_playful_pbn_masterpiece",
+        "resolution": "Masterpiece (4,000+)",
+        "complexity": "masterpiece",
+        "pieces": 810,
+        "colors": 31,
+        "jsonFile": "assets/converted/yorky_playful_pbn_masterpiece.json",
+        "thumbnailUrl": "assets/converted/yorky_playful_pbn_masterpiece_thumb.png"
+      }
+    ]
   }
 ]
