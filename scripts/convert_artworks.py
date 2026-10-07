@@ -591,8 +591,9 @@ def convert_to_paint_by_number(img_path, complexity, title, artist, output_id, o
     return artwork
 
 def main():
-    assets_dir = "/home/jmayer/Dev/Tap-Color/assets"
-    output_dir = "/home/jmayer/Dev/Tap-Color/assets/converted"
+    base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    assets_dir = os.path.join(base_dir, "public", "assets")
+    output_dir = os.path.join(assets_dir, "converted")
     os.makedirs(output_dir, exist_ok=True)
     
     catalog = [

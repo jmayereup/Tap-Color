@@ -40,9 +40,9 @@ From this folder (`/home/jmayer/Dev/Tap-Color`):
 
 ### 1. Compile the Rust WebAssembly Package
 ```bash
-wasm-pack build --target web --out-dir pkg
+wasm-pack build --target web --out-dir public/pkg
 ```
-This generates the optimized `.wasm` binary and JavaScript interop bindings in the `pkg/` directory.
+This generates the optimized `.wasm` binary and JavaScript interop bindings in the `public/pkg/` directory.
 
 ### 2. Launch Local Web Server
 You can launch using any of the following:

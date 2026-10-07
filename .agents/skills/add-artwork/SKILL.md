@@ -15,17 +15,17 @@ This guide outlines the end-to-end workflow for adding new high-quality artworks
 ## Architecture Overview
 
 ```text
- assets/<name>.jpeg                   (Original image source)
+ public/assets/<name>.jpeg            (Original image source)
         │
         ▼
  scripts/convert_artworks.py         (Auto-framing, K-Means++ clustering & watershed vectorizer)
         │
-        ├─► assets/converted/<id>.json           (Region geometries, labels, color palette)
-        ├─► assets/converted/<id>_thumb.png      (Optimized gallery thumbnail)
-        └─► assets/converted/manifest.json       (Master index of all artworks & variants)
+        ├─► public/assets/converted/<id>.json      (Region geometries, labels, color palette)
+        ├─► public/assets/converted/<id>_thumb.png (Optimized gallery thumbnail)
+        └─► public/assets/converted/manifest.json  (Master index of all artworks & variants)
         │
         ▼
- app.js (this.artworksMeta)           (Frontend gallery & game configuration)
+ src/app.js (this.artworksMeta)       (Frontend gallery & game configuration)
  index.html (Make from Photo preset)  (Optional quick-load preset button)
 ```
 
@@ -48,12 +48,12 @@ For optimal vectorization and gameplay satisfaction, source images should adhere
 
 ## 2. Step-by-Step Procedure
 
-### Step 1: Place Original Image in `assets/`
+### Step 1: Place Original Image in `public/assets/`
 
-Copy or generate the source image into the project `assets/` directory:
+Copy or generate the source image into the project `public/assets/` directory:
 ```bash
 # Example
-assets/cottage_garden.jpeg
+public/assets/cottage_garden.jpeg
 ```
 
 ---
@@ -101,11 +101,11 @@ For each artwork, 6 variants are generated in `assets/converted/`:
 
 ---
 
-### Step 4: Register in `app.js` (`this.artworksMeta`)
+### Step 4: Register in `src/app.js` (`this.artworksMeta`)
 
-Open [assets/converted/manifest.json](file:///home/jmayer/Dev/Tap-Color/assets/converted/manifest.json) to inspect the generated `pieces` and `colors` counts for your new artwork.
+Open [public/assets/converted/manifest.json](file:///home/jmayer/Dev/Tap-Color/public/assets/converted/manifest.json) to inspect the generated `pieces` and `colors` counts for your new artwork.
 
-Then open [app.js](file:///home/jmayer/Dev/Tap-Color/app.js) and add two entries to `this.artworksMeta`:
+Then open [src/app.js](file:///home/jmayer/Dev/Tap-Color/src/app.js) and add two entries to `this.artworksMeta`:
 
 #### 1. Diamond Painting Entry (in the Diamond section):
 ```javascript

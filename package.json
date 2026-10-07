@@ -4,7 +4,7 @@
   "description": "A polished tap-to-color game compiled to WebAssembly with Rust and HTML5 Canvas",
   "type": "module",
   "scripts": {
-    "build:wasm": "wasm-pack build --target web --out-dir pkg",
+    "build:wasm": "wasm-pack build --target web --out-dir public/pkg",
     "dev": "vite",
     "build": "npm run build:wasm && vite build",
     "preview": "vite preview",

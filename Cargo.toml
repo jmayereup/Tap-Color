@@ -7,6 +7,7 @@ description = "A polished tap-to-color game compiled to WebAssembly with Rust an
 
 [lib]
 crate-type = ["cdylib", "rlib"]
+path = "rust/src/lib.rs"
 
 [dependencies]
 wasm-bindgen = "0.2.129"

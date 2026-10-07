@@ -4,6 +4,7 @@ target/
 
 # WebAssembly & wasm-pack build output
 pkg/
+public/pkg/
 
 # Node & Package Managers
 node_modules/
