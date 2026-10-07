@@ -6,6 +6,7 @@ at 3 different resolutions each for country life & Christian themes.
 """
 
 import os
+import sys
 import json
 import math
 from collections import deque, Counter
@@ -17,36 +18,112 @@ def rgb_to_hex(r, g, b):
 def get_luminance(r, g, b):
     return 0.299 * r + 0.587 * g + 0.114 * b
 
+import random
+
+def detect_content_bounds(im):
+    w, h = im.size
+    sample = im.resize((200, 200), Image.Resampling.BOX)
+    pix = sample.load()
+    corners = [pix[1, 1], pix[198, 1], pix[1, 198], pix[198, 198]]
+    def is_bg(c):
+        return c[0] > 240 and c[1] > 240 and c[2] > 240
+    if not all(is_bg(c) for c in corners):
+        return 0, 0, w, h
+    min_x, max_x, min_y, max_y = 200, 0, 200, 0
+    non_bg = 0
+    for y in range(200):
+        for x in range(200):
+            c = pix[x, y]
+            if not is_bg(c):
+                if x < min_x: min_x = x
+                if x > max_x: max_x = x
+                if y < min_y: min_y = y
+                if y > max_y: max_y = y
+                non_bg += 1
+    if non_bg < 50 or max_x <= min_x or max_y <= min_y:
+        return 0, 0, w, h
+    scale_x = w / 200.0
+    scale_y = h / 200.0
+    rx0, rx1 = min_x * scale_x, max_x * scale_x
+    ry0, ry1 = min_y * scale_y, max_y * scale_y
+    cw, ch = rx1 - rx0, ry1 - ry0
+    pad_x = cw * 0.04
+    pad_y = ch * 0.04
+    sx = max(0, int(rx0 - pad_x))
+    sy = max(0, int(ry0 - pad_y))
+    sw = min(w - sx, int(cw + pad_x * 2))
+    sh = min(h - sy, int(ch + pad_y * 2))
+    return sx, sy, sw, sh
+
+def prepare_framed_image(im, target_size):
+    sx, sy, sw, sh = detect_content_bounds(im)
+    cropped = im.crop((sx, sy, sx + sw, sy + sh))
+    scale = min(target_size / sw, target_size / sh)
+    dw = int(round(sw * scale))
+    dh = int(round(sh * scale))
+    resized = cropped.resize((dw, dh), Image.Resampling.LANCZOS)
+    canvas = Image.new('RGB', (target_size, target_size), (255, 255, 255))
+    dx = (target_size - dw) // 2
+    dy = (target_size - dh) // 2
+    canvas.paste(resized, (dx, dy))
+    return canvas
+
+def kmeans_pp(samples, K, max_iter=12):
+    random.seed(42)
+    centers = [list(random.choice(samples))]
+    for _ in range(1, K):
+        dists = []
+        for s in samples:
+            min_d = min((s[0]-c[0])**2 + (s[1]-c[1])**2 + (s[2]-c[2])**2 for c in centers)
+            dists.append(min_d)
+        total = sum(dists)
+        if total == 0:
+            centers.append(list(random.choice(samples)))
+            continue
+        r = random.random() * total
+        acc = 0
+        for i, d in enumerate(dists):
+            acc += d
+            if acc >= r:
+                centers.append(list(samples[i]))
+                break
+    for _ in range(max_iter):
+        sums = [[0, 0, 0] for _ in range(K)]
+        counts = [0] * K
+        for s in samples:
+            best_k = min(range(K), key=lambda k: (s[0]-centers[k][0])**2 + (s[1]-centers[k][1])**2 + (s[2]-centers[k][2])**2)
+            sums[best_k][0] += s[0]
+            sums[best_k][1] += s[1]
+            sums[best_k][2] += s[2]
+            counts[best_k] += 1
+        for k in range(K):
+            if counts[k] > 0:
+                centers[k] = [sums[k][0] // counts[k], sums[k][1] // counts[k], sums[k][2] // counts[k]]
+    return centers
+
 # --- Diamond Art Generator ---
 def convert_to_diamond_art(img_path, N, K, title, artist, output_id, output_dir):
     json_path = os.path.join(output_dir, f"{output_id}.json")
     thumb_path = os.path.join(output_dir, f"{output_id}_thumb.png")
-    if os.path.exists(json_path) and os.path.exists(thumb_path):
-        with open(json_path, 'r', encoding='utf-8') as f:
-            artwork = json.load(f)
-        print(f"  [Diamond] {output_id} (cached): {len(artwork['regions'])} drills")
-        return artwork
 
     im = Image.open(img_path).convert('RGB')
-    # Resize to N x N
-    im_resized = im.resize((N, N), Image.Resampling.LANCZOS)
+    im_framed = prepare_framed_image(im, N)
     
-    # Adaptive palette quantization
-    quant = im_resized.convert('P', palette=Image.ADAPTIVE, colors=K)
-    raw_pal = quant.getpalette()[:K*3]
-    centers = [tuple(raw_pal[i:i+3]) for i in range(0, len(raw_pal), 3)]
-    
+    # Subsample pixels for k-means++ color clustering
+    samples = []
+    pix = im_framed.load()
+    sample_step = max(1, N // 30)
+    for y in range(0, N, sample_step):
+        for x in range(0, N, sample_step):
+            samples.append(pix[x, y])
+            
+    centers = kmeans_pp(samples, K, max_iter=12)
     # Sort palette colors by perceived brightness (descending)
-    indexed_centers = list(enumerate(centers))
-    indexed_centers.sort(key=lambda item: get_luminance(*item[1]), reverse=True)
-    
-    # Remap old indices to new sorted indices (0-indexed)
-    remap = {old_idx: new_idx for new_idx, (old_idx, _) in enumerate(indexed_centers)}
-    sorted_centers = [c for _, c in indexed_centers]
+    centers.sort(key=lambda c: get_luminance(*c), reverse=True)
     
     # Build Palette list
     palette = []
-    for idx, c in enumerate(sorted_centers):
+    for idx, c in enumerate(centers):
         palette.append({
             "number": idx + 1,
             "hex": rgb_to_hex(*c),
@@ -64,19 +141,19 @@ def convert_to_diamond_art(img_path, N, K, title, artist, output_id, output_dir)
     
     regions = []
     reg_id = 0
-    quant_pixels = quant.load()
+    cR = [c[0] for c in centers]
+    cG = [c[1] for c in centers]
+    cB = [c[2] for c in centers]
     
     for r in range(N):
         y0 = margin + r * cell_size
         y1 = y0 + cell_size
         cy = (y0 + y1) * 0.5
         for c in range(N):
-            raw_idx = quant_pixels[c, r]
-            if raw_idx >= len(centers):
-                raw_idx = 0
-            new_idx = remap.get(raw_idx, 0)
-            palette[new_idx]["total_count"] += 1
-            num = new_idx + 1
+            pr, pg, pb = pix[c, r]
+            best_k = min(range(K), key=lambda k: (pr-cR[k])**2 + (pg-cG[k])**2 + (pb-cB[k])**2)
+            palette[best_k]["total_count"] += 1
+            num = best_k + 1
             
             x0 = margin + c * cell_size
             x1 = x0 + cell_size
@@ -92,7 +169,7 @@ def convert_to_diamond_art(img_path, N, K, title, artist, output_id, output_dir)
                     {"x": round(x0, 2), "y": round(y1, 2)},
                 ],
                 "centroid": {"x": round(cx, 2), "y": round(cy, 2)},
-                "color_hex": palette[new_idx]["hex"],
+                "color_hex": palette[best_k]["hex"],
                 "is_filled": False,
                 "fill_anim": 0.0
             })
@@ -125,11 +202,13 @@ def convert_to_diamond_art(img_path, N, K, title, artist, output_id, output_dir)
     t_ox = (thumb_w - N * t_cell) / 2
     t_oy = (thumb_h - N * t_cell) / 2
     
+    drill_idx = 0
     for r in range(N):
         for c in range(N):
-            raw_idx = quant_pixels[c, r]
-            new_idx = remap.get(raw_idx, 0)
-            col = sorted_centers[new_idx]
+            drill = regions[drill_idx]
+            drill_idx += 1
+            col_hex = drill["color_hex"].lstrip('#')
+            col = tuple(int(col_hex[i:i+2], 16) for i in (0, 2, 4))
             x0 = t_ox + c * t_cell
             y0 = t_oy + r * t_cell
             draw.rectangle([x0, y0, x0 + t_cell - 0.5, y0 + t_cell - 0.5], fill=col)
@@ -201,8 +280,8 @@ def chaikin_smooth(points, iters=1):
         for i in range(n):
             p1 = curr[i]
             p2 = curr[(i + 1) % n]
-            nxt.append((p1[0] * 0.75 + p2[0] * 0.25, p1[1] * 0.75 + p2[1] * 0.25))
-            nxt.append((p1[0] * 0.25 + p2[0] * 0.75, p1[1] * 0.25 + p2[1] * 0.75))
+            nxt.append((p1[0] * 0.85 + p2[0] * 0.15, p1[1] * 0.85 + p2[1] * 0.15))
+            nxt.append((p1[0] * 0.15 + p2[0] * 0.85, p1[1] * 0.15 + p2[1] * 0.85))
         curr = nxt
     return curr
 
@@ -278,40 +357,41 @@ def calc_internal_centroid(comp_pixels, W):
 def convert_to_paint_by_number(img_path, complexity, title, artist, output_id, output_dir):
     json_path = os.path.join(output_dir, f"{output_id}.json")
     thumb_path = os.path.join(output_dir, f"{output_id}_thumb.png")
-    if os.path.exists(json_path) and os.path.exists(thumb_path):
-        with open(json_path, 'r', encoding='utf-8') as f:
-            artwork = json.load(f)
-        print(f"  [Paint-by-Number] {output_id} (cached): {len(artwork['regions'])} regions, {len(artwork['palette'])} colors")
-        return artwork
 
     presets = {
-        'detailed': {'K': 20, 'W': 320, 'min_pixels': 20, 'epsilon': 0.95},
-        'intricate': {'K': 28, 'W': 400, 'min_pixels': 12, 'epsilon': 0.70},
-        'masterpiece': {'K': 36, 'W': 480, 'min_pixels': 8, 'epsilon': 0.50},
+        'detailed': {'K': 16, 'W': 320, 'min_pixels': 22, 'epsilon': 0.70},
+        'intricate': {'K': 24, 'W': 360, 'min_pixels': 14, 'epsilon': 0.60},
+        'masterpiece': {'K': 32, 'W': 420, 'min_pixels': 10, 'epsilon': 0.50},
     }
     cfg = presets[complexity]
     K, W, min_pixels, epsilon = cfg['K'], cfg['W'], cfg['min_pixels'], cfg['epsilon']
     
     im = Image.open(img_path).convert('RGB')
-    im_resized = im.resize((W, W), Image.Resampling.LANCZOS)
-    im_smoothed = im_resized.filter(ImageFilter.GaussianBlur(radius=1.2))
+    im_framed = prepare_framed_image(im, W)
+    im_smoothed = im_framed.filter(ImageFilter.MedianFilter(size=3))
     
-    quant = im_smoothed.convert('P', palette=Image.ADAPTIVE, colors=K)
-    raw_pal = quant.getpalette()[:K*3]
-    centers = [tuple(raw_pal[i:i+3]) for i in range(0, len(raw_pal), 3)]
+    # Sample pixels for k-means++
+    samples = []
+    pix = im_smoothed.load()
+    step = max(1, W // 40)
+    for y in range(0, W, step):
+        for x in range(0, W, step):
+            samples.append(pix[x, y])
+            
+    centers = kmeans_pp(samples, K, max_iter=12)
+    # Sort palette colors by perceived brightness (descending)
+    centers.sort(key=lambda c: get_luminance(*c), reverse=True)
     
-    # Sort palette by perceived brightness (descending)
-    indexed_centers = list(enumerate(centers))
-    indexed_centers.sort(key=lambda item: get_luminance(*item[1]), reverse=True)
-    remap = {old_idx: new_idx for new_idx, (old_idx, _) in enumerate(indexed_centers)}
-    sorted_centers = [c for _, c in indexed_centers]
+    cR = [c[0] for c in centers]
+    cG = [c[1] for c in centers]
+    cB = [c[2] for c in centers]
     
-    pixels = quant.load()
     grid = [0] * (W * W)
     for y in range(W):
         for x in range(W):
-            raw_idx = pixels[x, y]
-            grid[y * W + x] = remap.get(raw_idx, 0)
+            pr, pg, pb = pix[x, y]
+            best_k = min(range(K), key=lambda k: (pr-cR[k])**2 + (pg-cG[k])**2 + (pb-cB[k])**2)
+            grid[y * W + x] = best_k
             
     # Majority filter (speckle cleaning)
     for _ in range(2):
@@ -329,56 +409,76 @@ def convert_to_paint_by_number(img_path, complexity, title, artist, output_id, o
                     new_grid[idx] = dom
         grid = new_grid
         
-    # Connected component labeling (BFS)
-    labels = [-1] * (W * W)
-    components = []
-    next_label = 0
-    
-    for y in range(W):
-        for x in range(W):
-            idx = y * W + x
-            if labels[idx] != -1:
-                continue
-            color = grid[idx]
-            label = next_label
-            next_label += 1
-            labels[idx] = label
-            
-            q = deque([idx])
-            comp_pixels = []
-            
-            while q:
-                curr = q.popleft()
-                comp_pixels.append(curr)
-                cx = curr % W
-                cy = curr // W
+    # Watershed neighbor merge: absorb micro-regions (< min_pixels) into adjacent neighbors
+    for _ in range(5):
+        labels = [-1] * (W * W)
+        components = []
+        next_label = 0
+        for y in range(W):
+            for x in range(W):
+                idx = y * W + x
+                if labels[idx] != -1:
+                    continue
+                color = grid[idx]
+                label = next_label
+                next_label += 1
+                labels[idx] = label
                 
-                # Check 4 neighbors
-                if cx > 0:
-                    left = curr - 1
-                    if labels[left] == -1 and grid[left] == color:
-                        labels[left] = label
-                        q.append(left)
-                if cx < W - 1:
-                    right = curr + 1
-                    if labels[right] == -1 and grid[right] == color:
-                        labels[right] = label
-                        q.append(right)
-                if cy > 0:
-                    up = curr - W
-                    if labels[up] == -1 and grid[up] == color:
-                        labels[up] = label
-                        q.append(up)
-                if cy < W - 1:
-                    down = curr + W
-                    if labels[down] == -1 and grid[down] == color:
-                        labels[down] = label
-                        q.append(down)
-                        
-            components.append({'label': label, 'color': color, 'pixels': comp_pixels})
+                q = deque([idx])
+                comp_pixels = []
+                while q:
+                    curr = q.popleft()
+                    comp_pixels.append(curr)
+                    cx = curr % W
+                    cy = curr // W
+                    if cx > 0 and labels[curr - 1] == -1 and grid[curr - 1] == color:
+                        labels[curr - 1] = label
+                        q.append(curr - 1)
+                    if cx < W - 1 and labels[curr + 1] == -1 and grid[curr + 1] == color:
+                        labels[curr + 1] = label
+                        q.append(curr + 1)
+                    if cy > 0 and labels[curr - W] == -1 and grid[curr - W] == color:
+                        labels[curr - W] = label
+                        q.append(curr - W)
+                    if cy < W - 1 and labels[curr + W] == -1 and grid[curr + W] == color:
+                        labels[curr + W] = label
+                        q.append(curr + W)
+                components.append({'label': label, 'color': color, 'pixels': comp_pixels})
+        
+        small_comps = [c for c in components if len(c['pixels']) < min_pixels]
+        if not small_comps:
+            break
+        small_comps.sort(key=lambda c: len(c['pixels']))
+        merged_any = False
+        for c in small_comps:
+            contact = Counter()
+            for p in c['pixels']:
+                cx = p % W
+                cy = p // W
+                if cx > 0 and labels[p - 1] != c['label']:
+                    contact[grid[p - 1]] += 1
+                if cx < W - 1 and labels[p + 1] != c['label']:
+                    contact[grid[p + 1]] += 1
+                if cy > 0 and labels[p - W] != c['label']:
+                    contact[grid[p - W]] += 1
+                if cy < W - 1 and labels[p + W] != c['label']:
+                    contact[grid[p + W]] += 1
+            if not contact:
+                continue
+            cur_rgb = centers[c['color']]
+            def score(cand):
+                n_rgb = centers[cand]
+                cdist = math.sqrt(sum((a - b)**2 for a, b in zip(cur_rgb, n_rgb)))
+                return contact[cand] * 1000 - cdist
+            best_col = max(contact.keys(), key=score)
+            for p in c['pixels']:
+                grid[p] = best_col
+            merged_any = True
+        if not merged_any:
+            break
             
-    # Filter valid components
-    valid_components = [c for c in components if len(c['pixels']) >= min_pixels]
+    # Filter valid components (100% planar partition, zero dropped holes)
+    valid_components = [c for c in components if len(c['pixels']) >= 3]
     
     width = 800
     height = 800
@@ -391,7 +491,7 @@ def convert_to_paint_by_number(img_path, complexity, title, artist, output_id, o
     
     # Initialize palette
     palette = []
-    for idx, c in enumerate(sorted_centers):
+    for idx, c in enumerate(centers):
         palette.append({
             "number": idx + 1,
             "hex": rgb_to_hex(*c),
@@ -497,39 +597,46 @@ def main():
     
     catalog = [
         {
-            "key": "country_chapel",
-            "file": "country_chapel.jpg",
-            "title": "Country Chapel in Meadow",
-            "artist": "Heartland Faith Studio",
-            "desc": "Little white country chapel with steeple & cross, grazing sheep, sunflowers, and split-rail fence bathed in morning rays"
-        },
-        {
-            "key": "good_shepherd",
-            "file": "good_shepherd.jpg",
-            "title": "The Lord is My Shepherd",
-            "artist": "Psalm 23 Heritage",
-            "desc": "Peaceful rolling pasture with mother sheep and lambs resting beside still waters and stone bridge"
-        },
-        {
-            "key": "country_porch_bible",
-            "file": "country_porch_bible.jpg",
-            "title": "Devotions on the Porch",
-            "artist": "Country Cottage Morning",
-            "desc": "Open Holy Bible, reading glasses, wild garden bouquet, and quilt on a rustic rocking chair overlooking red barn"
-        },
-        {
-            "key": "cross_and_dogwood",
-            "file": "cross_and_dogwood.jpg",
-            "title": "Old Rugged Cross & Dogwoods",
-            "artist": "Grace & Glory Studio",
-            "desc": "Handcrafted timber cross adorned with blooming dogwoods and wild roses overlooking tranquil valley at sunrise"
-        },
-        {
             "key": "fluffy_cow",
             "file": "fluffy-cow-3.jpeg",
             "title": "Sweet Highland Calf",
             "artist": "Country Homestead",
             "desc": "Gentle fluffy highland cow calf surrounded by meadow wildflowers and rustic wooden pasture"
+        },
+        {
+            "key": "hummingbird",
+            "file": "hummingbird.jpeg",
+            "title": "Garden Hummingbird",
+            "artist": "Sunlit Meadow",
+            "desc": "Vibrant hummingbird sipping sweet nectar among blooming country garden flora"
+        },
+        {
+            "key": "country_barn",
+            "file": "country_barn.jpeg",
+            "title": "Rustic Red Barn",
+            "artist": "Heartland Heritage",
+            "desc": "Classic red country barn with silo, split-rail fence, and sunflowers under sunny blue sky"
+        },
+        {
+            "key": "country_rooster",
+            "file": "country_rooster.jpeg",
+            "title": "Morning Farm Rooster",
+            "artist": "Sunrise Farmstead",
+            "desc": "Colorful country rooster greeting the morning sun from a rustic fence post"
+        },
+        {
+            "key": "country_truck",
+            "file": "country_truck.jpeg",
+            "title": "Vintage Harvest Truck",
+            "artist": "Country Roads Studio",
+            "desc": "Classic turquoise vintage pickup truck filled with harvest pumpkins and sunflowers"
+        },
+        {
+            "key": "country_puppy",
+            "file": "country_puppy.jpeg",
+            "title": "Porch Golden Puppy",
+            "artist": "Cottage Companions",
+            "desc": "Adorable golden retriever puppy in a red bandana enjoying a sunny farm morning"
         }
     ]
     
@@ -545,9 +652,22 @@ def main():
         {"name": "Masterpiece (4,000+)", "complexity": "masterpiece", "suffix": "masterpiece", "label": "Masterpiece"},
     ]
     
-    manifest = []
+    target_key = sys.argv[1].strip() if len(sys.argv) > 1 and not sys.argv[1].startswith('-') else None
     
+    manifest_path = os.path.join(output_dir, "manifest.json")
+    manifest_map = {}
+    if os.path.exists(manifest_path):
+        try:
+            with open(manifest_path, 'r', encoding='utf-8') as f:
+                for entry in json.load(f):
+                    manifest_map[entry["key"]] = entry
+        except Exception as e:
+            print(f"Warning: could not read existing manifest ({e})")
+
     for item in catalog:
+        if target_key and item["key"] != target_key:
+            continue
+
         img_path = os.path.join(assets_dir, item["file"])
         if not os.path.exists(img_path):
             print(f"Skipping {img_path}: file not found")
@@ -603,7 +723,7 @@ def main():
                 "thumbnailUrl": f"assets/converted/{art_id}_thumb.png",
             })
             
-        manifest.append({
+        manifest_map[item["key"]] = {
             "key": item["key"],
             "title": item["title"],
             "artist": item["artist"],
@@ -611,12 +731,21 @@ def main():
             "originalAsset": f"assets/{item['file']}",
             "diamondVariants": diamond_variants,
             "pbnVariants": pbn_variants,
-        })
+        }
+
+    # Order manifest according to catalog ordering
+    ordered_manifest = []
+    for item in catalog:
+        if item["key"] in manifest_map:
+            ordered_manifest.append(manifest_map[item["key"]])
+    # Append any extra existing entries that might not be in catalog
+    for k, v in manifest_map.items():
+        if not any(item["key"] == k for item in catalog):
+            ordered_manifest.append(v)
         
-    manifest_path = os.path.join(output_dir, "manifest.json")
     with open(manifest_path, 'w', encoding='utf-8') as f:
-        json.dump(manifest, f, indent=2)
-    print(f"\nManifest saved to {manifest_path} with {len(manifest)} gallery entries.")
+        json.dump(ordered_manifest, f, indent=2)
+    print(f"\nManifest saved to {manifest_path} with {len(ordered_manifest)} gallery entries.")
 
 if __name__ == '__main__':
     main()

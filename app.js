@@ -460,7 +460,7 @@ class TapColorApp {
     this.initialPinchDistance = 0;
     this.toolMode = 'pen'; // 'pen', 'erase', or 'pan'
     this.highlightMatching = false; // Matching tiles are not highlighted by default
-    this.currentArtworkId = 'starry_night_diamond';
+    this.currentArtworkId = 'fluffy_cow_pbn';
     this.activeNumber = 1;
     this.hintCount = 5;
     this.activeCategory = 'classic'; // 'classic', 'diamond', 'saved', 'custom'
@@ -488,123 +488,14 @@ class TapColorApp {
     this.activeImportedRecord = null;
 
     this.artworksMeta = [
-      // 5 Curated Fine-Scale Diamond Art Paintings
-      {
-        id: 'starry_night_diamond',
-        title: 'Van Gogh: Starry Night',
-        artist: 'Vincent van Gogh (Diamond Edition)',
-        category: 'diamond',
-        pieces: 784,
-        desc: 'Celestial swirling stars, golden crescent moon, and deep cobalt river with village glow'
-      },
-      {
-        id: 'peacock_diamond',
-        title: 'Royal Crystal Peacock',
-        artist: 'Jeweled Aviary',
-        category: 'diamond',
-        pieces: 784,
-        desc: 'Majestic peacock displaying iridescent turquoise, gold, and sapphire tail eye-plumage'
-      },
-      {
-        id: 'sakura_pagoda_diamond',
-        title: 'Mount Fuji & Sakura Pagoda',
-        artist: 'Ukiyo-e Gem Art',
-        category: 'diamond',
-        pieces: 784,
-        desc: 'Snow-crowned Mount Fuji with five-story pagoda framed by blooming cherry blossoms at sunset'
-      },
-      {
-        id: 'cosmic_wolf_diamond',
-        title: 'Cosmic Aurora Wolf',
-        artist: 'Celestial Wilderness',
-        category: 'diamond',
-        pieces: 784,
-        desc: 'Astral wolf howling into the starry cosmos under shimmering emerald and violet aurora curtains'
-      },
-      {
-        id: 'lotus_koi_diamond',
-        title: 'Zen Lotus & Golden Koi',
-        artist: 'Harmonic Waters',
-        category: 'diamond',
-        pieces: 784,
-        desc: 'Shimmering twin golden koi fish dancing around a sacred pink lotus in a tranquil jade pond'
-      },
-      // 5 Faith & Country Life Diamond Art Masterpieces (High-Resolution Diamond Grids)
-      {
-        id: 'country_chapel_diamond',
-        title: 'Country Chapel in Meadow',
-        artist: 'Heartland Faith Studio',
-        category: 'diamond',
-        pieces: 14400,
-        desc: 'Little white country chapel with steeple & cross, grazing sheep, sunflowers, and split-rail fence under morning rays',
-        defaultVariantId: 'country_chapel_diamond_120',
-        selectedVariantId: 'country_chapel_diamond_120',
-        originalAsset: 'assets/country_chapel.jpg',
-        thumbnailUrl: 'assets/converted/country_chapel_diamond_120_thumb.png',
-        variants: [
-          { id: 'country_chapel_diamond_80', label: '80×80', name: 'Cozy Canvas', pieces: 6400, colors: 18, grid: 80, jsonFile: 'assets/converted/country_chapel_diamond_80.json', thumbnailUrl: 'assets/converted/country_chapel_diamond_80_thumb.png' },
-          { id: 'country_chapel_diamond_120', label: '120×120', name: 'Standard Kit', pieces: 14400, colors: 26, grid: 120, jsonFile: 'assets/converted/country_chapel_diamond_120.json', thumbnailUrl: 'assets/converted/country_chapel_diamond_120_thumb.png' },
-          { id: 'country_chapel_diamond_160', label: '160×160', name: 'Masterpiece Ultra', pieces: 25600, colors: 36, grid: 160, jsonFile: 'assets/converted/country_chapel_diamond_160.json', thumbnailUrl: 'assets/converted/country_chapel_diamond_160_thumb.png' },
-        ],
-      },
-      {
-        id: 'good_shepherd_diamond',
-        title: 'The Lord is My Shepherd',
-        artist: 'Psalm 23 Heritage',
-        category: 'diamond',
-        pieces: 14400,
-        desc: 'Peaceful rolling pasture with mother sheep and lambs resting beside still waters and stone bridge',
-        defaultVariantId: 'good_shepherd_diamond_120',
-        selectedVariantId: 'good_shepherd_diamond_120',
-        originalAsset: 'assets/good_shepherd.jpg',
-        thumbnailUrl: 'assets/converted/good_shepherd_diamond_120_thumb.png',
-        variants: [
-          { id: 'good_shepherd_diamond_80', label: '80×80', name: 'Cozy Canvas', pieces: 6400, colors: 18, grid: 80, jsonFile: 'assets/converted/good_shepherd_diamond_80.json', thumbnailUrl: 'assets/converted/good_shepherd_diamond_80_thumb.png' },
-          { id: 'good_shepherd_diamond_120', label: '120×120', name: 'Standard Kit', pieces: 14400, colors: 26, grid: 120, jsonFile: 'assets/converted/good_shepherd_diamond_120.json', thumbnailUrl: 'assets/converted/good_shepherd_diamond_120_thumb.png' },
-          { id: 'good_shepherd_diamond_160', label: '160×160', name: 'Masterpiece Ultra', pieces: 25600, colors: 36, grid: 160, jsonFile: 'assets/converted/good_shepherd_diamond_160.json', thumbnailUrl: 'assets/converted/good_shepherd_diamond_160_thumb.png' },
-        ],
-      },
-      {
-        id: 'country_porch_bible_diamond',
-        title: 'Devotions on the Porch',
-        artist: 'Country Cottage Morning',
-        category: 'diamond',
-        pieces: 14400,
-        desc: 'Open Holy Bible, reading glasses, wild garden bouquet, and quilt on rocking chair overlooking red barn',
-        defaultVariantId: 'country_porch_bible_diamond_120',
-        selectedVariantId: 'country_porch_bible_diamond_120',
-        originalAsset: 'assets/country_porch_bible.jpg',
-        thumbnailUrl: 'assets/converted/country_porch_bible_diamond_120_thumb.png',
-        variants: [
-          { id: 'country_porch_bible_diamond_80', label: '80×80', name: 'Cozy Canvas', pieces: 6400, colors: 18, grid: 80, jsonFile: 'assets/converted/country_porch_bible_diamond_80.json', thumbnailUrl: 'assets/converted/country_porch_bible_diamond_80_thumb.png' },
-          { id: 'country_porch_bible_diamond_120', label: '120×120', name: 'Standard Kit', pieces: 14400, colors: 26, grid: 120, jsonFile: 'assets/converted/country_porch_bible_diamond_120.json', thumbnailUrl: 'assets/converted/country_porch_bible_diamond_120_thumb.png' },
-          { id: 'country_porch_bible_diamond_160', label: '160×160', name: 'Masterpiece Ultra', pieces: 25600, colors: 36, grid: 160, jsonFile: 'assets/converted/country_porch_bible_diamond_160.json', thumbnailUrl: 'assets/converted/country_porch_bible_diamond_160_thumb.png' },
-        ],
-      },
-      {
-        id: 'cross_and_dogwood_diamond',
-        title: 'Old Rugged Cross & Dogwoods',
-        artist: 'Grace & Glory Studio',
-        category: 'diamond',
-        pieces: 14400,
-        desc: 'Handcrafted timber cross adorned with blooming dogwoods and wild roses overlooking tranquil valley at sunrise',
-        defaultVariantId: 'cross_and_dogwood_diamond_120',
-        selectedVariantId: 'cross_and_dogwood_diamond_120',
-        originalAsset: 'assets/cross_and_dogwood.jpg',
-        thumbnailUrl: 'assets/converted/cross_and_dogwood_diamond_120_thumb.png',
-        variants: [
-          { id: 'cross_and_dogwood_diamond_80', label: '80×80', name: 'Cozy Canvas', pieces: 6400, colors: 18, grid: 80, jsonFile: 'assets/converted/cross_and_dogwood_diamond_80.json', thumbnailUrl: 'assets/converted/cross_and_dogwood_diamond_80_thumb.png' },
-          { id: 'cross_and_dogwood_diamond_120', label: '120×120', name: 'Standard Kit', pieces: 14400, colors: 26, grid: 120, jsonFile: 'assets/converted/cross_and_dogwood_diamond_120.json', thumbnailUrl: 'assets/converted/cross_and_dogwood_diamond_120_thumb.png' },
-          { id: 'cross_and_dogwood_diamond_160', label: '160×160', name: 'Masterpiece Ultra', pieces: 25600, colors: 36, grid: 160, jsonFile: 'assets/converted/cross_and_dogwood_diamond_160.json', thumbnailUrl: 'assets/converted/cross_and_dogwood_diamond_160_thumb.png' },
-        ],
-      },
+      // 6 Country Life Diamond Art Masterpieces (High-Resolution Diamond Grids)
       {
         id: 'fluffy_cow_diamond',
         title: 'Sweet Highland Calf',
         artist: 'Country Homestead',
         category: 'diamond',
         pieces: 14400,
-        desc: 'Gentle fluffy highland cow calf surrounded by meadow wildflowers and rustic pasture',
+        desc: 'Gentle fluffy highland cow calf surrounded by meadow wildflowers and rustic wooden pasture',
         defaultVariantId: 'fluffy_cow_diamond_120',
         selectedVariantId: 'fluffy_cow_diamond_120',
         originalAsset: 'assets/fluffy-cow-3.jpeg',
@@ -615,124 +506,193 @@ class TapColorApp {
           { id: 'fluffy_cow_diamond_160', label: '160×160', name: 'Masterpiece Ultra', pieces: 25600, colors: 36, grid: 160, jsonFile: 'assets/converted/fluffy_cow_diamond_160.json', thumbnailUrl: 'assets/converted/fluffy_cow_diamond_160_thumb.png' },
         ],
       },
-      // 5 Faith & Country Life Paint by Number Paintings (Adult Resolutions: Detailed is Minimum, Intricate, Masterpiece)
       {
-        id: 'country_chapel_pbn',
-        title: 'Country Chapel in Meadow',
-        artist: 'Heartland Faith Studio',
-        category: 'classic',
-        pieces: 1965,
-        desc: 'White country chapel with cross, sunflowers, sheep, and split-rail fence bathed in morning rays',
-        defaultVariantId: 'country_chapel_pbn_intricate',
-        selectedVariantId: 'country_chapel_pbn_intricate',
-        originalAsset: 'assets/country_chapel.jpg',
-        thumbnailUrl: 'assets/converted/country_chapel_pbn_intricate_thumb.png',
+        id: 'hummingbird_diamond',
+        title: 'Garden Hummingbird',
+        artist: 'Sunlit Meadow',
+        category: 'diamond',
+        pieces: 14400,
+        desc: 'Vibrant hummingbird sipping sweet nectar among blooming country garden flora',
+        defaultVariantId: 'hummingbird_diamond_120',
+        selectedVariantId: 'hummingbird_diamond_120',
+        originalAsset: 'assets/hummingbird.jpeg',
+        thumbnailUrl: 'assets/converted/hummingbird_diamond_120_thumb.png',
         variants: [
-          { id: 'country_chapel_pbn_detailed', label: 'Detailed', name: 'Detailed (Adult Min)', pieces: 833, colors: 20, complexity: 'detailed', jsonFile: 'assets/converted/country_chapel_pbn_detailed.json', thumbnailUrl: 'assets/converted/country_chapel_pbn_detailed_thumb.png' },
-          { id: 'country_chapel_pbn_intricate', label: 'Intricate', name: 'Intricate (2,000+ Pieces)', pieces: 1965, colors: 28, complexity: 'intricate', jsonFile: 'assets/converted/country_chapel_pbn_intricate.json', thumbnailUrl: 'assets/converted/country_chapel_pbn_intricate_thumb.png' },
-          { id: 'country_chapel_pbn_masterpiece', label: 'Masterpiece', name: 'Masterpiece (4,000+ Pieces)', pieces: 4316, colors: 36, complexity: 'masterpiece', jsonFile: 'assets/converted/country_chapel_pbn_masterpiece.json', thumbnailUrl: 'assets/converted/country_chapel_pbn_masterpiece_thumb.png' },
+          { id: 'hummingbird_diamond_80', label: '80×80', name: 'Cozy Canvas', pieces: 6400, colors: 18, grid: 80, jsonFile: 'assets/converted/hummingbird_diamond_80.json', thumbnailUrl: 'assets/converted/hummingbird_diamond_80_thumb.png' },
+          { id: 'hummingbird_diamond_120', label: '120×120', name: 'Standard Kit', pieces: 14400, colors: 26, grid: 120, jsonFile: 'assets/converted/hummingbird_diamond_120.json', thumbnailUrl: 'assets/converted/hummingbird_diamond_120_thumb.png' },
+          { id: 'hummingbird_diamond_160', label: '160×160', name: 'Masterpiece Ultra', pieces: 25600, colors: 36, grid: 160, jsonFile: 'assets/converted/hummingbird_diamond_160.json', thumbnailUrl: 'assets/converted/hummingbird_diamond_160_thumb.png' },
         ],
       },
       {
-        id: 'good_shepherd_pbn',
-        title: 'The Lord is My Shepherd',
-        artist: 'Psalm 23 Heritage',
-        category: 'classic',
-        pieces: 2195,
-        desc: 'Peaceful rolling pasture with mother sheep and lambs resting beside still waters and stone bridge',
-        defaultVariantId: 'good_shepherd_pbn_intricate',
-        selectedVariantId: 'good_shepherd_pbn_intricate',
-        originalAsset: 'assets/good_shepherd.jpg',
-        thumbnailUrl: 'assets/converted/good_shepherd_pbn_intricate_thumb.png',
+        id: 'country_barn_diamond',
+        title: 'Rustic Red Barn',
+        artist: 'Heartland Heritage',
+        category: 'diamond',
+        pieces: 14400,
+        desc: 'Classic red country barn with silo, split-rail fence, and sunflowers under sunny blue sky',
+        defaultVariantId: 'country_barn_diamond_120',
+        selectedVariantId: 'country_barn_diamond_120',
+        originalAsset: 'assets/country_barn.jpeg',
+        thumbnailUrl: 'assets/converted/country_barn_diamond_120_thumb.png',
         variants: [
-          { id: 'good_shepherd_pbn_detailed', label: 'Detailed', name: 'Detailed (Adult Min)', pieces: 896, colors: 20, complexity: 'detailed', jsonFile: 'assets/converted/good_shepherd_pbn_detailed.json', thumbnailUrl: 'assets/converted/good_shepherd_pbn_detailed_thumb.png' },
-          { id: 'good_shepherd_pbn_intricate', label: 'Intricate', name: 'Intricate (2,000+ Pieces)', pieces: 2195, colors: 28, complexity: 'intricate', jsonFile: 'assets/converted/good_shepherd_pbn_intricate.json', thumbnailUrl: 'assets/converted/good_shepherd_pbn_intricate_thumb.png' },
-          { id: 'good_shepherd_pbn_masterpiece', label: 'Masterpiece', name: 'Masterpiece (4,000+ Pieces)', pieces: 4620, colors: 36, complexity: 'masterpiece', jsonFile: 'assets/converted/good_shepherd_pbn_masterpiece.json', thumbnailUrl: 'assets/converted/good_shepherd_pbn_masterpiece_thumb.png' },
+          { id: 'country_barn_diamond_80', label: '80×80', name: 'Cozy Canvas', pieces: 6400, colors: 18, grid: 80, jsonFile: 'assets/converted/country_barn_diamond_80.json', thumbnailUrl: 'assets/converted/country_barn_diamond_80_thumb.png' },
+          { id: 'country_barn_diamond_120', label: '120×120', name: 'Standard Kit', pieces: 14400, colors: 26, grid: 120, jsonFile: 'assets/converted/country_barn_diamond_120.json', thumbnailUrl: 'assets/converted/country_barn_diamond_120_thumb.png' },
+          { id: 'country_barn_diamond_160', label: '160×160', name: 'Masterpiece Ultra', pieces: 25600, colors: 36, grid: 160, jsonFile: 'assets/converted/country_barn_diamond_160.json', thumbnailUrl: 'assets/converted/country_barn_diamond_160_thumb.png' },
         ],
       },
       {
-        id: 'country_porch_bible_pbn',
-        title: 'Devotions on the Porch',
-        artist: 'Country Cottage Morning',
-        category: 'classic',
-        pieces: 2005,
-        desc: 'Open Holy Bible, reading glasses, wild bouquet, and patchwork quilt on rocking chair overlooking red barn',
-        defaultVariantId: 'country_porch_bible_pbn_intricate',
-        selectedVariantId: 'country_porch_bible_pbn_intricate',
-        originalAsset: 'assets/country_porch_bible.jpg',
-        thumbnailUrl: 'assets/converted/country_porch_bible_pbn_intricate_thumb.png',
+        id: 'country_rooster_diamond',
+        title: 'Morning Farm Rooster',
+        artist: 'Sunrise Farmstead',
+        category: 'diamond',
+        pieces: 14400,
+        desc: 'Colorful country rooster greeting the morning sun from a rustic fence post',
+        defaultVariantId: 'country_rooster_diamond_120',
+        selectedVariantId: 'country_rooster_diamond_120',
+        originalAsset: 'assets/country_rooster.jpeg',
+        thumbnailUrl: 'assets/converted/country_rooster_diamond_120_thumb.png',
         variants: [
-          { id: 'country_porch_bible_pbn_detailed', label: 'Detailed', name: 'Detailed (Adult Min)', pieces: 831, colors: 20, complexity: 'detailed', jsonFile: 'assets/converted/country_porch_bible_pbn_detailed.json', thumbnailUrl: 'assets/converted/country_porch_bible_pbn_detailed_thumb.png' },
-          { id: 'country_porch_bible_pbn_intricate', label: 'Intricate', name: 'Intricate (2,000+ Pieces)', pieces: 2005, colors: 28, complexity: 'intricate', jsonFile: 'assets/converted/country_porch_bible_pbn_intricate.json', thumbnailUrl: 'assets/converted/country_porch_bible_pbn_intricate_thumb.png' },
-          { id: 'country_porch_bible_pbn_masterpiece', label: 'Masterpiece', name: 'Masterpiece (4,000+ Pieces)', pieces: 4137, colors: 36, complexity: 'masterpiece', jsonFile: 'assets/converted/country_porch_bible_pbn_masterpiece.json', thumbnailUrl: 'assets/converted/country_porch_bible_pbn_masterpiece_thumb.png' },
+          { id: 'country_rooster_diamond_80', label: '80×80', name: 'Cozy Canvas', pieces: 6400, colors: 18, grid: 80, jsonFile: 'assets/converted/country_rooster_diamond_80.json', thumbnailUrl: 'assets/converted/country_rooster_diamond_80_thumb.png' },
+          { id: 'country_rooster_diamond_120', label: '120×120', name: 'Standard Kit', pieces: 14400, colors: 26, grid: 120, jsonFile: 'assets/converted/country_rooster_diamond_120.json', thumbnailUrl: 'assets/converted/country_rooster_diamond_120_thumb.png' },
+          { id: 'country_rooster_diamond_160', label: '160×160', name: 'Masterpiece Ultra', pieces: 25600, colors: 36, grid: 160, jsonFile: 'assets/converted/country_rooster_diamond_160.json', thumbnailUrl: 'assets/converted/country_rooster_diamond_160_thumb.png' },
         ],
       },
       {
-        id: 'cross_and_dogwood_pbn',
-        title: 'Old Rugged Cross & Dogwoods',
-        artist: 'Grace & Glory Studio',
-        category: 'classic',
-        pieces: 1765,
-        desc: 'Handcrafted timber cross adorned with blooming dogwoods and wild roses overlooking tranquil valley at sunrise',
-        defaultVariantId: 'cross_and_dogwood_pbn_intricate',
-        selectedVariantId: 'cross_and_dogwood_pbn_intricate',
-        originalAsset: 'assets/cross_and_dogwood.jpg',
-        thumbnailUrl: 'assets/converted/cross_and_dogwood_pbn_intricate_thumb.png',
+        id: 'country_truck_diamond',
+        title: 'Vintage Harvest Truck',
+        artist: 'Country Roads Studio',
+        category: 'diamond',
+        pieces: 14400,
+        desc: 'Classic turquoise vintage pickup truck filled with harvest pumpkins and sunflowers',
+        defaultVariantId: 'country_truck_diamond_120',
+        selectedVariantId: 'country_truck_diamond_120',
+        originalAsset: 'assets/country_truck.jpeg',
+        thumbnailUrl: 'assets/converted/country_truck_diamond_120_thumb.png',
         variants: [
-          { id: 'cross_and_dogwood_pbn_detailed', label: 'Detailed', name: 'Detailed (Adult Min)', pieces: 731, colors: 20, complexity: 'detailed', jsonFile: 'assets/converted/cross_and_dogwood_pbn_detailed.json', thumbnailUrl: 'assets/converted/cross_and_dogwood_pbn_detailed_thumb.png' },
-          { id: 'cross_and_dogwood_pbn_intricate', label: 'Intricate', name: 'Intricate (1,700+ Pieces)', pieces: 1765, colors: 28, complexity: 'intricate', jsonFile: 'assets/converted/cross_and_dogwood_pbn_intricate.json', thumbnailUrl: 'assets/converted/cross_and_dogwood_pbn_intricate_thumb.png' },
-          { id: 'cross_and_dogwood_pbn_masterpiece', label: 'Masterpiece', name: 'Masterpiece (3,600+ Pieces)', pieces: 3653, colors: 36, complexity: 'masterpiece', jsonFile: 'assets/converted/cross_and_dogwood_pbn_masterpiece.json', thumbnailUrl: 'assets/converted/cross_and_dogwood_pbn_masterpiece_thumb.png' },
+          { id: 'country_truck_diamond_80', label: '80×80', name: 'Cozy Canvas', pieces: 6400, colors: 18, grid: 80, jsonFile: 'assets/converted/country_truck_diamond_80.json', thumbnailUrl: 'assets/converted/country_truck_diamond_80_thumb.png' },
+          { id: 'country_truck_diamond_120', label: '120×120', name: 'Standard Kit', pieces: 14400, colors: 26, grid: 120, jsonFile: 'assets/converted/country_truck_diamond_120.json', thumbnailUrl: 'assets/converted/country_truck_diamond_120_thumb.png' },
+          { id: 'country_truck_diamond_160', label: '160×160', name: 'Masterpiece Ultra', pieces: 25600, colors: 36, grid: 160, jsonFile: 'assets/converted/country_truck_diamond_160.json', thumbnailUrl: 'assets/converted/country_truck_diamond_160_thumb.png' },
         ],
       },
+      {
+        id: 'country_puppy_diamond',
+        title: 'Porch Golden Puppy',
+        artist: 'Cottage Companions',
+        category: 'diamond',
+        pieces: 14400,
+        desc: 'Adorable golden retriever puppy in a red bandana enjoying a sunny farm morning',
+        defaultVariantId: 'country_puppy_diamond_120',
+        selectedVariantId: 'country_puppy_diamond_120',
+        originalAsset: 'assets/country_puppy.jpeg',
+        thumbnailUrl: 'assets/converted/country_puppy_diamond_120_thumb.png',
+        variants: [
+          { id: 'country_puppy_diamond_80', label: '80×80', name: 'Cozy Canvas', pieces: 6400, colors: 18, grid: 80, jsonFile: 'assets/converted/country_puppy_diamond_80.json', thumbnailUrl: 'assets/converted/country_puppy_diamond_80_thumb.png' },
+          { id: 'country_puppy_diamond_120', label: '120×120', name: 'Standard Kit', pieces: 14400, colors: 26, grid: 120, jsonFile: 'assets/converted/country_puppy_diamond_120.json', thumbnailUrl: 'assets/converted/country_puppy_diamond_120_thumb.png' },
+          { id: 'country_puppy_diamond_160', label: '160×160', name: 'Masterpiece Ultra', pieces: 25600, colors: 36, grid: 160, jsonFile: 'assets/converted/country_puppy_diamond_160.json', thumbnailUrl: 'assets/converted/country_puppy_diamond_160_thumb.png' },
+        ],
+      },
+      // 6 Country Life Paint by Number Paintings (Multi-Resolution Vector Masterpieces)
       {
         id: 'fluffy_cow_pbn',
         title: 'Sweet Highland Calf',
         artist: 'Country Homestead',
         category: 'classic',
-        pieces: 743,
+        pieces: 333,
         desc: 'Gentle fluffy highland cow calf surrounded by meadow wildflowers and rustic pasture',
         defaultVariantId: 'fluffy_cow_pbn_intricate',
         selectedVariantId: 'fluffy_cow_pbn_intricate',
         originalAsset: 'assets/fluffy-cow-3.jpeg',
         thumbnailUrl: 'assets/converted/fluffy_cow_pbn_intricate_thumb.png',
         variants: [
-          { id: 'fluffy_cow_pbn_detailed', label: 'Detailed', name: 'Detailed (Adult Min)', pieces: 357, colors: 18, complexity: 'detailed', jsonFile: 'assets/converted/fluffy_cow_pbn_detailed.json', thumbnailUrl: 'assets/converted/fluffy_cow_pbn_detailed_thumb.png' },
-          { id: 'fluffy_cow_pbn_intricate', label: 'Intricate', name: 'Intricate (High Detail)', pieces: 743, colors: 26, complexity: 'intricate', jsonFile: 'assets/converted/fluffy_cow_pbn_intricate.json', thumbnailUrl: 'assets/converted/fluffy_cow_pbn_intricate_thumb.png' },
-          { id: 'fluffy_cow_pbn_masterpiece', label: 'Masterpiece', name: 'Masterpiece (1,600+ Pieces)', pieces: 1665, colors: 34, complexity: 'masterpiece', jsonFile: 'assets/converted/fluffy_cow_pbn_masterpiece.json', thumbnailUrl: 'assets/converted/fluffy_cow_pbn_masterpiece_thumb.png' },
+          { id: 'fluffy_cow_pbn_detailed', label: 'Detailed', name: 'Detailed', pieces: 198, colors: 15, complexity: 'detailed', jsonFile: 'assets/converted/fluffy_cow_pbn_detailed.json', thumbnailUrl: 'assets/converted/fluffy_cow_pbn_detailed_thumb.png' },
+          { id: 'fluffy_cow_pbn_intricate', label: 'Intricate', name: 'Intricate', pieces: 333, colors: 22, complexity: 'intricate', jsonFile: 'assets/converted/fluffy_cow_pbn_intricate.json', thumbnailUrl: 'assets/converted/fluffy_cow_pbn_intricate_thumb.png' },
+          { id: 'fluffy_cow_pbn_masterpiece', label: 'Masterpiece', name: 'Masterpiece', pieces: 759, colors: 31, complexity: 'masterpiece', jsonFile: 'assets/converted/fluffy_cow_pbn_masterpiece.json', thumbnailUrl: 'assets/converted/fluffy_cow_pbn_masterpiece_thumb.png' },
         ],
       },
-      // Classic Paint by Number & Origami
       {
-        id: 'hummingbird',
-        title: 'Origami Hummingbird & Blossoms',
-        artist: 'Geometric Fauna',
+        id: 'hummingbird_pbn',
+        title: 'Garden Hummingbird',
+        artist: 'Sunlit Meadow',
         category: 'classic',
-        pieces: 34,
-        desc: 'Vibrant origami hummingbird sipping cherry blossom nectar'
+        pieces: 248,
+        desc: 'Vibrant hummingbird sipping sweet nectar among blooming country garden flora',
+        defaultVariantId: 'hummingbird_pbn_intricate',
+        selectedVariantId: 'hummingbird_pbn_intricate',
+        originalAsset: 'assets/hummingbird.jpeg',
+        thumbnailUrl: 'assets/converted/hummingbird_pbn_intricate_thumb.png',
+        variants: [
+          { id: 'hummingbird_pbn_detailed', label: 'Detailed', name: 'Detailed', pieces: 140, colors: 15, complexity: 'detailed', jsonFile: 'assets/converted/hummingbird_pbn_detailed.json', thumbnailUrl: 'assets/converted/hummingbird_pbn_detailed_thumb.png' },
+          { id: 'hummingbird_pbn_intricate', label: 'Intricate', name: 'Intricate', pieces: 248, colors: 23, complexity: 'intricate', jsonFile: 'assets/converted/hummingbird_pbn_intricate.json', thumbnailUrl: 'assets/converted/hummingbird_pbn_intricate_thumb.png' },
+          { id: 'hummingbird_pbn_masterpiece', label: 'Masterpiece', name: 'Masterpiece', pieces: 586, colors: 31, complexity: 'masterpiece', jsonFile: 'assets/converted/hummingbird_pbn_masterpiece.json', thumbnailUrl: 'assets/converted/hummingbird_pbn_masterpiece_thumb.png' },
+        ],
       },
       {
-        id: 'cosmic_whale',
-        title: 'Cosmic Whale & Stars',
-        artist: 'Astral Ocean',
+        id: 'country_barn_pbn',
+        title: 'Rustic Red Barn',
+        artist: 'Heartland Heritage',
         category: 'classic',
-        pieces: 23,
-        desc: 'Ethereal whale swimming through constellations'
+        pieces: 657,
+        desc: 'Classic red country barn with silo, split-rail fence, and sunflowers under sunny blue sky',
+        defaultVariantId: 'country_barn_pbn_intricate',
+        selectedVariantId: 'country_barn_pbn_intricate',
+        originalAsset: 'assets/country_barn.jpeg',
+        thumbnailUrl: 'assets/converted/country_barn_pbn_intricate_thumb.png',
+        variants: [
+          { id: 'country_barn_pbn_detailed', label: 'Detailed', name: 'Detailed', pieces: 318, colors: 16, complexity: 'detailed', jsonFile: 'assets/converted/country_barn_pbn_detailed.json', thumbnailUrl: 'assets/converted/country_barn_pbn_detailed_thumb.png' },
+          { id: 'country_barn_pbn_intricate', label: 'Intricate', name: 'Intricate', pieces: 657, colors: 24, complexity: 'intricate', jsonFile: 'assets/converted/country_barn_pbn_intricate.json', thumbnailUrl: 'assets/converted/country_barn_pbn_intricate_thumb.png' },
+          { id: 'country_barn_pbn_masterpiece', label: 'Masterpiece', name: 'Masterpiece', pieces: 1161, colors: 32, complexity: 'masterpiece', jsonFile: 'assets/converted/country_barn_pbn_masterpiece.json', thumbnailUrl: 'assets/converted/country_barn_pbn_masterpiece_thumb.png' },
+        ],
       },
       {
-        id: 'stained_butterfly',
-        title: 'Monarch Butterfly',
-        artist: 'Floral Garden',
+        id: 'country_rooster_pbn',
+        title: 'Morning Farm Rooster',
+        artist: 'Sunrise Farmstead',
         category: 'classic',
-        pieces: 25,
-        desc: 'Monarch butterfly resting on a blooming lotus flower'
+        pieces: 638,
+        desc: 'Colorful country rooster greeting the morning sun from a rustic fence post',
+        defaultVariantId: 'country_rooster_pbn_intricate',
+        selectedVariantId: 'country_rooster_pbn_intricate',
+        originalAsset: 'assets/country_rooster.jpeg',
+        thumbnailUrl: 'assets/converted/country_rooster_pbn_intricate_thumb.png',
+        variants: [
+          { id: 'country_rooster_pbn_detailed', label: 'Detailed', name: 'Detailed', pieces: 283, colors: 16, complexity: 'detailed', jsonFile: 'assets/converted/country_rooster_pbn_detailed.json', thumbnailUrl: 'assets/converted/country_rooster_pbn_detailed_thumb.png' },
+          { id: 'country_rooster_pbn_intricate', label: 'Intricate', name: 'Intricate', pieces: 638, colors: 24, complexity: 'intricate', jsonFile: 'assets/converted/country_rooster_pbn_intricate.json', thumbnailUrl: 'assets/converted/country_rooster_pbn_intricate_thumb.png' },
+          { id: 'country_rooster_pbn_masterpiece', label: 'Masterpiece', name: 'Masterpiece', pieces: 1092, colors: 32, complexity: 'masterpiece', jsonFile: 'assets/converted/country_rooster_pbn_masterpiece.json', thumbnailUrl: 'assets/converted/country_rooster_pbn_masterpiece_thumb.png' },
+        ],
       },
       {
-        id: 'sunset_landscape',
-        title: 'Geometric Sunset Mountains',
-        artist: 'Low Poly Vistas',
+        id: 'country_truck_pbn',
+        title: 'Vintage Harvest Truck',
+        artist: 'Country Roads Studio',
         category: 'classic',
-        pieces: 21,
-        desc: 'Tranquil alpine peaks and glowing lake'
+        pieces: 436,
+        desc: 'Classic turquoise vintage pickup truck filled with harvest pumpkins and sunflowers',
+        defaultVariantId: 'country_truck_pbn_intricate',
+        selectedVariantId: 'country_truck_pbn_intricate',
+        originalAsset: 'assets/country_truck.jpeg',
+        thumbnailUrl: 'assets/converted/country_truck_pbn_intricate_thumb.png',
+        variants: [
+          { id: 'country_truck_pbn_detailed', label: 'Detailed', name: 'Detailed', pieces: 195, colors: 15, complexity: 'detailed', jsonFile: 'assets/converted/country_truck_pbn_detailed.json', thumbnailUrl: 'assets/converted/country_truck_pbn_detailed_thumb.png' },
+          { id: 'country_truck_pbn_intricate', label: 'Intricate', name: 'Intricate', pieces: 436, colors: 24, complexity: 'intricate', jsonFile: 'assets/converted/country_truck_pbn_intricate.json', thumbnailUrl: 'assets/converted/country_truck_pbn_intricate_thumb.png' },
+          { id: 'country_truck_pbn_masterpiece', label: 'Masterpiece', name: 'Masterpiece', pieces: 784, colors: 32, complexity: 'masterpiece', jsonFile: 'assets/converted/country_truck_pbn_masterpiece.json', thumbnailUrl: 'assets/converted/country_truck_pbn_masterpiece_thumb.png' },
+        ],
+      },
+      {
+        id: 'country_puppy_pbn',
+        title: 'Porch Golden Puppy',
+        artist: 'Cottage Companions',
+        category: 'classic',
+        pieces: 420,
+        desc: 'Adorable golden retriever puppy in a red bandana enjoying a sunny farm morning',
+        defaultVariantId: 'country_puppy_pbn_intricate',
+        selectedVariantId: 'country_puppy_pbn_intricate',
+        originalAsset: 'assets/country_puppy.jpeg',
+        thumbnailUrl: 'assets/converted/country_puppy_pbn_intricate_thumb.png',
+        variants: [
+          { id: 'country_puppy_pbn_detailed', label: 'Detailed', name: 'Detailed', pieces: 195, colors: 16, complexity: 'detailed', jsonFile: 'assets/converted/country_puppy_pbn_detailed.json', thumbnailUrl: 'assets/converted/country_puppy_pbn_detailed_thumb.png' },
+          { id: 'country_puppy_pbn_intricate', label: 'Intricate', name: 'Intricate', pieces: 420, colors: 24, complexity: 'intricate', jsonFile: 'assets/converted/country_puppy_pbn_intricate.json', thumbnailUrl: 'assets/converted/country_puppy_pbn_intricate_thumb.png' },
+          { id: 'country_puppy_pbn_masterpiece', label: 'Masterpiece', name: 'Masterpiece', pieces: 755, colors: 32, complexity: 'masterpiece', jsonFile: 'assets/converted/country_puppy_pbn_masterpiece.json', thumbnailUrl: 'assets/converted/country_puppy_pbn_masterpiece_thumb.png' },
+        ],
       },
     ];
   }
@@ -754,6 +714,8 @@ class TapColorApp {
       console.warn('WASM module not yet compiled or unavailable. Launching client preview engine.', e);
       this.controller = new FallbackJsController(this.canvas, this.currentArtworkId);
     }
+
+    await this.selectArtwork(this.currentArtworkId);
 
     this.updateArtworkUI();
     this.refreshPaletteUI();
@@ -899,25 +861,52 @@ class TapColorApp {
       modalGallery.classList.add('hidden');
     });
 
-    // Resolution Switcher Modal events
-    const modalResPicker = document.getElementById('modal-resolution-picker');
+    // Quick Style & Detail Dropdown
     const btnResSwitcher = document.getElementById('btn-resolution-switcher');
-    const btnCloseResPicker = document.getElementById('btn-close-res-picker');
+    const dropdownQuick = document.getElementById('quick-style-dropdown');
+    const togglePbn = document.getElementById('quick-toggle-pbn');
+    const toggleDiamond = document.getElementById('quick-toggle-diamond');
 
-    if (btnResSwitcher) {
-      btnResSwitcher.addEventListener('click', () => {
-        this.showResolutionPickerModal();
+    if (btnResSwitcher && dropdownQuick) {
+      btnResSwitcher.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const isHidden = dropdownQuick.classList.contains('hidden');
+        if (isHidden) {
+          this.renderQuickStyleDropdown();
+          dropdownQuick.classList.remove('hidden');
+          btnResSwitcher.classList.add('active');
+        } else {
+          dropdownQuick.classList.add('hidden');
+          btnResSwitcher.classList.remove('active');
+        }
+      });
+
+      document.addEventListener('click', (e) => {
+        if (!dropdownQuick.classList.contains('hidden') && !dropdownQuick.contains(e.target) && e.target !== btnResSwitcher) {
+          dropdownQuick.classList.add('hidden');
+          btnResSwitcher.classList.remove('active');
+        }
+      });
+
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && !dropdownQuick.classList.contains('hidden')) {
+          dropdownQuick.classList.add('hidden');
+          btnResSwitcher.classList.remove('active');
+        }
       });
     }
 
-    if (btnCloseResPicker && modalResPicker) {
-      btnCloseResPicker.addEventListener('click', () => {
-        modalResPicker.classList.add('hidden');
+    if (togglePbn) {
+      togglePbn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        this.switchArtworkArtType('classic');
       });
-      modalResPicker.addEventListener('click', (e) => {
-        if (e.target === modalResPicker) {
-          modalResPicker.classList.add('hidden');
-        }
+    }
+
+    if (toggleDiamond) {
+      toggleDiamond.addEventListener('click', (e) => {
+        e.stopPropagation();
+        this.switchArtworkArtType('diamond');
       });
     }
 
@@ -1764,6 +1753,7 @@ class TapColorApp {
     this.successfulTaps = 0;
     this.updateArtworkUI();
     this.refreshPaletteUI();
+    this.updateResolutionBarUI();
   }
 
   renderThumbnail(canvas, meta) {
@@ -1848,10 +1838,14 @@ class TapColorApp {
 
   setupCustomStudio() {
     let customImg = null;
-    let selectedPreset = 'sunflower';
+    let selectedPreset = 'fluffy_cow';
+    let currentStudioMode = 'vector';
 
     const previewCanvas = document.getElementById('studio-preview-canvas');
     const previewCaption = document.getElementById('preview-caption');
+    const previewModeTag = document.getElementById('preview-mode-tag');
+    const modeBannerBadge = document.getElementById('mode-banner-badge');
+    const modeBannerText = document.getElementById('mode-banner-text');
 
     const updateStudioPreview = () => {
       if (!previewCanvas) return;
@@ -1867,12 +1861,30 @@ class TapColorApp {
         const dx = (previewCanvas.width - dw) / 2;
         const dy = (previewCanvas.height - dh) / 2;
         pCtx.drawImage(customImg, bounds.sx, bounds.sy, bounds.sw, bounds.sh, dx, dy, dw, dh);
-        if (previewCaption) previewCaption.textContent = 'Custom Photo Preview';
-      } else {
-        this.drawPresetScene(pCtx, selectedPreset, Math.min(previewCanvas.width, previewCanvas.height));
+
+        if (currentStudioMode === 'diamond') {
+          // Draw subtle diamond gemstone grid preview mesh with sparkle highlights
+          pCtx.strokeStyle = 'rgba(255, 255, 255, 0.22)';
+          pCtx.lineWidth = 0.5;
+          const step = 8;
+          for (let gx = dx; gx <= dx + dw; gx += step) {
+            pCtx.beginPath();
+            pCtx.moveTo(gx, dy);
+            pCtx.lineTo(gx, dy + dh);
+            pCtx.stroke();
+          }
+          for (let gy = dy; gy <= dy + dh; gy += step) {
+            pCtx.beginPath();
+            pCtx.moveTo(dx, gy);
+            pCtx.lineTo(dx + dw, gy);
+            pCtx.stroke();
+          }
+        }
+
         const activeBtn = document.querySelector('.btn-preset.active');
-        if (previewCaption && activeBtn) {
-          previewCaption.textContent = activeBtn.textContent.trim();
+        const titleInp = document.getElementById('input-custom-title');
+        if (previewCaption) {
+          previewCaption.textContent = (titleInp && titleInp.value.trim()) || (activeBtn ? activeBtn.textContent.trim() : 'Custom Photo Preview');
         }
       }
     };
@@ -1884,12 +1896,12 @@ class TapColorApp {
       btn.addEventListener('click', () => {
         presetButtons.forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
-        selectedPreset = btn.dataset.preset;
+        selectedPreset = btn.dataset.key || btn.dataset.preset;
         const assetUrl = btn.dataset.asset;
         const assetTitle = btn.dataset.title;
 
         if (assetUrl) {
-          document.getElementById('upload-filename').textContent = 'Gallery Asset: ' + btn.textContent.trim();
+          document.getElementById('upload-filename').textContent = btn.textContent.trim();
           if (assetTitle) {
             const titleInp = document.getElementById('input-custom-title');
             if (titleInp) titleInp.value = assetTitle;
@@ -1900,10 +1912,6 @@ class TapColorApp {
             updateStudioPreview();
           };
           img.src = assetUrl;
-        } else {
-          customImg = null;
-          document.getElementById('upload-filename').textContent = 'Selected: ' + btn.textContent.trim();
-          updateStudioPreview();
         }
       });
     });
@@ -1926,23 +1934,25 @@ class TapColorApp {
     }
 
     const fileInput = document.getElementById('input-custom-photo');
-    fileInput.addEventListener('change', (e) => {
-      const file = e.target.files[0];
-      if (file) {
-        document.getElementById('upload-filename').textContent = file.name;
-        presetButtons.forEach(b => b.classList.remove('active'));
-        const reader = new FileReader();
-        reader.onload = (event) => {
-          const img = new Image();
-          img.onload = () => {
-            customImg = img;
-            updateStudioPreview();
+    if (fileInput) {
+      fileInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (file) {
+          document.getElementById('upload-filename').textContent = file.name;
+          presetButtons.forEach(b => b.classList.remove('active'));
+          const reader = new FileReader();
+          reader.onload = (event) => {
+            const img = new Image();
+            img.onload = () => {
+              customImg = img;
+              updateStudioPreview();
+            };
+            img.src = event.target.result;
           };
-          img.src = event.target.result;
-        };
-        reader.readAsDataURL(file);
-      }
-    });
+          reader.readAsDataURL(file);
+        }
+      });
+    }
 
     // Difficulty chips for Paint by Number
     document.querySelectorAll('#difficulty-chips-vector .btn-diff-chip').forEach(chip => {
@@ -1972,26 +1982,56 @@ class TapColorApp {
       });
     });
 
-    // Studio Mode Switcher
+    // Studio Mode Switcher: Part 1 buttons dynamically change the options available
     const btnModeVector = document.getElementById('btn-mode-vector');
     const btnModeDiamond = document.getElementById('btn-mode-diamond');
     const settingsVector = document.getElementById('settings-vector-panel');
     const settingsDiamond = document.getElementById('settings-diamond-panel');
 
-    if (btnModeVector && btnModeDiamond) {
-      btnModeVector.addEventListener('click', () => {
+    const setStudioMode = (mode) => {
+      currentStudioMode = mode;
+      if (mode === 'vector') {
         btnModeVector.classList.add('active');
         btnModeDiamond.classList.remove('active');
         if (settingsVector) settingsVector.classList.remove('hidden');
         if (settingsDiamond) settingsDiamond.classList.add('hidden');
-      });
-      btnModeDiamond.addEventListener('click', () => {
+        if (modeBannerBadge) modeBannerBadge.textContent = '🎨 Paint by Number Active';
+        if (modeBannerText) modeBannerText.textContent = 'Vector mode active: Custom outlines, smooth curved boundaries, and seamless fills.';
+        if (previewModeTag) {
+          previewModeTag.textContent = '🎨 Paint by Number';
+          previewModeTag.classList.remove('diamond');
+        }
+      } else {
         btnModeDiamond.classList.add('active');
         btnModeVector.classList.remove('active');
         if (settingsDiamond) settingsDiamond.classList.remove('hidden');
         if (settingsVector) settingsVector.classList.add('hidden');
-      });
+        if (modeBannerBadge) modeBannerBadge.textContent = '💎 Diamond Painting Active';
+        if (modeBannerText) modeBannerText.textContent = 'Diamond mode active: Sparkly gemstone drills mapped onto a precision mosaic grid.';
+        if (previewModeTag) {
+          previewModeTag.textContent = '💎 Diamond Painting';
+          previewModeTag.classList.add('diamond');
+        }
+      }
+      updateStudioPreview();
+    };
+
+    if (btnModeVector && btnModeDiamond) {
+      btnModeVector.addEventListener('click', () => setStudioMode('vector'));
+      btnModeDiamond.addEventListener('click', () => setStudioMode('diamond'));
     }
+
+    const getActiveSourceImage = async () => {
+      if (customImg) return customImg;
+      const activeBtn = document.querySelector('.btn-preset.active[data-asset]');
+      const assetUrl = (activeBtn && activeBtn.dataset.asset) || 'assets/fluffy-cow-3.jpeg';
+      return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.onload = () => resolve(img);
+        img.onerror = reject;
+        img.src = assetUrl;
+      });
+    };
 
     // Paint-by-Number conversion
     const btnConvertVector = document.getElementById('btn-convert-vector');
@@ -2001,7 +2041,7 @@ class TapColorApp {
         const statusEl = document.getElementById('conversion-status');
         const fillEl = document.getElementById('conversion-progress-fill');
         const titleInput = document.getElementById('input-custom-title');
-        const customTitle = (titleInput && titleInput.value.trim()) || (customImg ? 'My Photo Painting' : `My Artwork (${selectedPreset})`);
+        const customTitle = (titleInput && titleInput.value.trim()) || 'My Painting';
 
         const complexity = document.getElementById('select-vector-complexity').value || 'balanced';
         const customPaletteSize = parseInt(document.getElementById('select-vector-colors').value, 10) || 14;
@@ -2011,15 +2051,14 @@ class TapColorApp {
         statusEl.textContent = 'Preparing your picture...';
 
         try {
-          let source = customImg;
-          if (!source) {
-            const presetCanvas = document.createElement('canvas');
-            presetCanvas.width = 400;
-            presetCanvas.height = 400;
-            const pCtx = presetCanvas.getContext('2d');
-            this.drawPresetScene(pCtx, selectedPreset, 400);
-            source = presetCanvas;
-          }
+          const source = await getActiveSourceImage();
+          this.lastCustomImage = source;
+          this.lastCustomTitle = customTitle;
+          this.lastCustomMode = 'classic';
+          this.lastCustomComplexity = complexity;
+          this.lastCustomPaletteSize = customPaletteSize;
+          this.currentArtworkMeta = null;
+          this.currentArtworkVariant = null;
 
           const onProgress = (msg, pct) => {
             statusEl.textContent = msg;
@@ -2061,15 +2100,27 @@ class TapColorApp {
       });
     }
 
-    document.getElementById('btn-convert-diamond').addEventListener('click', () => {
-      const N = parseInt(document.getElementById('select-custom-grid').value, 10) || 120;
-      const K = parseInt(document.getElementById('select-custom-colors').value, 10) || 26;
-      const titleInput = document.getElementById('input-custom-title');
-      const customTitle = (titleInput && titleInput.value.trim()) || (customImg ? 'Diamond Masterpiece' : `Diamond Masterpiece (${selectedPreset})`);
+    const btnConvertDiamond = document.getElementById('btn-convert-diamond');
+    if (btnConvertDiamond) {
+      btnConvertDiamond.addEventListener('click', async () => {
+        const N = parseInt(document.getElementById('select-custom-grid').value, 10) || 120;
+        const K = parseInt(document.getElementById('select-custom-colors').value, 10) || 26;
+        const titleInput = document.getElementById('input-custom-title');
+        const customTitle = (titleInput && titleInput.value.trim()) || 'Diamond Masterpiece';
 
-      this.convertImageToDiamondArt(customImg, selectedPreset, N, K, customTitle);
-      document.getElementById('modal-gallery').classList.add('hidden');
-    });
+        const source = await getActiveSourceImage();
+        this.lastCustomImage = source;
+        this.lastCustomTitle = customTitle;
+        this.lastCustomMode = 'diamond';
+        this.lastCustomGrid = N;
+        this.lastCustomColors = K;
+        this.currentArtworkMeta = null;
+        this.currentArtworkVariant = null;
+
+        this.convertImageToDiamondArt(source, selectedPreset, N, K, customTitle);
+        document.getElementById('modal-gallery').classList.add('hidden');
+      });
+    }
   }
 
   convertImageToDiamondArt(img, presetName, N, K, customTitle = '') {
@@ -2078,25 +2129,20 @@ class TapColorApp {
     offCanvas.height = N;
     const ctx = offCanvas.getContext('2d');
 
-    if (img) {
-      ctx.fillStyle = '#FFFFFF';
-      ctx.fillRect(0, 0, N, N);
-      const bounds = detectContentBounds(img);
-      const scale = Math.min(N / bounds.sw, N / bounds.sh);
-      const dw = bounds.sw * scale;
-      const dh = bounds.sh * scale;
-      const dx = (N - dw) / 2;
-      const dy = (N - dh) / 2;
-      ctx.drawImage(img, bounds.sx, bounds.sy, bounds.sw, bounds.sh, dx, dy, dw, dh);
-    } else {
-      // Draw procedural preset scene
-      this.drawPresetScene(ctx, presetName, N);
-    }
+    ctx.fillStyle = '#FFFFFF';
+    ctx.fillRect(0, 0, N, N);
+    const bounds = detectContentBounds(img);
+    const scale = Math.min(N / bounds.sw, N / bounds.sh);
+    const dw = bounds.sw * scale;
+    const dh = bounds.sh * scale;
+    const dx = (N - dw) / 2;
+    const dy = (N - dh) / 2;
+    ctx.drawImage(img, bounds.sx, bounds.sy, bounds.sw, bounds.sh, dx, dy, dw, dh);
 
     const imgData = ctx.getImageData(0, 0, N, N);
     const pixels = imgData.data;
 
-    // Palette quantization using kmeans (subsampled for instantaneous execution up to 50K pieces)
+    // Palette quantization using kmeans
     const totalDrills = N * N;
     const samples = [];
     const sampleStep = Math.max(1, Math.floor(totalDrills / 2800));
@@ -2131,7 +2177,7 @@ class TapColorApp {
       };
     });
 
-    // Build Regions with fast squared Euclidean distance
+    // Build Regions
     const width = 800;
     const height = 800;
     const margin = 28;
@@ -2191,7 +2237,7 @@ class TapColorApp {
 
     const artwork = {
       id: 'custom_diamond_' + Date.now(),
-      title: customTitle || (img ? 'Custom Photo Diamond Art' : `Diamond Masterpiece (${presetName})`),
+      title: customTitle || 'Custom Photo Diamond Art',
       artist: 'Custom Studio Creation',
       width,
       height,
@@ -2231,87 +2277,7 @@ class TapColorApp {
     this.successfulTaps = 0;
     this.updateArtworkUI();
     this.refreshPaletteUI();
-  }
-
-  drawPresetScene(ctx, preset, N) {
-    if (preset === 'sunflower') {
-      // Sky blue to green meadow background
-      const grad = ctx.createLinearGradient(0, 0, 0, N);
-      grad.addColorStop(0, '#38bdf8');
-      grad.addColorStop(0.6, '#7dd3fc');
-      grad.addColorStop(1, '#16a34a');
-      ctx.fillStyle = grad;
-      ctx.fillRect(0, 0, N, N);
-
-      // Sunflower center & petals
-      const cx = N / 2, cy = N / 2;
-      for (let a = 0; a < Math.PI * 2; a += 0.3) {
-        const px = cx + Math.cos(a) * (N * 0.35);
-        const py = cy + Math.sin(a) * (N * 0.35);
-        ctx.fillStyle = '#facc15';
-        ctx.beginPath();
-        ctx.arc(px, py, N * 0.12, 0, Math.PI * 2);
-        ctx.fill();
-      }
-      ctx.fillStyle = '#78350f';
-      ctx.beginPath();
-      ctx.arc(cx, cy, N * 0.22, 0, Math.PI * 2);
-      ctx.fill();
-    } else if (preset === 'cat') {
-      // Sunset gradient
-      const grad = ctx.createLinearGradient(0, 0, 0, N);
-      grad.addColorStop(0, '#f43f5e');
-      grad.addColorStop(0.5, '#fb923c');
-      grad.addColorStop(1, '#38bdf8');
-      ctx.fillStyle = grad;
-      ctx.fillRect(0, 0, N, N);
-
-      // Kitty silhouette sitting on windowsill
-      ctx.fillStyle = '#1e1b4b';
-      ctx.fillRect(0, N * 0.75, N, N * 0.25);
-      ctx.beginPath();
-      ctx.arc(N * 0.5, N * 0.6, N * 0.2, 0, Math.PI * 2); // body
-      ctx.arc(N * 0.5, N * 0.38, N * 0.14, 0, Math.PI * 2); // head
-      ctx.fill();
-      // Ears
-      ctx.beginPath();
-      ctx.moveTo(N * 0.4, N * 0.35); ctx.lineTo(N * 0.35, N * 0.22); ctx.lineTo(N * 0.46, N * 0.28);
-      ctx.moveTo(N * 0.6, N * 0.35); ctx.lineTo(N * 0.65, N * 0.22); ctx.lineTo(N * 0.54, N * 0.28);
-      ctx.fill();
-    } else if (preset === 'island') {
-      const grad = ctx.createLinearGradient(0, 0, 0, N);
-      grad.addColorStop(0, '#fdba74');
-      grad.addColorStop(0.4, '#f472b6');
-      grad.addColorStop(0.7, '#38bdf8');
-      grad.addColorStop(1, '#0284c7');
-      ctx.fillStyle = grad;
-      ctx.fillRect(0, 0, N, N);
-      // Island palm
-      ctx.fillStyle = '#fde047';
-      ctx.beginPath();
-      ctx.arc(N * 0.5, N * 0.8, N * 0.25, 0, Math.PI);
-      ctx.fill();
-      ctx.fillStyle = '#15803d';
-      ctx.beginPath();
-      ctx.arc(N * 0.45, N * 0.5, N * 0.2, 0, Math.PI * 2);
-      ctx.fill();
-    } else {
-      // Polar aurora
-      const grad = ctx.createLinearGradient(0, 0, 0, N);
-      grad.addColorStop(0, '#09090b');
-      grad.addColorStop(0.3, '#1e1b4b');
-      grad.addColorStop(1, '#0f172a');
-      ctx.fillStyle = grad;
-      ctx.fillRect(0, 0, N, N);
-      ctx.fillStyle = '#22c55e';
-      ctx.beginPath();
-      ctx.ellipse(N * 0.5, N * 0.35, N * 0.45, N * 0.15, -0.2, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.fillStyle = '#06b6d4';
-      ctx.beginPath();
-      ctx.ellipse(N * 0.5, N * 0.45, N * 0.4, N * 0.12, 0.2, 0, Math.PI * 2);
-      ctx.fill();
-    }
+    this.updateResolutionBarUI();
   }
 
   async selectArtwork(id, variantId = null) {
@@ -2384,60 +2350,299 @@ class TapColorApp {
     this.updateResolutionBarUI();
   }
 
+  getCurrentArtMode() {
+    if (this.currentArtworkMeta) {
+      return this.currentArtworkMeta.category === 'diamond' ? 'diamond' : 'classic';
+    }
+    if (this.controller && this.controller.is_diamond_mode) {
+      return 'diamond';
+    }
+    if (this.lastCustomMode) {
+      return this.lastCustomMode;
+    }
+    return 'classic';
+  }
+
   updateResolutionBarUI() {
     const btnRes = document.getElementById('btn-resolution-switcher');
     const labelRes = document.getElementById('label-current-resolution');
+    const resIcon = document.getElementById('res-icon-indicator');
     if (!btnRes || !labelRes) return;
 
-    if (this.currentArtworkMeta && this.currentArtworkMeta.variants && this.currentArtworkMeta.variants.length > 1) {
+    const isDiamond = this.getCurrentArtMode() === 'diamond';
+    if (resIcon) resIcon.textContent = isDiamond ? '💎' : '🎨';
+    btnRes.classList.toggle('diamond-mode', isDiamond);
+
+    if (this.currentArtworkMeta && this.currentArtworkMeta.variants) {
       const v = this.currentArtworkVariant;
-      labelRes.textContent = v ? `${v.name || v.label} (${v.pieces.toLocaleString()} pcs)` : 'Resolutions';
+      const typeLabel = isDiamond ? 'Diamond' : 'Paint';
+      labelRes.textContent = v ? `${typeLabel} • ${v.name || v.label} (${v.pieces.toLocaleString()} pcs)` : `${typeLabel} Art`;
+      btnRes.classList.remove('hidden');
+    } else if (this.activeImportedRecord || this.lastCustomImage) {
+      let count = 0;
+      if (this.activeImportedRecord && this.activeImportedRecord.artworkData && this.activeImportedRecord.artworkData.regions) {
+        count = this.activeImportedRecord.artworkData.regions.length;
+      } else if (this.controller && this.controller.get_artwork_info_json) {
+        try {
+          const info = JSON.parse(this.controller.get_artwork_info_json());
+          count = info.total_regions || 0;
+        } catch (_) {}
+      }
+      labelRes.textContent = isDiamond ? `Diamond (${count.toLocaleString()} drills)` : `Paint (${count.toLocaleString()} pcs)`;
       btnRes.classList.remove('hidden');
     } else {
-      btnRes.classList.add('hidden');
+      btnRes.classList.remove('hidden');
     }
   }
 
-  showResolutionPickerModal() {
-    const meta = this.currentArtworkMeta;
-    if (!meta || !meta.variants) return;
+  renderQuickStyleDropdown() {
+    const isDiamond = this.getCurrentArtMode() === 'diamond';
+    const togglePbn = document.getElementById('quick-toggle-pbn');
+    const toggleDiamond = document.getElementById('quick-toggle-diamond');
+    const optionsContainer = document.getElementById('quick-dropdown-options');
+    const artTitleEl = document.getElementById('quick-dropdown-art-title');
 
-    const modal = document.getElementById('modal-resolution-picker');
-    const titleEl = document.getElementById('res-picker-title');
-    const optionsContainer = document.getElementById('res-picker-options');
-    if (!modal || !optionsContainer) return;
+    if (togglePbn) togglePbn.classList.toggle('active', !isDiamond);
+    if (toggleDiamond) toggleDiamond.classList.toggle('active', isDiamond);
 
-    if (titleEl) titleEl.textContent = `${meta.title} — Choose Resolution`;
+    const title = this.currentArtworkMeta ? this.currentArtworkMeta.title : (this.lastCustomTitle || 'Current Artwork');
+    if (artTitleEl) artTitleEl.textContent = `${title} • Detail Level`;
 
-    const isDiamond = meta.category === 'diamond';
+    if (!optionsContainer) return;
     optionsContainer.innerHTML = '';
 
-    meta.variants.forEach(v => {
-      const isActive = this.currentArtworkVariant && this.currentArtworkVariant.id === v.id;
-      const item = document.createElement('div');
-      item.className = `res-picker-item ${isActive ? 'active' : ''}`;
-      item.innerHTML = `
-        <div class="res-item-left">
-          <span class="res-item-icon">${isDiamond ? '💎' : '🎨'}</span>
-          <div>
-            <div class="res-item-name">${v.name || v.label} ${isActive ? '✓ (Current)' : ''}</div>
-            <div class="res-item-desc">${isDiamond ? `${v.grid}×${v.grid} Gemstone grid` : 'Planar vector regions'} • ${v.colors} vibrant colors</div>
+    const closeDropdown = () => {
+      const dropdown = document.getElementById('quick-style-dropdown');
+      const btn = document.getElementById('btn-resolution-switcher');
+      if (dropdown) dropdown.classList.add('hidden');
+      if (btn) btn.classList.remove('active');
+    };
+
+    // Case 1: Gallery Artwork
+    if (this.currentArtworkMeta && this.currentArtworkMeta.variants) {
+      const meta = this.currentArtworkMeta;
+      const isMetaDiamond = meta.category === 'diamond';
+
+      meta.variants.forEach(v => {
+        const isActive = this.currentArtworkVariant && this.currentArtworkVariant.id === v.id;
+        const item = document.createElement('div');
+        item.className = `quick-dropdown-item ${isMetaDiamond ? 'diamond-item' : ''} ${isActive ? 'active' : ''}`;
+        
+        let icon = '🟡';
+        if (v.id.includes('80') || v.id.includes('detailed')) icon = '🟢';
+        if (v.id.includes('160') || v.id.includes('masterpiece')) icon = '🟣';
+
+        item.innerHTML = `
+          <div class="quick-item-left">
+            <span class="quick-item-icon">${icon}</span>
+            <div class="quick-item-info">
+              <span class="quick-item-title">${v.name || v.label} ${isActive ? '✓' : ''}</span>
+              <span class="quick-item-subtitle">${isMetaDiamond ? `${v.grid}×${v.grid} grid` : 'Clean vector contours'} • ${v.colors} colors</span>
+            </div>
           </div>
-        </div>
-        <span class="res-item-badge">${v.pieces.toLocaleString()} Pieces</span>
-      `;
+          <span class="quick-item-badge">${v.pieces.toLocaleString()} pcs</span>
+        `;
 
-      item.addEventListener('click', () => {
-        modal.classList.add('hidden');
-        if (!isActive) {
-          this.selectArtwork(meta.id, v.id);
-        }
+        item.addEventListener('click', () => {
+          closeDropdown();
+          if (!isActive) {
+            this.selectArtwork(meta.id, v.id);
+          }
+        });
+
+        optionsContainer.appendChild(item);
       });
+      return;
+    }
 
-      optionsContainer.appendChild(item);
-    });
+    // Case 2: Custom Photo
+    if (isDiamond) {
+      const diamondPresets = [
+        { grid: 80, colors: 18, name: 'Cozy Canvas (80×80)', icon: '🟢', drills: 6400 },
+        { grid: 120, colors: 26, name: 'Standard Kit (120×120)', icon: '🟡', drills: 14400 },
+        { grid: 160, colors: 36, name: 'Masterpiece Ultra (160×160)', icon: '🟣', drills: 25600 }
+      ];
 
-    modal.classList.remove('hidden');
+      diamondPresets.forEach(preset => {
+        const isActive = this.lastCustomGrid === preset.grid;
+        const item = document.createElement('div');
+        item.className = `quick-dropdown-item diamond-item ${isActive ? 'active' : ''}`;
+        item.innerHTML = `
+          <div class="quick-item-left">
+            <span class="quick-item-icon">${preset.icon}</span>
+            <div class="quick-item-info">
+              <span class="quick-item-title">${preset.name} ${isActive ? '✓' : ''}</span>
+              <span class="quick-item-subtitle">${preset.grid}×${preset.grid} drills • ${preset.colors} colors</span>
+            </div>
+          </div>
+          <span class="quick-item-badge">${preset.drills.toLocaleString()} pcs</span>
+        `;
+
+        item.addEventListener('click', () => {
+          closeDropdown();
+          if (this.lastCustomImage) {
+            this.lastCustomGrid = preset.grid;
+            this.lastCustomColors = preset.colors;
+            this.convertImageToDiamondArt(this.lastCustomImage, 'custom', preset.grid, preset.colors, this.lastCustomTitle || 'Custom Diamond');
+          }
+        });
+
+        optionsContainer.appendChild(item);
+      });
+    } else {
+      const pbnPresets = [
+        { complexity: 'cozy', colors: 10, name: 'Easy & Relaxing', icon: '🟢', desc: 'Larger spaces • 10 colors' },
+        { complexity: 'balanced', colors: 14, name: 'Standard', icon: '🟡', desc: 'Recommended • 14 colors' },
+        { complexity: 'detailed', colors: 24, name: 'Detailed', icon: '🟣', desc: 'Finer areas • 24 colors' }
+      ];
+
+      pbnPresets.forEach(preset => {
+        const isActive = this.lastCustomComplexity === preset.complexity;
+        const item = document.createElement('div');
+        item.className = `quick-dropdown-item ${isActive ? 'active' : ''}`;
+        item.innerHTML = `
+          <div class="quick-item-left">
+            <span class="quick-item-icon">${preset.icon}</span>
+            <div class="quick-item-info">
+              <span class="quick-item-title">${preset.name} ${isActive ? '✓' : ''}</span>
+              <span class="quick-item-subtitle">${preset.desc}</span>
+            </div>
+          </div>
+          <span class="quick-item-badge">${preset.colors} colors</span>
+        `;
+
+        item.addEventListener('click', async () => {
+          closeDropdown();
+          if (this.lastCustomImage) {
+            this.lastCustomComplexity = preset.complexity;
+            this.lastCustomPaletteSize = preset.colors;
+            const modalConv = document.getElementById('modal-conversion');
+            const statusEl = document.getElementById('conversion-status');
+            const fillEl = document.getElementById('conversion-progress-fill');
+            if (modalConv) modalConv.classList.remove('hidden');
+            if (fillEl) fillEl.style.width = '20%';
+            if (statusEl) statusEl.textContent = 'Generating Paint by Number...';
+
+            try {
+              const title = this.lastCustomTitle || 'Custom Painting';
+              const { artwork, thumbnailBlob } = await vectorizeImage(this.lastCustomImage, {
+                title,
+                complexity: preset.complexity,
+                customPaletteSize: preset.colors,
+                onProgress: (msg, pct) => {
+                  if (statusEl) statusEl.textContent = msg;
+                  if (fillEl) fillEl.style.width = `${pct}%`;
+                }
+              });
+
+              const savedId = await storage.saveArtwork(artwork, thumbnailBlob, title);
+              await this.updateSavedBadge();
+              if (modalConv) modalConv.classList.add('hidden');
+
+              this.loadImportedArtwork({
+                id: savedId,
+                title,
+                artist: 'My Custom Art',
+                category: 'imported',
+                createdAt: Date.now(),
+                thumbnailBlob,
+                artworkData: artwork,
+                pieces: artwork.regions.length,
+                colors: artwork.palette.length,
+                filledCount: 0,
+                completed: false,
+              });
+            } catch (err) {
+              console.error('Vectorization failed:', err);
+              if (modalConv) modalConv.classList.add('hidden');
+              alert('Could not update detail: ' + err.message);
+            }
+          }
+        });
+
+        optionsContainer.appendChild(item);
+      });
+    }
+  }
+
+  async switchArtworkArtType(targetMode) {
+    const currentMode = this.getCurrentArtMode();
+    if (currentMode === targetMode) return;
+
+    const dropdownQuick = document.getElementById('quick-style-dropdown');
+    const btnResSwitcher = document.getElementById('btn-resolution-switcher');
+
+    // 1. Gallery Artwork: find counterpart
+    if (this.currentArtworkMeta) {
+      const currentId = this.currentArtworkMeta.id;
+      const baseKey = currentId.replace(/_(pbn|diamond)$/, '');
+      const counterpartId = baseKey + (targetMode === 'diamond' ? '_diamond' : '_pbn');
+      const counterpartMeta = this.artworksMeta.find(a => a.id === counterpartId);
+      if (counterpartMeta) {
+        if (dropdownQuick) dropdownQuick.classList.add('hidden');
+        if (btnResSwitcher) btnResSwitcher.classList.remove('active');
+        await this.selectArtwork(counterpartMeta.id);
+        return;
+      }
+    }
+
+    // 2. Custom Photo or Active Imported Artwork
+    if (this.lastCustomImage) {
+      if (dropdownQuick) dropdownQuick.classList.add('hidden');
+      if (btnResSwitcher) btnResSwitcher.classList.remove('active');
+
+      if (targetMode === 'diamond') {
+        const N = this.lastCustomGrid || 120;
+        const K = this.lastCustomColors || 26;
+        const title = this.lastCustomTitle || 'Custom Diamond Art';
+        this.convertImageToDiamondArt(this.lastCustomImage, 'custom', N, K, title);
+      } else {
+        const modalConv = document.getElementById('modal-conversion');
+        const statusEl = document.getElementById('conversion-status');
+        const fillEl = document.getElementById('conversion-progress-fill');
+        if (modalConv) modalConv.classList.remove('hidden');
+        if (fillEl) fillEl.style.width = '20%';
+        if (statusEl) statusEl.textContent = 'Generating Paint by Number...';
+
+        try {
+          const comp = this.lastCustomComplexity || 'balanced';
+          const colors = this.lastCustomPaletteSize || 14;
+          const title = this.lastCustomTitle || 'Custom Painting';
+
+          const { artwork, thumbnailBlob } = await vectorizeImage(this.lastCustomImage, {
+            title,
+            complexity: comp,
+            customPaletteSize: colors,
+            onProgress: (msg, pct) => {
+              if (statusEl) statusEl.textContent = msg;
+              if (fillEl) fillEl.style.width = `${pct}%`;
+            }
+          });
+
+          const savedId = await storage.saveArtwork(artwork, thumbnailBlob, title);
+          await this.updateSavedBadge();
+          if (modalConv) modalConv.classList.add('hidden');
+
+          this.loadImportedArtwork({
+            id: savedId,
+            title,
+            artist: 'My Custom Art',
+            category: 'imported',
+            createdAt: Date.now(),
+            thumbnailBlob,
+            artworkData: artwork,
+            pieces: artwork.regions.length,
+            colors: artwork.palette.length,
+            filledCount: 0,
+            completed: false,
+          });
+        } catch (err) {
+          console.error('Failed to convert to PBN:', err);
+          if (modalConv) modalConv.classList.add('hidden');
+          alert('Could not convert to Paint by Number: ' + err.message);
+        }
+      }
+    }
   }
 
   updateArtworkUI() {
@@ -2558,6 +2763,11 @@ class TapColorApp {
           }
           ctx.closePath();
           ctx.fill();
+
+          // Seam-seal stroke prevents white hairline cracks between adjacent pieces
+          ctx.strokeStyle = region.color_hex;
+          ctx.lineWidth = 1.4;
+          ctx.stroke();
         }
 
         if (isQuad && (cellW * s) >= 8) {
@@ -2589,6 +2799,10 @@ class TapColorApp {
           }
           ctx.closePath();
           ctx.fill();
+
+          ctx.strokeStyle = '#F8FAFC';
+          ctx.lineWidth = 1.4;
+          ctx.stroke();
         }
       }
     }
@@ -3067,6 +3281,11 @@ class FallbackJsController {
         this.ctx.fillStyle = region.color_hex;
         this.ctx.fill();
 
+        // Seam-seal stroke prevents white hairline cracks between adjacent pieces
+        this.ctx.strokeStyle = region.color_hex;
+        this.ctx.lineWidth = 1.4 / Math.max(0.5, this.scale);
+        this.ctx.stroke();
+
         // 3D diamond facet luster when zoomed in
         if (isDiamond && region.polygon.length === 4 && drillScreenSize >= 10.0) {
           const p0 = region.polygon[0];
@@ -3093,14 +3312,17 @@ class FallbackJsController {
           this.ctx.fill();
         }
       } else {
-        if (isHinted) {
-          this.ctx.fillStyle = `rgba(255, 215, 0, ${0.45 + pulse * 0.35})`;
-        } else if (isActiveTarget) {
-          this.ctx.fillStyle = `rgba(99, 102, 241, ${0.16 + pulse * 0.12})`;
-        } else {
-          this.ctx.fillStyle = '#F8FAFC';
-        }
+        const unfillColor = isHinted
+          ? `rgba(255, 215, 0, ${0.45 + pulse * 0.35})`
+          : (isActiveTarget ? `rgba(99, 102, 241, ${0.16 + pulse * 0.12})` : '#F8FAFC');
+
+        this.ctx.fillStyle = unfillColor;
         this.ctx.fill();
+
+        // Seam-seal stroke for unfilled tiles
+        this.ctx.strokeStyle = unfillColor;
+        this.ctx.lineWidth = 1.4 / Math.max(0.5, this.scale);
+        this.ctx.stroke();
       }
 
       if (this.showOutlines) {

@@ -27,11 +27,40 @@
           <h1 id="artwork-title" class="artwork-title">Origami Hummingbird</h1>
           <span id="artwork-artist" class="artwork-artist">Geometric Fauna</span>
         </div>
-        <button id="btn-resolution-switcher" class="btn-res-pill hidden" title="Change Resolution / Difficulty">
-          <span class="res-icon">✨</span>
-          <span id="label-current-resolution">Standard</span>
-          <span class="res-caret">▾</span>
-        </button>
+        <div class="header-res-dropdown-wrap" id="header-res-dropdown-wrap">
+          <button id="btn-resolution-switcher" class="btn-res-pill" title="Change Art Style & Detail Level" aria-haspopup="true" aria-expanded="false">
+            <span class="res-icon" id="res-icon-indicator">🎨</span>
+            <span id="label-current-resolution">Standard</span>
+            <span class="res-caret">▾</span>
+          </button>
+          
+          <div id="quick-style-dropdown" class="quick-style-dropdown hidden" role="menu">
+            <div class="quick-dropdown-header">
+              <span class="quick-dropdown-title" id="quick-dropdown-art-title">Art Style & Detail Level</span>
+              <span class="quick-dropdown-subtitle">Switch style or detail without leaving canvas</span>
+            </div>
+
+            <!-- Segmented Art Style Switcher -->
+            <div class="quick-dropdown-style-toggle">
+              <button type="button" class="btn-quick-style-toggle active" id="quick-toggle-pbn" data-mode="classic">
+                <span class="toggle-icon">🎨</span>
+                <span class="toggle-text">Paint by Number</span>
+              </button>
+              <button type="button" class="btn-quick-style-toggle" id="quick-toggle-diamond" data-mode="diamond">
+                <span class="toggle-icon">💎</span>
+                <span class="toggle-text">Diamond Art</span>
+              </button>
+            </div>
+
+            <!-- Detail Level Section Header -->
+            <div class="quick-dropdown-section-title">Detail / Difficulty:</div>
+
+            <!-- Dynamic Options List -->
+            <div class="quick-dropdown-options" id="quick-dropdown-options">
+              <!-- Rendered via JavaScript -->
+            </div>
+          </div>
+        </div>
       </div>
 
       <!-- Center Progress Indicator -->
@@ -177,6 +206,7 @@
         </div>
 
         <!-- Photo to Paint-by-Number / Diamond Art Studio Tab Panel -->
+        <!-- Make from Photo Studio Tab Panel -->
         <div id="tab-custom-panel" class="custom-panel hidden">
           <div class="custom-studio-intro">
             <h3>Turn Any Photo into Art</h3>
@@ -191,11 +221,23 @@
             </div>
             <div class="studio-mode-toggle">
               <button class="btn-studio-mode active" data-mode="vector" id="btn-mode-vector">
-                🎨 Paint by Number (Smooth lines)
+                <span class="mode-icon">🎨</span>
+                <span class="mode-text">
+                  <span class="mode-name">Paint by Number</span>
+                  <span class="mode-desc">Smooth outlines & numbered regions</span>
+                </span>
               </button>
               <button class="btn-studio-mode" data-mode="diamond" id="btn-mode-diamond">
-                💎 Diamond Painting (Sparkly gems)
+                <span class="mode-icon">💎</span>
+                <span class="mode-text">
+                  <span class="mode-name">Diamond Painting</span>
+                  <span class="mode-desc">Sparkling gemstone mosaic grid</span>
+                </span>
               </button>
+            </div>
+            <div class="studio-mode-banner" id="studio-mode-banner">
+              <span class="mode-banner-badge" id="mode-banner-badge">🎨 Paint by Number Active</span>
+              <span class="mode-banner-text" id="mode-banner-text">Vector mode active: Custom outlines, smooth curved boundaries, and seamless fills.</span>
             </div>
           </div>
 
@@ -208,42 +250,38 @@
             <div class="custom-studio-grid">
               <div class="preset-pickers">
                 <div class="asset-collection-header">
-                  <span class="collection-tag">🕊️ Faith & Country Life Collection</span>
-                  <span class="collection-hint">Original gallery images (Assets) — regenerate at any resolution:</span>
+                  <span class="collection-tag">🏡 Country Life Collection</span>
+                  <span class="collection-hint">Clean lines & solid colors — ready to paint:</span>
                 </div>
                 <div class="preset-buttons asset-preset-buttons">
-                  <button class="btn-preset active" data-preset="asset:country_chapel" data-asset="assets/country_chapel.jpg" data-key="country_chapel" data-title="Country Chapel in Meadow">⛪ Country Chapel</button>
-                  <button class="btn-preset" data-preset="asset:good_shepherd" data-asset="assets/good_shepherd.jpg" data-key="good_shepherd" data-title="The Lord is My Shepherd">🐑 Good Shepherd</button>
-                  <button class="btn-preset" data-preset="asset:country_porch_bible" data-asset="assets/country_porch_bible.jpg" data-key="country_porch_bible" data-title="Devotions on the Porch">📖 Porch & Bible</button>
-                  <button class="btn-preset" data-preset="asset:cross_and_dogwood" data-asset="assets/cross_and_dogwood.jpg" data-key="cross_and_dogwood" data-title="Old Rugged Cross & Dogwoods">✝️ Rugged Cross</button>
-                  <button class="btn-preset" data-preset="asset:fluffy_cow" data-asset="assets/fluffy-cow-3.jpeg" data-key="fluffy_cow" data-title="Sweet Highland Calf">🐮 Highland Calf</button>
+                  <button class="btn-preset active" data-preset="asset:fluffy_cow" data-asset="assets/fluffy-cow-3.jpeg" data-key="fluffy_cow" data-title="Sweet Highland Calf">🐮 Highland Calf</button>
+                  <button class="btn-preset" data-preset="asset:hummingbird" data-asset="assets/hummingbird.jpeg" data-key="hummingbird" data-title="Garden Hummingbird">🐦 Hummingbird</button>
+                  <button class="btn-preset" data-preset="asset:country_barn" data-asset="assets/country_barn.jpeg" data-key="country_barn" data-title="Rustic Red Barn">🏡 Red Barn</button>
+                  <button class="btn-preset" data-preset="asset:country_rooster" data-asset="assets/country_rooster.jpeg" data-key="country_rooster" data-title="Morning Farm Rooster">🐓 Rooster</button>
+                  <button class="btn-preset" data-preset="asset:country_truck" data-asset="assets/country_truck.jpeg" data-key="country_truck" data-title="Vintage Harvest Truck">🛻 Harvest Truck</button>
+                  <button class="btn-preset" data-preset="asset:country_puppy" data-asset="assets/country_puppy.jpeg" data-key="country_puppy" data-title="Porch Golden Puppy">🐶 Porch Puppy</button>
                 </div>
-                <div class="preset-sub-header">
-                  <span>Drawings & Presets:</span>
-                </div>
-                <div class="preset-buttons secondary-presets">
-                  <button class="btn-preset" data-preset="sunflower">🌻 Sunflower</button>
-                  <button class="btn-preset" data-preset="cat">🐱 Starlight Kitty</button>
-                  <button class="btn-preset" data-preset="island">🏝️ Emerald Island</button>
-                  <button class="btn-preset" data-preset="aurora">🌌 Aurora</button>
-                </div>
+
                 <div class="upload-box">
                   <label for="input-custom-photo" class="btn-secondary upload-btn">
                     📁 Choose a Photo from My Device...
                   </label>
                   <input type="file" id="input-custom-photo" accept="image/*" style="display:none">
-                  <span id="upload-filename" class="upload-filename">No photo chosen yet</span>
+                  <span id="upload-filename" class="upload-filename">Sweet Highland Calf</span>
                 </div>
 
                 <!-- Live Preview Box -->
                 <div id="studio-preview-box" class="studio-preview-box">
+                  <div class="preview-header-bar">
+                    <span id="preview-mode-tag" class="preview-mode-tag">🎨 Paint by Number</span>
+                  </div>
                   <canvas id="studio-preview-canvas" class="studio-preview-canvas" width="280" height="200"></canvas>
-                  <div class="preview-caption" id="preview-caption">Sunlit Sunflower</div>
+                  <div class="preview-caption" id="preview-caption">Sweet Highland Calf</div>
                 </div>
 
                 <div class="setting-item title-input-wrap">
                   <label for="input-custom-title">Name your picture (Optional):</label>
-                  <input type="text" id="input-custom-title" class="styled-input" placeholder="e.g. Bella the Cat, Sunny Garden">
+                  <input type="text" id="input-custom-title" class="styled-input" placeholder="e.g. Sweet Highland Calf, Sunny Porch">
                 </div>
               </div>
 
@@ -251,13 +289,16 @@
               <div class="custom-settings" id="settings-vector-panel">
                 <div class="studio-step-header">
                   <span class="step-num">3</span>
-                  <span class="step-title">Choose Difficulty</span>
+                  <span class="step-title">Paint by Number Options</span>
+                </div>
+                <div class="settings-feature-badge">
+                  <span>🎨 Vector Outlines</span> • <span>Smooth Curves</span> • <span>Seamless Fills</span>
                 </div>
                 <div class="difficulty-picker" id="difficulty-chips-vector">
                   <button type="button" class="btn-diff-chip" data-complexity="cozy" data-colors="10">
                     <span class="diff-icon">🟢</span>
                     <span class="diff-name">Easy & Relaxing</span>
-                    <span class="diff-desc">Bigger spaces • 10 colors</span>
+                    <span class="diff-desc">Larger spaces • 10 colors</span>
                   </button>
                   <button type="button" class="btn-diff-chip active" data-complexity="balanced" data-colors="14">
                     <span class="diff-icon">🟡</span>
@@ -283,7 +324,7 @@
                 </select>
 
                 <button id="btn-convert-vector" class="btn-primary btn-sparkle btn-large-action">
-                  ✨ Create Coloring Page & Start Coloring
+                  ✨ Create Paint by Number & Start Coloring
                 </button>
               </div>
 
@@ -291,7 +332,10 @@
               <div class="custom-settings hidden" id="settings-diamond-panel">
                 <div class="studio-step-header">
                   <span class="step-num">3</span>
-                  <span class="step-title">Choose Canvas Size</span>
+                  <span class="step-title">Diamond Painting Options</span>
+                </div>
+                <div class="settings-feature-badge diamond-badge">
+                  <span>💎 Gemstone Mosaic</span> • <span>Facet Shimmer</span> • <span>Precision Grid</span>
                 </div>
                 <div class="difficulty-picker" id="difficulty-chips-diamond">
                   <button type="button" class="btn-diff-chip" data-grid="80" data-colors="18">

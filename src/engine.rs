@@ -559,6 +559,11 @@ impl GameEngine {
                     }
                     ctx.close_path();
                     ctx.fill();
+
+                    // Seam-seal stroke: prevents anti-aliasing white cracks between adjacent polygons
+                    ctx.set_stroke_style_str(&region.color_hex);
+                    ctx.set_line_width((1.5 / s).max(0.8));
+                    ctx.stroke();
                 }
 
                 if is_quad && can_draw_facets {
@@ -611,6 +616,11 @@ impl GameEngine {
                     }
                     ctx.close_path();
                     ctx.fill();
+
+                    // Seam-seal stroke for unfilled background
+                    ctx.set_stroke_style_str("#F8FAFC");
+                    ctx.set_line_width((1.5 / s).max(0.8));
+                    ctx.stroke();
                 }
             }
 
@@ -620,13 +630,19 @@ impl GameEngine {
                     ctx.set_stroke_style_str("rgba(148, 163, 184, 0.35)");
                     ctx.set_line_width((0.7 / s).max(0.5));
                 } else {
-                    ctx.set_stroke_style_str("rgba(30, 41, 59, 0.35)");
-                    ctx.set_line_width((1.0 / s).max(0.6));
+                    ctx.set_stroke_style_str("rgba(30, 41, 59, 0.55)");
+                    ctx.set_line_width((1.3 / s).max(0.7));
                 }
 
                 if is_quad {
                     ctx.stroke_rect(p0.x, p0.y, cell_w, cell_h);
                 } else {
+                    ctx.begin_path();
+                    ctx.move_to(region.polygon[0].x, region.polygon[0].y);
+                    for pt in region.polygon.iter().skip(1) {
+                        ctx.line_to(pt.x, pt.y);
+                    }
+                    ctx.close_path();
                     ctx.stroke();
                 }
             }
@@ -767,6 +783,11 @@ impl GameEngine {
                     }
                     ctx.close_path();
                     ctx.fill();
+
+                    // Seam-seal stroke: prevents anti-aliasing white cracks between adjacent polygons
+                    ctx.set_stroke_style_str(&region.color_hex);
+                    ctx.set_line_width((1.5 / self.scale).max(0.8));
+                    ctx.stroke();
                 }
 
                 // Authentic 5D Diamond Facet Cut for diamond art tiles when zoomed in
@@ -811,15 +832,17 @@ impl GameEngine {
                 }
             } else {
                 // Unfilled region
-                if is_hinted {
+                let unfill_color = if is_hinted {
                     let alpha = 0.45 + active_pulse * 0.35;
-                    ctx.set_fill_style_str(&format!("rgba(255, 215, 0, {:.2})", alpha));
+                    format!("rgba(255, 215, 0, {:.2})", alpha)
                 } else if is_active_target {
                     let alpha = 0.16 + active_pulse * 0.12;
-                    ctx.set_fill_style_str(&format!("rgba(99, 102, 241, {:.2})", alpha));
+                    format!("rgba(99, 102, 241, {:.2})", alpha)
                 } else {
-                    ctx.set_fill_style_str("#F8FAFC");
-                }
+                    "#F8FAFC".to_string()
+                };
+
+                ctx.set_fill_style_str(&unfill_color);
 
                 if is_quad {
                     ctx.fill_rect(p0.x, p0.y, cell_w, cell_h);
@@ -831,6 +854,11 @@ impl GameEngine {
                     }
                     ctx.close_path();
                     ctx.fill();
+
+                    // Seam-seal stroke for unfilled tiles
+                    ctx.set_stroke_style_str(&unfill_color);
+                    ctx.set_line_width((1.5 / self.scale).max(0.8));
+                    ctx.stroke();
                 }
             }
 
@@ -841,18 +869,24 @@ impl GameEngine {
                     ctx.set_line_width(2.5 / self.scale.max(0.5));
                 } else if is_active_target {
                     ctx.set_stroke_style_str("rgba(99, 102, 241, 0.6)");
-                    ctx.set_line_width(1.2 / self.scale.max(0.5));
+                    ctx.set_line_width(1.3 / self.scale.max(0.5));
                 } else if is_diamond_art {
                     ctx.set_stroke_style_str("rgba(148, 163, 184, 0.35)");
                     ctx.set_line_width(0.7 / self.scale.max(0.5));
                 } else {
-                    ctx.set_stroke_style_str("rgba(30, 41, 59, 0.45)");
-                    ctx.set_line_width(1.2 / self.scale.max(0.5));
+                    ctx.set_stroke_style_str("rgba(30, 41, 59, 0.55)");
+                    ctx.set_line_width(1.3 / self.scale.max(0.5));
                 }
 
                 if is_quad {
                     ctx.stroke_rect(p0.x, p0.y, cell_w, cell_h);
                 } else {
+                    ctx.begin_path();
+                    ctx.move_to(region.polygon[0].x, region.polygon[0].y);
+                    for pt in region.polygon.iter().skip(1) {
+                        ctx.line_to(pt.x, pt.y);
+                    }
+                    ctx.close_path();
                     ctx.stroke();
                 }
             }

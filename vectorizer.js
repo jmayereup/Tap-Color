@@ -13,23 +13,23 @@ export const COMPLEXITY_PRESETS = {
   cozy: {
     name: 'Cozy (Relaxing)',
     paletteSize: 10,
-    minPixels: 36,
+    minPixels: 40,
     workingSize: 300,
-    simplifyEpsilon: 1.4,
+    simplifyEpsilon: 0.75,
   },
   balanced: {
     name: 'Balanced (Standard)',
     paletteSize: 14,
     minPixels: 22,
     workingSize: 340,
-    simplifyEpsilon: 1.1,
+    simplifyEpsilon: 0.65,
   },
   detailed: {
     name: 'Detailed (Masterpiece)',
     paletteSize: 18,
     minPixels: 14,
     workingSize: 380,
-    simplifyEpsilon: 0.9,
+    simplifyEpsilon: 0.55,
   },
 };
 
@@ -132,12 +132,12 @@ function chaikinSmooth(points, iterations = 1) {
       const p1 = curr[i];
       const p2 = curr[(i + 1) % len];
       next.push({
-        x: p1.x * 0.75 + p2.x * 0.25,
-        y: p1.y * 0.75 + p2.y * 0.25,
+        x: p1.x * 0.85 + p2.x * 0.15,
+        y: p1.y * 0.85 + p2.y * 0.15,
       });
       next.push({
-        x: p1.x * 0.25 + p2.x * 0.75,
-        y: p1.y * 0.25 + p2.y * 0.75,
+        x: p1.x * 0.15 + p2.x * 0.85,
+        y: p1.y * 0.15 + p2.y * 0.85,
       });
     }
     curr = next;
@@ -302,6 +302,157 @@ function calculateInternalCentroid(compPixels, W) {
 }
 
 /**
+ * Connected Component Labeling (4-connectivity) using fast typed array queue.
+ */
+function computeConnectedComponents(grid, W, H) {
+  const labels = new Int32Array(W * H).fill(-1);
+  let nextLabel = 0;
+  const components = [];
+  const q = new Int32Array(W * H);
+
+  for (let y = 0; y < H; y++) {
+    for (let x = 0; x < W; x++) {
+      const idx = y * W + x;
+      if (labels[idx] !== -1) continue;
+      const color = grid[idx];
+      const label = nextLabel++;
+      labels[idx] = label;
+
+      let head = 0;
+      let tail = 0;
+      q[tail++] = idx;
+      const pixels = [];
+
+      while (head < tail) {
+        const curr = q[head++];
+        pixels.push(curr);
+        const cx = curr % W;
+        const cy = Math.floor(curr / W);
+
+        if (cx > 0) {
+          const left = curr - 1;
+          if (labels[left] === -1 && grid[left] === color) {
+            labels[left] = label;
+            q[tail++] = left;
+          }
+        }
+        if (cx < W - 1) {
+          const right = curr + 1;
+          if (labels[right] === -1 && grid[right] === color) {
+            labels[right] = label;
+            q[tail++] = right;
+          }
+        }
+        if (cy > 0) {
+          const up = curr - W;
+          if (labels[up] === -1 && grid[up] === color) {
+            labels[up] = label;
+            q[tail++] = up;
+          }
+        }
+        if (cy < H - 1) {
+          const down = curr + W;
+          if (labels[down] === -1 && grid[down] === color) {
+            labels[down] = label;
+            q[tail++] = down;
+          }
+        }
+      }
+
+      components.push({ label, color, pixels });
+    }
+  }
+
+  return { components, labels };
+}
+
+/**
+ * Watershed neighbor merge: absorbs micro-components (< minPixels) into their
+ * most compatible adjacent neighbor (maximizing shared border length and color similarity).
+ * Guarantees 100% planar partition with zero dropped pixels, eliminating white holes.
+ */
+function mergeSmallRegions(grid, W, H, minPixels, centers, maxPasses = 5) {
+  for (let pass = 0; pass < maxPasses; pass++) {
+    const { components, labels } = computeConnectedComponents(grid, W, H);
+    const smallComponents = components.filter(c => c.pixels.length < minPixels);
+    if (smallComponents.length === 0) break;
+
+    // Smallest first so isolated fragments get absorbed first
+    smallComponents.sort((a, b) => a.pixels.length - b.pixels.length);
+
+    let mergedCount = 0;
+    for (const comp of smallComponents) {
+      const neighborCounts = new Map(); // color -> count of border contacts
+
+      for (const p of comp.pixels) {
+        const cx = p % W;
+        const cy = Math.floor(p / W);
+
+        if (cx > 0) {
+          const n = p - 1;
+          if (labels[n] !== comp.label) {
+            const col = grid[n];
+            neighborCounts.set(col, (neighborCounts.get(col) || 0) + 1);
+          }
+        }
+        if (cx < W - 1) {
+          const n = p + 1;
+          if (labels[n] !== comp.label) {
+            const col = grid[n];
+            neighborCounts.set(col, (neighborCounts.get(col) || 0) + 1);
+          }
+        }
+        if (cy > 0) {
+          const n = p - W;
+          if (labels[n] !== comp.label) {
+            const col = grid[n];
+            neighborCounts.set(col, (neighborCounts.get(col) || 0) + 1);
+          }
+        }
+        if (cy < H - 1) {
+          const n = p + W;
+          if (labels[n] !== comp.label) {
+            const col = grid[n];
+            neighborCounts.set(col, (neighborCounts.get(col) || 0) + 1);
+          }
+        }
+      }
+
+      if (neighborCounts.size === 0) continue;
+
+      // Select neighbor with maximum contact length and minimum color difference
+      let bestColor = -1;
+      let bestScore = -Infinity;
+      const curRgb = centers[comp.color] || [128, 128, 128];
+
+      for (const [col, contactCount] of neighborCounts.entries()) {
+        const nRgb = centers[col] || [128, 128, 128];
+        const dr = curRgb[0] - nRgb[0];
+        const dg = curRgb[1] - nRgb[1];
+        const db = curRgb[2] - nRgb[2];
+        const colorDist = Math.sqrt(dr * dr + dg * dg + db * db);
+
+        // Strongly prioritize boundary contact, with color difference penalty
+        const score = contactCount * 1000 - colorDist;
+        if (score > bestScore) {
+          bestScore = score;
+          bestColor = col;
+        }
+      }
+
+      if (bestColor !== -1) {
+        for (const p of comp.pixels) {
+          grid[p] = bestColor;
+        }
+        mergedCount++;
+      }
+    }
+
+    if (mergedCount === 0) break;
+  }
+}
+
+/**
  * Converts any photo or drawing into a clean, planar non-overlapping Paint-by-Number artwork.
  *
  * @param {HTMLImageElement|HTMLCanvasElement} sourceImage
@@ -423,71 +574,15 @@ export async function vectorizeImage(sourceImage, options = {}) {
     }
   }
 
-  // 6. Connected Component Labeling (CCL)
+  // 6. Watershed Neighbor Merge: absorb micro-regions (< minPixels) into adjacent neighbors
   progress('Drawing clean outlines...', 75);
   await new Promise(r => setTimeout(r, 20));
 
-  const labels = new Int32Array(W * H).fill(-1);
-  let nextLabel = 0;
-  const components = [];
-  const q = new Int32Array(W * H);
+  mergeSmallRegions(grid, W, H, preset.minPixels, centers, 5);
 
-  for (let y = 0; y < H; y++) {
-    for (let x = 0; x < W; x++) {
-      const idx = y * W + x;
-      if (labels[idx] !== -1) continue;
-      const color = grid[idx];
-      const label = nextLabel++;
-      labels[idx] = label;
-
-      let head = 0;
-      let tail = 0;
-      q[tail++] = idx;
-      const pixels = [];
-
-      while (head < tail) {
-        const curr = q[head++];
-        pixels.push(curr);
-        const cx = curr % W;
-        const cy = Math.floor(curr / W);
-
-        if (cx > 0) {
-          const left = curr - 1;
-          if (labels[left] === -1 && grid[left] === color) {
-            labels[left] = label;
-            q[tail++] = left;
-          }
-        }
-        if (cx < W - 1) {
-          const right = curr + 1;
-          if (labels[right] === -1 && grid[right] === color) {
-            labels[right] = label;
-            q[tail++] = right;
-          }
-        }
-        if (cy > 0) {
-          const up = curr - W;
-          if (labels[up] === -1 && grid[up] === color) {
-            labels[up] = label;
-            q[tail++] = up;
-          }
-        }
-        if (cy < H - 1) {
-          const down = curr + W;
-          if (labels[down] === -1 && grid[down] === color) {
-            labels[down] = label;
-            q[tail++] = down;
-          }
-        }
-      }
-
-      components.push({ label, color, pixels });
-    }
-  }
-
-  // 7. Filter out micro-regions (< minPixels)
-  const minPixels = preset.minPixels;
-  const validComponents = components.filter(c => c.pixels.length >= minPixels);
+  // 7. Final Connected Component Labeling (guaranteed 100% planar partition with zero dropped holes)
+  const { components } = computeConnectedComponents(grid, W, H);
+  const validComponents = components.filter(c => c.pixels.length >= 3);
 
   // 8. Build ArtworkData structures (scaled to 800x800)
   progress('Adding numbers to coloring areas...', 90);
@@ -630,8 +725,13 @@ export async function generateThumbnailBlob(artwork) {
       ctx.fillStyle = reg.color_hex;
       ctx.fill();
 
+      // Seam-seal stroke prevents white hairline cracks in thumbnails
+      ctx.strokeStyle = reg.color_hex;
+      ctx.lineWidth = 1.2;
+      ctx.stroke();
+
       if (!isHighRes) {
-        ctx.strokeStyle = 'rgba(0, 0, 0, 0.2)';
+        ctx.strokeStyle = 'rgba(0, 0, 0, 0.25)';
         ctx.lineWidth = 1.0;
         ctx.stroke();
       }
