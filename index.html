@@ -197,16 +197,80 @@
           <button class="gallery-tab" data-tab="custom">📸 Make from Photo</button>
         </div>
 
+        <!-- Catalog Artwork Grid (Paint by Number & Diamond Painting) -->
         <div class="artwork-grid" id="artwork-grid">
           <!-- Populated dynamically with rich visual thumbnails -->
         </div>
 
-        <!-- Saved On-Device Gallery Empty State Container -->
-        <div id="saved-gallery-empty" class="saved-empty-panel hidden">
-          <div class="empty-gallery-icon">🌸</div>
-          <h3>Your Picture Collection is Empty</h3>
-          <p>Turn your favorite photos of family, pets, or flowers into custom Paint by Number pages saved right here on your device!</p>
-          <button class="btn-primary" id="btn-open-studio-from-empty">📸 Make Art from a Photo</button>
+        <!-- My Pictures Tab Panel (Features Autosaved In-Progress at the TOP!) -->
+        <div id="tab-saved-panel" class="saved-panel hidden">
+          <!-- 1. Top Subsection: Autosaved In-Progress Artworks -->
+          <div id="saved-in-progress-section" class="saved-subsection">
+            <div class="saved-subsection-header">
+              <div class="saved-subsection-title-wrap">
+                <span class="saved-subsection-icon">⏳</span>
+                <div class="saved-subsection-headings">
+                  <div class="saved-title-row">
+                    <h3 class="saved-subsection-title">In Progress</h3>
+                    <span class="saved-subsection-badge" id="in-progress-badge">0</span>
+                  </div>
+                  <p class="saved-subsection-desc">Autosaved coloring sessions • Pick up right where you left off</p>
+                </div>
+              </div>
+            </div>
+            <div class="artwork-grid in-progress-grid" id="in-progress-grid">
+              <!-- Populated dynamically with autosaved in-progress cards -->
+            </div>
+          </div>
+
+          <!-- 2. Completed Masterpieces Subsection -->
+          <div id="saved-completed-section" class="saved-subsection hidden">
+            <div class="saved-subsection-header">
+              <div class="saved-subsection-title-wrap">
+                <span class="saved-subsection-icon">🏆</span>
+                <div class="saved-subsection-headings">
+                  <div class="saved-title-row">
+                    <h3 class="saved-subsection-title">Completed Masterpieces</h3>
+                    <span class="saved-subsection-badge completed" id="completed-badge">0</span>
+                  </div>
+                  <p class="saved-subsection-desc">Finished artworks ready to celebrate, inspect, and export</p>
+                </div>
+              </div>
+            </div>
+            <div class="artwork-grid completed-grid" id="completed-grid">
+              <!-- Populated dynamically with completed artworks -->
+            </div>
+          </div>
+
+          <!-- 3. Photo Studio Creations Subsection -->
+          <div id="saved-creations-section" class="saved-subsection hidden">
+            <div class="saved-subsection-header">
+              <div class="saved-subsection-title-wrap">
+                <span class="saved-subsection-icon">📸</span>
+                <div class="saved-subsection-headings">
+                  <div class="saved-title-row">
+                    <h3 class="saved-subsection-title">My Photo Studio Artworks</h3>
+                    <span class="saved-subsection-badge creations" id="creations-badge">0</span>
+                  </div>
+                  <p class="saved-subsection-desc">Custom coloring pages made from your photos</p>
+                </div>
+              </div>
+            </div>
+            <div class="artwork-grid creations-grid" id="creations-grid">
+              <!-- Populated dynamically with photo creations -->
+            </div>
+          </div>
+
+          <!-- Saved On-Device Gallery Empty State Container -->
+          <div id="saved-gallery-empty" class="saved-empty-panel hidden">
+            <div class="empty-gallery-icon">🌸</div>
+            <h3>No Pictures in Your Gallery Yet</h3>
+            <p>Start coloring any picture from the gallery or turn your photo into custom art! Your progress will autosave right here at the top of My Pictures.</p>
+            <div class="saved-empty-actions">
+              <button class="btn-primary" id="btn-browse-from-empty">🎨 Browse Library</button>
+              <button class="btn-secondary" id="btn-open-studio-from-empty">📸 Make Art from a Photo</button>
+            </div>
+          </div>
         </div>
 
         <!-- Photo to Paint-by-Number / Diamond Art Studio Tab Panel -->

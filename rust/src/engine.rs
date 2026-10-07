@@ -159,10 +159,6 @@ impl GameEngine {
                     region.is_filled = true;
                     region.fill_anim = 0.0; // Starts pop/expand animation
 
-                    // Spawn celebratory sparkle particles
-                    let color = region.color_hex.clone();
-                    self.spawn_burst(centroid.x, centroid.y, &color, 16);
-
                     // Clear active hint if this was the hinted region
                     if self.hint_region_id == Some(reg_id) {
                         self.hint_region_id = None;

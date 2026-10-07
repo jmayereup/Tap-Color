@@ -56,15 +56,58 @@ class TapColorStorage {
   }
 
   /**
-   * Saves or updates an imported vector artwork in IndexedDB.
-   * @param {Object} artworkData - Full ArtworkData object matching Rust models.
-   * @param {Blob} thumbnailBlob - Pre-rendered PNG thumbnail Blob.
-   * @param {string} [customTitle] - Optional title.
+   * Saves or updates an artwork record in IndexedDB.
+   * Preserves original createdAt if already present.
+   * @param {Object} record
    * @returns {Promise<string>} The saved artwork ID.
    */
-  async saveArtwork(artworkData, thumbnailBlob, customTitle = '') {
+  async saveArtworkRecord(record) {
     const db = await this.getDB();
-    const id = artworkData.id || `import_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
+    const id = record.id || `art_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
+    record.id = id;
+
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction([STORE_NAME], 'readwrite');
+      const store = tx.objectStore(STORE_NAME);
+      const getReq = store.get(id);
+
+      getReq.onsuccess = () => {
+        const existing = getReq.result;
+        if (existing) {
+          record.createdAt = existing.createdAt || record.createdAt || Date.now();
+          if (!record.thumbnailBlob && existing.thumbnailBlob) {
+            record.thumbnailBlob = existing.thumbnailBlob;
+          }
+        } else {
+          record.createdAt = record.createdAt || Date.now();
+        }
+        record.lastModified = Date.now();
+
+        const putReq = store.put(record);
+        putReq.onsuccess = () => resolve(id);
+        putReq.onerror = () => reject(putReq.error || new Error(`Failed to put artwork ${id}`));
+      };
+
+      getReq.onerror = () => {
+        record.createdAt = record.createdAt || Date.now();
+        record.lastModified = Date.now();
+        const putReq = store.put(record);
+        putReq.onsuccess = () => resolve(id);
+        putReq.onerror = () => reject(putReq.error || new Error(`Failed to put artwork ${id}`));
+      };
+    });
+  }
+
+  /**
+   * Saves or updates an imported or preset artwork in IndexedDB.
+   * @param {Object} artworkData - Full ArtworkData object matching Rust models.
+   * @param {Blob|null} thumbnailBlob - Pre-rendered PNG/JPEG thumbnail Blob.
+   * @param {string} [customTitle] - Optional title.
+   * @param {Object} [extraMeta] - Additional metadata (category, artist, isAutosave, etc.)
+   * @returns {Promise<string>} The saved artwork ID.
+   */
+  async saveArtwork(artworkData, thumbnailBlob = null, customTitle = '', extraMeta = {}) {
+    const id = extraMeta.id || artworkData.id || `import_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
     artworkData.id = id;
 
     const pieces = (artworkData.regions && artworkData.regions.length) || 0;
@@ -73,30 +116,27 @@ class TapColorStorage {
 
     const record = {
       id,
-      title: customTitle || artworkData.title || 'Custom Imported Artwork',
-      artist: artworkData.artist || 'My Photo Studio',
-      category: 'imported',
+      title: customTitle || artworkData.title || extraMeta.title || 'Custom Artwork',
+      artist: extraMeta.artist || artworkData.artist || 'Tap Color Studio',
+      category: extraMeta.category || artworkData.category || 'imported',
+      parentArtworkId: extraMeta.parentArtworkId || null,
+      variantId: extraMeta.variantId || null,
       createdAt: Date.now(),
+      lastModified: Date.now(),
       thumbnailBlob,
       artworkData,
       pieces,
       colors,
       filledCount,
       completed: pieces > 0 && filledCount >= pieces,
+      isAutosave: !!extraMeta.isAutosave,
     };
 
-    return new Promise((resolve, reject) => {
-      const tx = db.transaction([STORE_NAME], 'readwrite');
-      const store = tx.objectStore(STORE_NAME);
-      const req = store.put(record);
-
-      req.onsuccess = () => resolve(id);
-      req.onerror = () => reject(req.error || new Error(`Failed to save artwork ${id}`));
-    });
+    return this.saveArtworkRecord(record);
   }
 
   /**
-   * Retrieves all imported artworks sorted by createdAt (newest first).
+   * Retrieves all saved artworks sorted by lastModified / createdAt (newest first).
    * @returns {Promise<Array<Object>>}
    */
   async getAllArtworks() {
@@ -104,21 +144,20 @@ class TapColorStorage {
     return new Promise((resolve, reject) => {
       const tx = db.transaction([STORE_NAME], 'readonly');
       const store = tx.objectStore(STORE_NAME);
-      const index = store.index('createdAt');
-      const request = index.openCursor(null, 'prev'); // Newest first
+      const req = store.getAll();
 
-      const items = [];
-      request.onsuccess = (event) => {
-        const cursor = event.target.result;
-        if (cursor) {
-          items.push(cursor.value);
-          cursor.continue();
-        } else {
-          resolve(items);
-        }
+      req.onsuccess = () => {
+        const items = req.result || [];
+        // Sort by lastModified desc (fallback to createdAt desc)
+        items.sort((a, b) => {
+          const timeA = a.lastModified || a.createdAt || 0;
+          const timeB = b.lastModified || b.createdAt || 0;
+          return timeB - timeA;
+        });
+        resolve(items);
       };
 
-      request.onerror = () => reject(request.error || new Error('Failed to load gallery artworks'));
+      req.onerror = () => reject(req.error || new Error('Failed to load gallery artworks'));
     });
   }
 
@@ -145,8 +184,9 @@ class TapColorStorage {
    * @param {number} filledCount
    * @param {boolean} completed
    * @param {Object} [updatedArtworkData] Optional full state update
+   * @param {Blob} [thumbnailBlob] Optional updated thumbnail
    */
-  async updateArtworkProgress(id, filledCount, completed, updatedArtworkData = null) {
+  async updateArtworkProgress(id, filledCount, completed, updatedArtworkData = null, thumbnailBlob = null) {
     const db = await this.getDB();
     return new Promise((resolve, reject) => {
       const tx = db.transaction([STORE_NAME], 'readwrite');
@@ -162,8 +202,59 @@ class TapColorStorage {
 
         record.filledCount = filledCount;
         record.completed = completed;
+        record.lastModified = Date.now();
         if (updatedArtworkData) {
           record.artworkData = updatedArtworkData;
+        }
+        if (thumbnailBlob) {
+          record.thumbnailBlob = thumbnailBlob;
+        }
+
+        const putReq = store.put(record);
+        putReq.onsuccess = () => resolve(true);
+        putReq.onerror = () => reject(putReq.error);
+      };
+
+      getReq.onerror = () => reject(getReq.error);
+    });
+  }
+
+  /**
+   * Resets progress on an artwork back to 0%.
+   * @param {string} id
+   * @returns {Promise<boolean>}
+   */
+  async resetArtworkProgress(id) {
+    const db = await this.getDB();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction([STORE_NAME], 'readwrite');
+      const store = tx.objectStore(STORE_NAME);
+      const getReq = store.get(id);
+
+      getReq.onsuccess = () => {
+        const record = getReq.result;
+        if (!record) {
+          resolve(false);
+          return;
+        }
+
+        record.filledCount = 0;
+        record.completed = false;
+        record.lastModified = Date.now();
+
+        if (record.artworkData) {
+          if (Array.isArray(record.artworkData.regions)) {
+            record.artworkData.regions.forEach(r => {
+              r.is_filled = false;
+              r.fill_anim = 0.0;
+            });
+          }
+          if (Array.isArray(record.artworkData.palette)) {
+            record.artworkData.palette.forEach(p => {
+              p.filled_count = 0;
+              p.is_completed = false;
+            });
+          }
         }
 
         const putReq = store.put(record);

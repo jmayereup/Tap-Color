@@ -486,6 +486,7 @@ class TapColorApp {
     this.totalTaps = 0;
     this.successfulTaps = 0;
     this.activeImportedRecord = null;
+    this.autosaveTimer = null;
 
     this.artworksMeta = [
       // 6 Country Life Diamond Art Masterpieces (High-Resolution Diamond Grids)
@@ -854,12 +855,27 @@ class TapColorApp {
 
     // Gallery Modal open/close
     const modalGallery = document.getElementById('modal-gallery');
-    document.getElementById('btn-gallery').addEventListener('click', () => {
+    document.getElementById('btn-gallery').addEventListener('click', async () => {
+      await this.flushAutosave();
       modalGallery.classList.remove('hidden');
+      if (this.activeCategory === 'saved') {
+        await this.renderSavedGallery();
+      }
     });
 
     document.getElementById('btn-close-gallery').addEventListener('click', () => {
       modalGallery.classList.add('hidden');
+    });
+
+    // Flush autosave when window loses focus or unloads
+    window.addEventListener('beforeunload', () => {
+      this.flushAutosave();
+    });
+
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'hidden') {
+        this.flushAutosave();
+      }
     });
 
     // Quick Style & Detail Dropdown
@@ -920,19 +936,21 @@ class TapColorApp {
 
         const grid = document.getElementById('artwork-grid');
         const customPanel = document.getElementById('tab-custom-panel');
-        const emptyPanel = document.getElementById('saved-gallery-empty');
+        const savedPanel = document.getElementById('tab-saved-panel');
 
         if (this.activeCategory === 'custom') {
           grid.style.display = 'none';
-          if (emptyPanel) emptyPanel.classList.add('hidden');
+          if (savedPanel) savedPanel.classList.add('hidden');
           customPanel.classList.remove('hidden');
           if (this.updateStudioPreview) this.updateStudioPreview();
         } else if (this.activeCategory === 'saved') {
+          grid.style.display = 'none';
           customPanel.classList.add('hidden');
+          if (savedPanel) savedPanel.classList.remove('hidden');
           await this.renderSavedGallery();
         } else {
           customPanel.classList.add('hidden');
-          if (emptyPanel) emptyPanel.classList.add('hidden');
+          if (savedPanel) savedPanel.classList.add('hidden');
           grid.style.display = 'grid';
           this.populateGalleryModal();
           this.filterGalleryCards();
@@ -945,6 +963,14 @@ class TapColorApp {
       btnOpenStudioEmpty.addEventListener('click', () => {
         const studioTab = document.querySelector('.gallery-tab[data-tab="custom"]');
         if (studioTab) studioTab.click();
+      });
+    }
+
+    const btnBrowseFromEmpty = document.getElementById('btn-browse-from-empty');
+    if (btnBrowseFromEmpty) {
+      btnBrowseFromEmpty.addEventListener('click', () => {
+        const classicTab = document.querySelector('.gallery-tab[data-tab="classic"]');
+        if (classicTab) classicTab.click();
       });
     }
 
@@ -1418,13 +1444,8 @@ class TapColorApp {
 
     this.refreshPaletteUI();
 
-    if (this.activeImportedRecord) {
-      storage.updateArtworkProgress(
-        this.activeImportedRecord.id,
-        res.total_filled || 0,
-        !!res.artwork_completed
-      ).catch(e => console.warn('Could not persist progress to IndexedDB:', e));
-    }
+    // Persist coloring progress automatically to IndexedDB
+    this.triggerAutosave();
 
     const isCompleted = Boolean(res.artwork_completed || percent >= 100);
     const progressPill = document.querySelector('.progress-pill');
@@ -1442,6 +1463,7 @@ class TapColorApp {
     }
 
     if (res.artwork_completed) {
+      this.flushAutosave();
       // Smoothly zoom out so the user can see the entire completed artwork
       if (this.controller && this.controller.fit_to_screen) {
         this.controller.fit_to_screen();
@@ -1470,6 +1492,7 @@ class TapColorApp {
     const res = JSON.parse(resJson);
     this.sound.playErase();
     this.onTapFeedback(res);
+    this.triggerAutosave();
   }
 
   triggerHint() {
@@ -1652,89 +1675,396 @@ class TapColorApp {
     try {
       const artworks = await storage.getAllArtworks();
       const badge = document.getElementById('saved-badge');
-      if (badge) badge.textContent = artworks.length;
+      if (badge) {
+        const inProgress = artworks.filter(a => (a.filledCount || 0) > 0 && !a.completed);
+        const count = inProgress.length > 0 ? inProgress.length : artworks.length;
+        badge.textContent = count;
+        badge.title = inProgress.length > 0 ? `${inProgress.length} In Progress` : `${artworks.length} Saved Artworks`;
+      }
     } catch (e) {
       console.warn('Could not update saved badge:', e);
     }
   }
 
-  async renderSavedGallery() {
-    const grid = document.getElementById('artwork-grid');
-    const emptyPanel = document.getElementById('saved-gallery-empty');
-    if (!grid) return;
-    grid.innerHTML = '';
+  triggerAutosave() {
+    if (this.autosaveTimer) {
+      clearTimeout(this.autosaveTimer);
+    }
+    this.autosaveTimer = setTimeout(() => {
+      this.saveCurrentProgress();
+    }, 400);
+  }
+
+  async flushAutosave() {
+    if (this.autosaveTimer) {
+      clearTimeout(this.autosaveTimer);
+      this.autosaveTimer = null;
+    }
+    await this.saveCurrentProgress();
+  }
+
+  async saveCurrentProgress() {
+    if (!this.controller) return;
+
+    let artwork = null;
+    if (typeof this.controller.get_artwork_json === 'function') {
+      try {
+        artwork = JSON.parse(this.controller.get_artwork_json());
+      } catch (e) {
+        artwork = this.controller.artwork;
+      }
+    } else {
+      artwork = this.controller.artwork;
+    }
+
+    if (!artwork || !artwork.regions) return;
+
+    const pieces = artwork.regions.length;
+    const filledCount = artwork.regions.filter(r => r.is_filled).length;
+
+    // Do not save clean 0% catalog templates unless it was already an imported/saved record
+    if (filledCount === 0 && !this.activeImportedRecord) {
+      return;
+    }
+
+    let id;
+    let title;
+    let artist;
+    let category = this.getCurrentArtMode();
+    let parentArtworkId = null;
+    let variantId = null;
+
+    if (this.activeImportedRecord) {
+      id = this.activeImportedRecord.id;
+      title = this.activeImportedRecord.title || artwork.title;
+      artist = this.activeImportedRecord.artist || artwork.artist;
+      category = this.activeImportedRecord.category || category;
+      parentArtworkId = this.activeImportedRecord.parentArtworkId;
+      variantId = this.activeImportedRecord.variantId;
+    } else {
+      parentArtworkId = this.currentArtworkMeta ? this.currentArtworkMeta.id : this.currentArtworkId;
+      variantId = this.currentArtworkVariant ? this.currentArtworkVariant.id : this.currentArtworkId;
+      id = variantId || parentArtworkId;
+      title = (this.currentArtworkMeta ? this.currentArtworkMeta.title : null) || artwork.title || 'Artwork';
+      artist = (this.currentArtworkMeta ? this.currentArtworkMeta.artist : null) || artwork.artist || 'Tap Color Studio';
+    }
+
+    // Render snapshot thumbnail showing colored progress
+    let thumbnailBlob = null;
+    try {
+      const thumbCanvas = document.createElement('canvas');
+      thumbCanvas.width = 280;
+      thumbCanvas.height = 200;
+      const thumbCtx = thumbCanvas.getContext('2d');
+      if (this.isWasmActive && typeof this.controller.render_export === 'function') {
+        this.controller.render_export(thumbCtx, 280, 200, false);
+      } else {
+        this.renderExportFallback(thumbCtx, 280, 200, false);
+      }
+      thumbnailBlob = await new Promise(resolve => thumbCanvas.toBlob(resolve, 'image/jpeg', 0.85));
+    } catch (err) {
+      console.warn('Could not generate progress thumbnail:', err);
+    }
+
+    const completed = pieces > 0 && filledCount >= pieces;
+
+    const record = {
+      id,
+      title,
+      artist,
+      category,
+      parentArtworkId,
+      variantId,
+      thumbnailBlob: thumbnailBlob || (this.activeImportedRecord ? this.activeImportedRecord.thumbnailBlob : null),
+      artworkData: artwork,
+      pieces,
+      colors: artwork.palette ? artwork.palette.length : 0,
+      filledCount,
+      completed,
+      isAutosave: true,
+      lastModified: Date.now(),
+    };
 
     try {
-      const savedList = await storage.getAllArtworks();
+      await storage.saveArtworkRecord(record);
+      this.activeImportedRecord = record;
       await this.updateSavedBadge();
 
-      if (savedList.length === 0) {
-        grid.style.display = 'none';
-        if (emptyPanel) emptyPanel.classList.remove('hidden');
-        return;
+      // If the gallery modal is currently open and viewing saved tab, refresh it live
+      const modalGallery = document.getElementById('modal-gallery');
+      if (modalGallery && !modalGallery.classList.contains('hidden') && this.activeCategory === 'saved') {
+        await this.renderSavedGallery();
       }
-
-      if (emptyPanel) emptyPanel.classList.add('hidden');
-      grid.style.display = 'grid';
-
-      savedList.forEach(record => {
-        const card = document.createElement('div');
-        card.className = 'artwork-card';
-        card.dataset.category = 'saved';
-
-        const isDiamond = record.artworkData && record.artworkData.id && record.artworkData.id.includes('diamond');
-        const badgeText = isDiamond ? '💎 Diamond Painting' : '🎨 Paint by Number';
-        const thumbUrl = record.thumbnailBlob ? URL.createObjectURL(record.thumbnailBlob) : '';
-        const dateStr = new Date(record.createdAt || Date.now()).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
-
-        card.innerHTML = `
-          <div class="artwork-thumb-wrap">
-            ${thumbUrl ? `<img class="artwork-thumb-img" src="${thumbUrl}" alt="${record.title}">` : '<canvas class="artwork-thumb-canvas" width="280" height="200"></canvas>'}
-            <span class="artwork-badge imported">${badgeText}</span>
-          </div>
-          <div class="artwork-info">
-            <h4>${record.title}</h4>
-            <span class="artwork-artist-tag">${record.artist || 'My Custom Art'} • ${dateStr}</span>
-            <p>${record.completed ? '🎉 Masterpiece Completed!' : `${record.filledCount || 0} / ${record.pieces} pieces colored`}</p>
-            <div class="artwork-footer">
-              <span class="artwork-pieces-count">
-                ${isDiamond ? '💎' : '🎨'} ${record.pieces} Pieces • ${record.colors} Colors
-              </span>
-              <div class="artwork-card-actions">
-                <button class="btn-delete-saved" title="Delete Artwork">🗑️</button>
-                <span class="btn-play-artwork">Start Coloring</span>
-              </div>
-            </div>
-          </div>
-        `;
-
-        card.addEventListener('click', (e) => {
-          if (e.target.closest('.btn-delete-saved')) return;
-          this.loadImportedArtwork(record);
-          document.getElementById('modal-gallery').classList.add('hidden');
-        });
-
-        const deleteBtn = card.querySelector('.btn-delete-saved');
-        if (deleteBtn) {
-          deleteBtn.addEventListener('click', async (e) => {
-            e.stopPropagation();
-            if (confirm(`Remove "${record.title}" from your saved pictures?`)) {
-              await storage.deleteArtwork(record.id);
-              await this.renderSavedGallery();
-            }
-          });
-        }
-
-        grid.appendChild(card);
-      });
-    } catch (err) {
-      console.error('Failed to load saved gallery:', err);
+    } catch (e) {
+      console.warn('Could not persist autosave to IndexedDB:', e);
     }
   }
 
-  loadImportedArtwork(record) {
+  formatRelativeTime(ts) {
+    if (!ts) return 'Recently';
+    const diffMs = Date.now() - ts;
+    const diffSec = Math.floor(diffMs / 1000);
+    if (diffSec < 45) return 'Just now';
+    const diffMin = Math.floor(diffSec / 60);
+    if (diffMin < 60) return `${diffMin}m ago`;
+    const diffHr = Math.floor(diffMin / 60);
+    if (diffHr < 24) return `${diffHr}h ago`;
+    const diffDays = Math.floor(diffHr / 24);
+    if (diffDays < 7) return `${diffDays}d ago`;
+    return new Date(ts).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+  }
+
+  async renderSavedGallery() {
+    if (this._renderSavedPromise) {
+      this._renderSavedQueued = true;
+      return this._renderSavedPromise;
+    }
+
+    this._renderSavedPromise = (async () => {
+      const savedPanel = document.getElementById('tab-saved-panel');
+      const inProgressSection = document.getElementById('saved-in-progress-section');
+      const inProgressGrid = document.getElementById('in-progress-grid');
+      const inProgressBadge = document.getElementById('in-progress-badge');
+
+      const completedSection = document.getElementById('saved-completed-section');
+      const completedGrid = document.getElementById('completed-grid');
+      const completedBadge = document.getElementById('completed-badge');
+
+      const creationsSection = document.getElementById('saved-creations-section');
+      const creationsGrid = document.getElementById('creations-grid');
+      const creationsBadge = document.getElementById('creations-badge');
+
+      const emptyPanel = document.getElementById('saved-gallery-empty');
+
+      if (!savedPanel) return;
+
+      try {
+        const allSaved = await storage.getAllArtworks();
+        await this.updateSavedBadge();
+
+        if (inProgressGrid) inProgressGrid.innerHTML = '';
+        if (completedGrid) completedGrid.innerHTML = '';
+        if (creationsGrid) creationsGrid.innerHTML = '';
+
+        if (allSaved.length === 0) {
+          if (inProgressSection) inProgressSection.classList.add('hidden');
+          if (completedSection) completedSection.classList.add('hidden');
+          if (creationsSection) creationsSection.classList.add('hidden');
+          if (emptyPanel) emptyPanel.classList.remove('hidden');
+          return;
+        }
+
+        if (emptyPanel) emptyPanel.classList.add('hidden');
+
+        // Separate into in-progress, completed, and creations (0% progress)
+        const inProgressList = allSaved.filter(r => (r.filledCount || 0) > 0 && !r.completed);
+        const completedList = allSaved.filter(r => r.completed);
+        const creationsList = allSaved.filter(r => (r.filledCount || 0) === 0 && !r.completed);
+
+        // 1. IN PROGRESS SUBSECTION (At the top of My Pictures)
+        if (inProgressSection && inProgressGrid) {
+          inProgressSection.classList.remove('hidden');
+          if (inProgressBadge) inProgressBadge.textContent = inProgressList.length;
+
+          if (inProgressList.length > 0) {
+            inProgressList.forEach(record => {
+              const card = this.createSavedArtworkCard(record, 'in-progress');
+              inProgressGrid.appendChild(card);
+            });
+          } else {
+            // Subtle empty state notice for In Progress section
+            const emptyNotice = document.createElement('div');
+            emptyNotice.className = 'empty-in-progress-notice';
+            emptyNotice.innerHTML = `
+              <div class="empty-notice-icon">🎨</div>
+              <div class="empty-notice-text">
+                <strong>No artworks in progress right now.</strong>
+                <span>Pick any picture from Paint by Number or Diamond Painting to start coloring — your progress will autosave right here!</span>
+              </div>
+              <button class="btn-sm-browse" type="button">Browse Library</button>
+            `;
+            const browseBtn = emptyNotice.querySelector('.btn-sm-browse');
+            if (browseBtn) {
+              browseBtn.addEventListener('click', () => {
+                const pbnTab = document.querySelector('.gallery-tab[data-tab="classic"]');
+                if (pbnTab) pbnTab.click();
+              });
+            }
+            inProgressGrid.appendChild(emptyNotice);
+          }
+        }
+
+        // 2. COMPLETED MASTERPIECES SUBSECTION
+        if (completedSection && completedGrid) {
+          if (completedList.length > 0) {
+            completedSection.classList.remove('hidden');
+            if (completedBadge) completedBadge.textContent = completedList.length;
+            completedList.forEach(record => {
+              const card = this.createSavedArtworkCard(record, 'completed');
+              completedGrid.appendChild(card);
+            });
+          } else {
+            completedSection.classList.add('hidden');
+          }
+        }
+
+        // 3. MY PHOTO STUDIO ARTWORKS SUBSECTION
+        if (creationsSection && creationsGrid) {
+          if (creationsList.length > 0) {
+            creationsSection.classList.remove('hidden');
+            if (creationsBadge) creationsBadge.textContent = creationsList.length;
+            creationsList.forEach(record => {
+              const card = this.createSavedArtworkCard(record, 'creation');
+              creationsGrid.appendChild(card);
+            });
+          } else {
+            creationsSection.classList.add('hidden');
+          }
+        }
+      } catch (err) {
+        console.error('Failed to render saved gallery:', err);
+      }
+    })();
+
+    try {
+      await this._renderSavedPromise;
+    } finally {
+      this._renderSavedPromise = null;
+      if (this._renderSavedQueued) {
+        this._renderSavedQueued = false;
+        await this.renderSavedGallery();
+      }
+    }
+  }
+
+  createSavedArtworkCard(record, sectionType) {
+    const card = document.createElement('div');
+    card.className = 'artwork-card';
+    card.dataset.category = 'saved';
+
+    const isDiamond = (record.category === 'diamond') || (record.artworkData && record.artworkData.id && record.artworkData.id.includes('diamond'));
+    const modeBadgeText = isDiamond ? '💎 Diamond Painting' : '🎨 Paint by Number';
+    const thumbUrl = record.thumbnailBlob ? URL.createObjectURL(record.thumbnailBlob) : '';
+    const timeStr = this.formatRelativeTime(record.lastModified || record.createdAt);
+    const totalPieces = record.pieces || (record.artworkData && record.artworkData.regions ? record.artworkData.regions.length : 0);
+    const filled = record.filledCount || 0;
+    const percent = Math.min(100, Math.round((filled / Math.max(1, totalPieces)) * 100));
+
+    let overlayBadgeHtml = '';
+    let actionBtnHtml = '';
+
+    if (sectionType === 'in-progress') {
+      overlayBadgeHtml = `<span class="progress-pill-badge">⚡ ${percent}%</span>`;
+      actionBtnHtml = `
+        <button class="btn-resume-card" type="button">▶ Continue</button>
+        <button class="btn-reset-card" title="Reset Progress" type="button">↺</button>
+        <button class="btn-delete-saved" title="Remove" type="button">🗑️</button>
+      `;
+    } else if (sectionType === 'completed') {
+      overlayBadgeHtml = `<span class="progress-pill-badge completed">🎉 100%</span>`;
+      actionBtnHtml = `
+        <button class="btn-resume-card completed" type="button">👀 View</button>
+        <button class="btn-export-card" title="Export High-Res PNG" type="button">💾 Export</button>
+        <button class="btn-delete-saved" title="Remove" type="button">🗑️</button>
+      `;
+    } else {
+      actionBtnHtml = `
+        <button class="btn-resume-card" type="button">🎨 Color</button>
+        <button class="btn-delete-saved" title="Remove" type="button">🗑️</button>
+      `;
+    }
+
+    card.innerHTML = `
+      <div class="artwork-thumb-wrap">
+        ${thumbUrl ? `<img class="artwork-thumb-img" src="${thumbUrl}" alt="${record.title}">` : '<canvas class="artwork-thumb-canvas" width="280" height="200"></canvas>'}
+        <span class="artwork-badge ${isDiamond ? 'diamond' : 'classic'}">${modeBadgeText}</span>
+        ${overlayBadgeHtml}
+      </div>
+      <div class="artwork-info">
+        <h4>${record.title}</h4>
+        <span class="artwork-artist-tag">${record.artist || 'Tap Color Studio'} • ${timeStr}</span>
+        
+        <div class="card-progress-bar-wrap">
+          <div class="card-progress-bar">
+            <div class="card-progress-fill ${record.completed ? 'completed' : ''}" style="width: ${percent}%;"></div>
+          </div>
+          <div class="card-progress-labels">
+            <span>${filled} / ${totalPieces} pieces</span>
+            <span class="card-progress-percent ${record.completed ? 'completed' : ''}">${percent}%</span>
+          </div>
+        </div>
+
+        <div class="artwork-footer">
+          <span class="artwork-pieces-count">
+            ${isDiamond ? '💎' : '🎨'} ${record.colors || (record.artworkData && record.artworkData.palette ? record.artworkData.palette.length : 0)} Colors
+          </span>
+          <div class="artwork-card-actions">
+            ${actionBtnHtml}
+          </div>
+        </div>
+      </div>
+    `;
+
+    // Click on card to load
+    card.addEventListener('click', (e) => {
+      if (e.target.closest('.btn-delete-saved') || e.target.closest('.btn-reset-card') || e.target.closest('.btn-export-card')) {
+        return;
+      }
+      this.loadSavedArtwork(record);
+      document.getElementById('modal-gallery').classList.add('hidden');
+    });
+
+    // Reset progress button
+    const resetBtn = card.querySelector('.btn-reset-card');
+    if (resetBtn) {
+      resetBtn.addEventListener('click', async (e) => {
+        e.stopPropagation();
+        if (confirm(`Reset progress on "${record.title}" back to 0%?`)) {
+          await storage.resetArtworkProgress(record.id);
+          // If this artwork is currently loaded on canvas, reload it
+          if (this.currentArtworkId === record.id || (this.activeImportedRecord && this.activeImportedRecord.id === record.id)) {
+            const fresh = await storage.getArtworkById(record.id);
+            if (fresh) this.loadSavedArtwork(fresh);
+          }
+          await this.renderSavedGallery();
+        }
+      });
+    }
+
+    // Export button (for completed)
+    const exportBtn = card.querySelector('.btn-export-card');
+    if (exportBtn) {
+      exportBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        this.loadSavedArtwork(record);
+        document.getElementById('modal-gallery').classList.add('hidden');
+        setTimeout(() => this.exportArtworkPng(), 200);
+      });
+    }
+
+    // Delete button
+    const deleteBtn = card.querySelector('.btn-delete-saved');
+    if (deleteBtn) {
+      deleteBtn.addEventListener('click', async (e) => {
+        e.stopPropagation();
+        if (confirm(`Remove "${record.title}" from your saved pictures?`)) {
+          if (this.activeImportedRecord && this.activeImportedRecord.id === record.id) {
+            this.activeImportedRecord = null;
+          }
+          await storage.deleteArtwork(record.id);
+          await this.renderSavedGallery();
+        }
+      });
+    }
+
+    return card;
+  }
+
+  loadSavedArtwork(record) {
     const artwork = record.artworkData;
-    this.currentArtworkId = artwork.id;
+    if (!artwork) return;
+
+    this.currentArtworkId = record.parentArtworkId || artwork.id;
     this.activeImportedRecord = record;
     this.highlightMatching = false;
     const btnHint = document.getElementById('btn-hint');
@@ -1742,6 +2072,17 @@ class TapColorApp {
     if (btnHint) btnHint.classList.remove('active');
     if (badge) badge.textContent = 'OFF';
 
+    // Find meta if it's a catalog artwork
+    let meta = this.artworksMeta.find(a => a.id === this.currentArtworkId);
+    let targetVariant = null;
+    if (meta && meta.variants && record.variantId) {
+      targetVariant = meta.variants.find(v => v.id === record.variantId) || meta.variants[0];
+      meta.selectedVariantId = targetVariant.id;
+    }
+    this.currentArtworkMeta = meta || null;
+    this.currentArtworkVariant = targetVariant || null;
+
+    // Load artwork into controller
     if (this.controller && this.controller.load_artwork_json) {
       this.controller.load_artwork_json(JSON.stringify(artwork));
     } else if (this.controller) {
@@ -1755,6 +2096,10 @@ class TapColorApp {
     this.updateArtworkUI();
     this.refreshPaletteUI();
     this.updateResolutionBarUI();
+  }
+
+  loadImportedArtwork(record) {
+    this.loadSavedArtwork(record);
   }
 
   renderThumbnail(canvas, meta) {
@@ -2282,6 +2627,8 @@ class TapColorApp {
   }
 
   async selectArtwork(id, variantId = null) {
+    await this.flushAutosave();
+
     this.currentArtworkId = id;
     this.activeImportedRecord = null;
     this.highlightMatching = false;
@@ -2318,6 +2665,18 @@ class TapColorApp {
 
     this.currentArtworkMeta = meta;
     this.currentArtworkVariant = targetVariant;
+
+    // Check if there is an autosaved in-progress session for this artwork variant in storage!
+    const targetId = targetVariant ? targetVariant.id : (variantId || id);
+    try {
+      const savedRecord = await storage.getArtworkById(targetId);
+      if (savedRecord && savedRecord.artworkData && (savedRecord.filledCount || 0) > 0) {
+        this.loadSavedArtwork(savedRecord);
+        return;
+      }
+    } catch (e) {
+      console.warn('Could not check saved record in storage:', e);
+    }
 
     const jsonPath = targetVariant ? targetVariant.jsonFile : (meta ? meta.jsonFile : null);
 
@@ -3164,7 +3523,6 @@ class FallbackJsController {
       if (!reg.is_filled) {
         if (reg.number === this.activeNumber) {
           reg.is_filled = true;
-          this.spawnBurst(reg.centroid.x, reg.centroid.y, reg.color_hex);
 
           const pal = this.artwork.palette.find(p => p.number === this.activeNumber);
           let colComp = false;
