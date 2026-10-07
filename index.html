@@ -15,22 +15,22 @@
     <!-- Top Navigation Bar -->
     <header class="header-bar">
       <div class="header-left">
-        <button id="btn-gallery" class="btn-icon" title="Choose Artwork">
+        <button id="btn-gallery" class="btn-icon" title="Open Artwork Library">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
             <circle cx="8.5" cy="8.5" r="1.5"/>
             <polyline points="21 15 16 10 5 21"/>
           </svg>
-          <span class="btn-label">Gallery</span>
+          <span class="btn-label">Library</span>
         </button>
         <div class="artwork-meta">
-          <h1 id="artwork-title" class="artwork-title">Origami Hummingbird</h1>
-          <span id="artwork-artist" class="artwork-artist">Geometric Fauna</span>
+          <h1 id="artwork-title" class="artwork-title">Sweet Highland Calf</h1>
+          <span id="artwork-artist" class="artwork-artist">Country Homestead</span>
         </div>
         <div class="header-res-dropdown-wrap" id="header-res-dropdown-wrap">
-          <button id="btn-resolution-switcher" class="btn-res-pill" title="Change Art Style & Detail Level" aria-haspopup="true" aria-expanded="false">
-            <span class="res-icon" id="res-icon-indicator">🎨</span>
-            <span id="label-current-resolution">Standard</span>
+          <button id="btn-resolution-switcher" class="btn-res-pill diamond-mode" title="Change Art Style & Detail Level" aria-haspopup="true" aria-expanded="false">
+            <span class="res-icon" id="res-icon-indicator">💎</span>
+            <span id="label-current-resolution">Diamond • Standard Kit (14,400 pcs)</span>
             <span class="res-caret">▾</span>
           </button>
           
@@ -42,13 +42,13 @@
 
             <!-- Segmented Art Style Switcher -->
             <div class="quick-dropdown-style-toggle">
-              <button type="button" class="btn-quick-style-toggle active" id="quick-toggle-pbn" data-mode="classic">
-                <span class="toggle-icon">🎨</span>
-                <span class="toggle-text">Paint by Number</span>
-              </button>
-              <button type="button" class="btn-quick-style-toggle" id="quick-toggle-diamond" data-mode="diamond">
+              <button type="button" class="btn-quick-style-toggle active" id="quick-toggle-diamond" data-mode="diamond">
                 <span class="toggle-icon">💎</span>
                 <span class="toggle-text">Diamond Art</span>
+              </button>
+              <button type="button" class="btn-quick-style-toggle" id="quick-toggle-pbn" data-mode="classic">
+                <span class="toggle-icon">🎨</span>
+                <span class="toggle-text">Paint by Number</span>
               </button>
             </div>
 
@@ -177,18 +177,22 @@
       </div>
     </footer>
 
-    <!-- Gallery / Artwork Picker Modal -->
-    <div id="modal-gallery" class="modal-overlay hidden">
+    <!-- Gallery / Artwork Picker Modal (Default Landing View) -->
+    <div id="modal-gallery" class="modal-overlay">
       <div class="modal-card">
         <div class="modal-header">
-          <h2>Select Artwork</h2>
-          <button id="btn-close-gallery" class="btn-close">&times;</button>
+          <div class="modal-header-titles">
+            <span class="modal-header-badge">💎 Diamond Art &amp; Painting Studio</span>
+            <h2>Artwork Library</h2>
+            <p class="modal-header-subtitle">Choose a sparkling diamond painting or classic canvas to begin</p>
+          </div>
+          <button id="btn-close-gallery" class="btn-close" title="Resume Art Studio" aria-label="Close Library">&times;</button>
         </div>
 
         <!-- Gallery Category Tabs -->
         <div class="gallery-tabs">
-          <button class="gallery-tab active" data-tab="classic">🎨 Paint by Number</button>
-          <button class="gallery-tab" data-tab="diamond">💎 Diamond Painting</button>
+          <button class="gallery-tab active" data-tab="diamond">💎 Diamond Painting</button>
+          <button class="gallery-tab" data-tab="classic">🎨 Paint by Number</button>
           <button class="gallery-tab" data-tab="saved" id="tab-saved-btn">🖼️ My Pictures <span class="tab-badge" id="saved-badge">0</span></button>
           <button class="gallery-tab" data-tab="custom">📸 Make from Photo</button>
         </div>
@@ -220,24 +224,24 @@
               <span class="step-title">Choose Your Art Style</span>
             </div>
             <div class="studio-mode-toggle">
-              <button class="btn-studio-mode active" data-mode="vector" id="btn-mode-vector">
-                <span class="mode-icon">🎨</span>
-                <span class="mode-text">
-                  <span class="mode-name">Paint by Number</span>
-                  <span class="mode-desc">Smooth outlines & numbered regions</span>
-                </span>
-              </button>
-              <button class="btn-studio-mode" data-mode="diamond" id="btn-mode-diamond">
+              <button class="btn-studio-mode active" data-mode="diamond" id="btn-mode-diamond">
                 <span class="mode-icon">💎</span>
                 <span class="mode-text">
                   <span class="mode-name">Diamond Painting</span>
                   <span class="mode-desc">Sparkling gemstone mosaic grid</span>
                 </span>
               </button>
+              <button class="btn-studio-mode" data-mode="vector" id="btn-mode-vector">
+                <span class="mode-icon">🎨</span>
+                <span class="mode-text">
+                  <span class="mode-name">Paint by Number</span>
+                  <span class="mode-desc">Smooth outlines & numbered regions</span>
+                </span>
+              </button>
             </div>
             <div class="studio-mode-banner" id="studio-mode-banner">
-              <span class="mode-banner-badge" id="mode-banner-badge">🎨 Paint by Number Active</span>
-              <span class="mode-banner-text" id="mode-banner-text">Vector mode active: Custom outlines, smooth curved boundaries, and seamless fills.</span>
+              <span class="mode-banner-badge" id="mode-banner-badge">💎 Diamond Painting Active</span>
+              <span class="mode-banner-text" id="mode-banner-text">Diamond mode active: Sparkly gemstone drills mapped onto a precision mosaic grid.</span>
             </div>
           </div>
 
@@ -273,7 +277,7 @@
                 <!-- Live Preview Box -->
                 <div id="studio-preview-box" class="studio-preview-box">
                   <div class="preview-header-bar">
-                    <span id="preview-mode-tag" class="preview-mode-tag">🎨 Paint by Number</span>
+                    <span id="preview-mode-tag" class="preview-mode-tag diamond">💎 Diamond Painting</span>
                   </div>
                   <canvas id="studio-preview-canvas" class="studio-preview-canvas" width="280" height="200"></canvas>
                   <div class="preview-caption" id="preview-caption">Sweet Highland Calf</div>
@@ -286,7 +290,7 @@
               </div>
 
               <!-- Step 3: Difficulty & Settings for Paint by Number -->
-              <div class="custom-settings" id="settings-vector-panel">
+              <div class="custom-settings hidden" id="settings-vector-panel">
                 <div class="studio-step-header">
                   <span class="step-num">3</span>
                   <span class="step-title">Paint by Number Options</span>
@@ -329,7 +333,7 @@
               </div>
 
               <!-- Step 3: Difficulty & Settings for Diamond Painting -->
-              <div class="custom-settings hidden" id="settings-diamond-panel">
+              <div class="custom-settings" id="settings-diamond-panel">
                 <div class="studio-step-header">
                   <span class="step-num">3</span>
                   <span class="step-title">Diamond Painting Options</span>

@@ -440,9 +440,9 @@ html, body {
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(4, 6, 12, 0.8);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  background: rgba(4, 6, 12, 0.82);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -459,14 +459,14 @@ html, body {
 
 .modal-card {
   width: 100%;
-  max-width: 780px;
-  max-height: 88vh;
+  max-width: 1080px;
+  max-height: 90vh;
   overflow-y: auto;
   background: #111827;
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-lg);
-  padding: 24px;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+  padding: 26px 28px;
+  box-shadow: 0 25px 60px -12px rgba(0, 0, 0, 0.8), 0 0 40px rgba(99, 102, 241, 0.12);
   display: flex;
   flex-direction: column;
   gap: 20px;
@@ -474,23 +474,62 @@ html, body {
 
 .modal-header {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
+  gap: 16px;
+}
+
+.modal-header-titles {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.modal-header-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #c084fc;
 }
 
 .modal-header h2 {
-  font-size: 20px;
-  font-weight: 700;
+  font-size: 24px;
+  font-weight: 800;
   color: var(--text-main);
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+
+.modal-header-subtitle {
+  font-size: 13.5px;
+  color: var(--text-muted);
+  margin: 0;
 }
 
 .btn-close {
-  background: transparent;
-  border: none;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--border-subtle);
   color: var(--text-muted);
-  font-size: 28px;
+  font-size: 22px;
   cursor: pointer;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
   line-height: 1;
+}
+
+.btn-close:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: var(--text-main);
+  border-color: rgba(255, 255, 255, 0.2);
 }
 
 /* Tool mode button group */

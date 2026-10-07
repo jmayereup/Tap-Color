@@ -460,10 +460,10 @@ class TapColorApp {
     this.initialPinchDistance = 0;
     this.toolMode = 'pen'; // 'pen', 'erase', or 'pan'
     this.highlightMatching = false; // Matching tiles are not highlighted by default
-    this.currentArtworkId = 'fluffy_cow_pbn';
+    this.currentArtworkId = 'fluffy_cow_diamond';
     this.activeNumber = 1;
     this.hintCount = 5;
-    this.activeCategory = 'classic'; // 'classic', 'diamond', 'saved', 'custom'
+    this.activeCategory = 'diamond'; // 'classic', 'diamond', 'saved', 'custom'
 
     // Multi-touch & touchscreen controls
     this.touchPinchDist = 0;
@@ -705,8 +705,9 @@ class TapColorApp {
 
     // Attempt to load compiled Rust WebAssembly module
     try {
-      const wasmPath = `${import.meta.env.BASE_URL || '/'}pkg/tap_color.js`;
-      const wasmModule = await import(/* @vite-ignore */ wasmPath);
+      const baseUrl = import.meta.env.BASE_URL || '/';
+      const wasmUrl = new URL(`${baseUrl.replace(/\/$/, '')}/pkg/tap_color.js`, window.location.href).href;
+      const wasmModule = await import(/* @vite-ignore */ wasmUrl);
       await wasmModule.default();
       this.controller = new wasmModule.GameController('game-canvas', this.currentArtworkId);
       this.isWasmActive = true;
@@ -1839,7 +1840,7 @@ class TapColorApp {
   setupCustomStudio() {
     let customImg = null;
     let selectedPreset = 'fluffy_cow';
-    let currentStudioMode = 'vector';
+    let currentStudioMode = 'diamond';
 
     const previewCanvas = document.getElementById('studio-preview-canvas');
     const previewCaption = document.getElementById('preview-caption');
@@ -2360,7 +2361,7 @@ class TapColorApp {
     if (this.lastCustomMode) {
       return this.lastCustomMode;
     }
-    return 'classic';
+    return 'diamond';
   }
 
   updateResolutionBarUI() {
@@ -2831,6 +2832,10 @@ class FallbackJsController {
     this.lastTime = 0;
     this.highlightMatchingTiles = false;
     this.load_artwork(artworkId);
+  }
+
+  get is_diamond_mode() {
+    return (this.artwork && this.artwork.id && this.artwork.id.includes('diamond')) || false;
   }
 
   load_artwork(id) {
