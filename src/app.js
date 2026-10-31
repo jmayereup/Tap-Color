@@ -481,6 +481,12 @@ class TapColorApp {
     this.arrowKeys = new Set();
     this.arrowPanRafId = null;
 
+    // Stylus hold-to-scroll gesture state
+    this.stylusHoldTimeout = null;
+    this.isStylusPanning = false;
+    this.isStylusActive = false;
+    this.pendingStylusAction = null;
+
     // Statistics
     this.startTime = Date.now();
     this.totalTaps = 0;
@@ -1062,6 +1068,7 @@ class TapColorApp {
     this.canvas.addEventListener('pointerdown', (e) => this.onPointerDown(e));
     window.addEventListener('pointermove', (e) => this.onPointerMove(e));
     window.addEventListener('pointerup', (e) => this.onPointerUp(e));
+    window.addEventListener('pointercancel', (e) => this.onPointerCancel(e));
 
     // Wheel zoom
     this.canvas.addEventListener('wheel', (e) => {
@@ -1454,7 +1461,56 @@ class TapColorApp {
     this.lastPointerY = e.clientY;
     this.pointerButton = e.button;
 
-    // In Pen or Erase mode, left click immediately interacts
+    // Clean up any existing stylus hold timer
+    if (this.stylusHoldTimeout) {
+      clearTimeout(this.stylusHoldTimeout);
+      this.stylusHoldTimeout = null;
+    }
+    this.isStylusPanning = false;
+
+    // Stylus (Pen) interaction
+    if (e.pointerType === 'pen') {
+      this.isStylusActive = true;
+
+      // Stylus barrel / side button (button 1 or 2) pans immediately with zero delay
+      if (e.button === 1 || e.button === 2) {
+        this.isStylusPanning = true;
+        this.canvas.style.cursor = 'grabbing';
+        return;
+      }
+
+      // If user is already in Pan tool mode, regular drag pans
+      if (this.toolMode === 'pan') {
+        return;
+      }
+
+      // Stylus primary tip (button 0): schedule hold-to-scroll gesture (~260ms)
+      const rect = this.canvas.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      this.pendingStylusAction = {
+        mode: this.toolMode,
+        x,
+        y,
+        clientX: e.clientX,
+        clientY: e.clientY
+      };
+
+      this.stylusHoldTimeout = setTimeout(() => {
+        // Stationary hold threshold reached -> activate pan mode!
+        this.isStylusPanning = true;
+        this.pendingStylusAction = null;
+        this.canvas.style.cursor = 'grabbing';
+        if (navigator.vibrate) {
+          try { navigator.vibrate(12); } catch (_) {}
+        }
+        this.showStylusPanFeedback(e.clientX, e.clientY);
+      }, 260);
+
+      return;
+    }
+
+    // Mouse interaction: Pen or Erase mode left click immediately interacts
     if (this.toolMode === 'pen' && e.button === 0) {
       const rect = this.canvas.getBoundingClientRect();
       const x = e.clientX - rect.left;
@@ -1478,11 +1534,38 @@ class TapColorApp {
     this.lastPointerX = e.clientX;
     this.lastPointerY = e.clientY;
 
-    // Middle click or right click always pans
+    // Middle click, right click, or stylus barrel button always pans
     if (this.pointerButton === 1 || this.pointerButton === 2) {
       const rect = this.canvas.getBoundingClientRect();
       this.controller.update_pan_zoom(dx, dy, 1.0, rect.width / 2, rect.height / 2);
       return;
+    }
+
+    // Stylus hold-to-scroll active: pan canvas freely
+    if (this.isStylusPanning) {
+      const rect = this.canvas.getBoundingClientRect();
+      this.controller.update_pan_zoom(dx, dy, 1.0, rect.width / 2, rect.height / 2);
+      return;
+    }
+
+    // Stylus pending hold check: if movement exceeds deadzone (7px), user is gliding to color
+    if (e.pointerType === 'pen' && this.pendingStylusAction) {
+      if (this.dragDistance > 7) {
+        if (this.stylusHoldTimeout) {
+          clearTimeout(this.stylusHoldTimeout);
+          this.stylusHoldTimeout = null;
+        }
+        const act = this.pendingStylusAction;
+        this.pendingStylusAction = null;
+        if (act.mode === 'pen') {
+          this.tryPlaceDrill(act.x, act.y);
+        } else if (act.mode === 'erase') {
+          this.tryEraseDrill(act.x, act.y);
+        }
+      } else {
+        // Still within hold stationary threshold; wait for timer
+        return;
+      }
     }
 
     if (this.toolMode === 'pen' && e.buttons === 1) {
@@ -1509,6 +1592,37 @@ class TapColorApp {
     if (!this.isDragging) return;
     this.isDragging = false;
 
+    if (this.stylusHoldTimeout) {
+      clearTimeout(this.stylusHoldTimeout);
+      this.stylusHoldTimeout = null;
+    }
+
+    // Stylus finished panning
+    if (this.isStylusPanning) {
+      this.isStylusPanning = false;
+      this.isStylusActive = false;
+      this.pendingStylusAction = null;
+      this.canvas.style.cursor = this.toolMode === 'pen' ? 'crosshair' : (this.toolMode === 'erase' ? 'cell' : 'grab');
+      return;
+    }
+
+    // Stylus released before hold timer expired -> quick tap to place/erase!
+    if (e.pointerType === 'pen') {
+      this.isStylusActive = false;
+      if (this.pendingStylusAction) {
+        const act = this.pendingStylusAction;
+        this.pendingStylusAction = null;
+        if (this.dragDistance < 7 && this.controller && this.pointerButton === 0) {
+          if (act.mode === 'pen') {
+            this.tryPlaceDrill(act.x, act.y, true);
+          } else if (act.mode === 'erase') {
+            this.tryEraseDrill(act.x, act.y);
+          }
+        }
+        return;
+      }
+    }
+
     // Small movement (< 6px) tap interaction
     if (this.toolMode === 'pan' && this.dragDistance < 6 && this.controller && this.pointerButton === 0) {
       const rect = this.canvas.getBoundingClientRect();
@@ -1523,9 +1637,37 @@ class TapColorApp {
     }
   }
 
+  onPointerCancel(e) {
+    if (this.stylusHoldTimeout) {
+      clearTimeout(this.stylusHoldTimeout);
+      this.stylusHoldTimeout = null;
+    }
+    this.isStylusPanning = false;
+    this.isStylusActive = false;
+    this.pendingStylusAction = null;
+    this.isDragging = false;
+    this.canvas.style.cursor = this.toolMode === 'pen' ? 'crosshair' : (this.toolMode === 'erase' ? 'cell' : 'grab');
+  }
+
+  showStylusPanFeedback(clientX, clientY) {
+    const ring = document.createElement('div');
+    ring.className = 'stylus-pan-ring';
+    ring.style.left = `${clientX}px`;
+    ring.style.top = `${clientY}px`;
+    document.body.appendChild(ring);
+    setTimeout(() => {
+      if (ring.parentNode) ring.parentNode.removeChild(ring);
+    }, 400);
+  }
+
   // Touchscreen Controls: 1-finger touch to place/glide, 2-fingers pan & pinch-zoom
   onTouchStart(e) {
     e.preventDefault();
+
+    // If stylus pointerdown is active or touch is from a stylus handled by Pointer Events, prevent conflict
+    if (this.isStylusActive || (e.touches.length === 1 && e.touches[0].touchType === 'stylus')) {
+      return;
+    }
 
     if (e.touches.length === 1) {
       if (Date.now() < this.suppressSingleTouchUntil) return;
