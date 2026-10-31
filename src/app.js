@@ -494,6 +494,10 @@ class TapColorApp {
     this.activeImportedRecord = null;
     this.autosaveTimer = null;
 
+    // Custom alert & confirm dialog state
+    this.dialogResolve = null;
+    this.dialogPreviousFocus = null;
+
     this.artworksMeta = [
       // 6 Country Life Diamond Art Masterpieces (High-Resolution Diamond Grids)
       {
@@ -1059,6 +1063,8 @@ class TapColorApp {
   }
 
   bindEvents() {
+    this.initDialogListeners();
+
     window.addEventListener('resize', () => {
       this.setupCanvasDpi();
       if (this.controller) this.controller.fit_to_screen();
@@ -1106,8 +1112,16 @@ class TapColorApp {
     btnPan.addEventListener('click', () => setToolMode('pan'));
 
     if (btnClearCanvas) {
-      btnClearCanvas.addEventListener('click', () => {
-        if (confirm('Clear all placed tiles on this artwork?')) {
+      btnClearCanvas.addEventListener('click', async () => {
+        const ok = await this.showConfirm({
+          title: 'Clear Canvas?',
+          message: 'Clear all placed tiles on this artwork? Your current coloring progress on this canvas will be reset.',
+          confirmText: 'Clear Canvas',
+          cancelText: 'Keep Coloring',
+          variant: 'danger',
+          icon: 'trash'
+        });
+        if (ok) {
           this.clearCanvasTiles();
         }
       });
@@ -1375,7 +1389,7 @@ class TapColorApp {
             } else if (this.controller && this.controller.artwork) {
               totalPieces = this.controller.artwork.regions?.length || 0;
             }
-          } catch (e) {}
+          } catch (e) { }
           this.showVictoryModal(totalPieces);
         }
       });
@@ -1392,6 +1406,11 @@ class TapColorApp {
     window.addEventListener('keydown', (e) => {
       // Escape key closes open modals
       if (e.key === 'Escape') {
+        const modalDialog = document.getElementById('modal-dialog');
+        if (modalDialog && !modalDialog.classList.contains('hidden')) {
+          this.closeDialog(false);
+          return;
+        }
         if (!modalVictory.classList.contains('hidden')) {
           closeVictoryModal();
           return;
@@ -1502,7 +1521,7 @@ class TapColorApp {
         this.pendingStylusAction = null;
         this.canvas.style.cursor = 'grabbing';
         if (navigator.vibrate) {
-          try { navigator.vibrate(12); } catch (_) {}
+          try { navigator.vibrate(12); } catch (_) { }
         }
         this.showStylusPanFeedback(e.clientX, e.clientY);
       }, 260);
@@ -2491,7 +2510,15 @@ class TapColorApp {
     if (resetBtn) {
       resetBtn.addEventListener('click', async (e) => {
         e.stopPropagation();
-        if (confirm(`Reset progress on "${record.title}" back to 0%?`)) {
+        const ok = await this.showConfirm({
+          title: 'Reset Progress?',
+          message: `Reset your progress on "${record.title}" back to 0%? All completed pieces will be cleared.`,
+          confirmText: 'Reset to 0%',
+          cancelText: 'Cancel',
+          variant: 'warning',
+          icon: 'warning'
+        });
+        if (ok) {
           await storage.resetArtworkProgress(record.id);
           // If this artwork is currently loaded on canvas, reload it
           if (this.currentArtworkId === record.id || (this.activeImportedRecord && this.activeImportedRecord.id === record.id)) {
@@ -2519,7 +2546,15 @@ class TapColorApp {
     if (deleteBtn) {
       deleteBtn.addEventListener('click', async (e) => {
         e.stopPropagation();
-        if (confirm(`Remove "${record.title}" from your saved pictures?`)) {
+        const ok = await this.showConfirm({
+          title: 'Remove Picture?',
+          message: `Are you sure you want to remove "${record.title}" from your saved pictures? This cannot be undone.`,
+          confirmText: 'Remove Picture',
+          cancelText: 'Keep Picture',
+          variant: 'danger',
+          icon: 'trash'
+        });
+        if (ok) {
           if (this.activeImportedRecord && this.activeImportedRecord.id === record.id) {
             this.activeImportedRecord = null;
           }
@@ -2912,8 +2947,13 @@ class TapColorApp {
           });
         } catch (err) {
           console.error('Art creation failed:', err);
-          alert('Could not create coloring page: ' + err.message);
           modalConv.classList.add('hidden');
+          await this.showAlert({
+            title: 'Creation Failed',
+            message: 'Could not create coloring page: ' + err.message,
+            variant: 'error',
+            icon: 'error'
+          });
         }
       });
     }
@@ -3218,7 +3258,7 @@ class TapColorApp {
         try {
           const info = JSON.parse(this.controller.get_artwork_info_json());
           count = info.total_regions || 0;
-        } catch (_) {}
+        } catch (_) { }
       }
       labelRes.textContent = isDiamond ? `Diamond (${count.toLocaleString()} drills)` : `Paint (${count.toLocaleString()} pcs)`;
       btnRes.classList.remove('hidden');
@@ -3261,7 +3301,7 @@ class TapColorApp {
         const isActive = this.currentArtworkVariant && this.currentArtworkVariant.id === v.id;
         const item = document.createElement('div');
         item.className = `quick-dropdown-item ${isMetaDiamond ? 'diamond-item' : ''} ${isActive ? 'active' : ''}`;
-        
+
         let icon = '🟡';
         if (v.id.includes('80') || v.id.includes('detailed')) icon = '🟢';
         if (v.id.includes('160') || v.id.includes('masterpiece')) icon = '🟣';
@@ -3389,7 +3429,12 @@ class TapColorApp {
             } catch (err) {
               console.error('Vectorization failed:', err);
               if (modalConv) modalConv.classList.add('hidden');
-              alert('Could not update detail: ' + err.message);
+              await this.showAlert({
+                title: 'Update Failed',
+                message: 'Could not update detail: ' + err.message,
+                variant: 'error',
+                icon: 'error'
+              });
             }
           }
         });
@@ -3475,7 +3520,12 @@ class TapColorApp {
         } catch (err) {
           console.error('Failed to convert to PBN:', err);
           if (modalConv) modalConv.classList.add('hidden');
-          alert('Could not convert to Paint by Number: ' + err.message);
+          await this.showAlert({
+            title: 'Conversion Failed',
+            message: 'Could not convert to Paint by Number: ' + err.message,
+            variant: 'error',
+            icon: 'error'
+          });
         }
       }
     }
@@ -3556,7 +3606,7 @@ class TapColorApp {
     if (!artwork && this.controller && typeof this.controller.get_artwork_json === 'function') {
       try {
         artwork = JSON.parse(this.controller.get_artwork_json());
-      } catch (e) {}
+      } catch (e) { }
     }
     if (!artwork || !artwork.regions) return;
 
@@ -3643,6 +3693,239 @@ class TapColorApp {
       }
     }
     ctx.restore();
+  }
+
+  /* ==========================================================================
+     Custom Accessible Alert & Confirm Dialog Modal System
+     ========================================================================== */
+
+  initDialogListeners() {
+    const modalDialog = document.getElementById('modal-dialog');
+    const btnClose = document.getElementById('btn-dialog-close');
+    const btnCancel = document.getElementById('btn-dialog-cancel');
+    const btnConfirm = document.getElementById('btn-dialog-confirm');
+
+    if (btnClose) {
+      btnClose.addEventListener('click', () => this.closeDialog(false));
+    }
+    if (btnCancel) {
+      btnCancel.addEventListener('click', () => this.closeDialog(false));
+    }
+    if (btnConfirm) {
+      btnConfirm.addEventListener('click', () => this.closeDialog(true));
+    }
+    if (modalDialog) {
+      modalDialog.addEventListener('click', (e) => {
+        if (e.target === modalDialog) {
+          this.closeDialog(false);
+        }
+      });
+
+      modalDialog.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          if (document.activeElement === btnCancel) {
+            this.closeDialog(false);
+          } else {
+            this.closeDialog(true);
+          }
+          e.preventDefault();
+        } else if (e.key === 'Tab') {
+          const focusables = Array.from(modalDialog.querySelectorAll('button:not([style*="display: none"]):not([disabled])'));
+          if (focusables.length === 0) return;
+          const first = focusables[0];
+          const last = focusables[focusables.length - 1];
+
+          if (e.shiftKey) {
+            if (document.activeElement === first) {
+              e.preventDefault();
+              last.focus();
+            }
+          } else {
+            if (document.activeElement === last) {
+              e.preventDefault();
+              first.focus();
+            }
+          }
+        }
+      });
+    }
+
+    // Expose helpers globally for seamless access throughout the app
+    window.showConfirm = (opts) => this.showConfirm(opts);
+    window.showAlert = (opts) => this.showAlert(opts);
+    window.alert = (msg) => this.showAlert(msg);
+  }
+
+  getDialogIconSvg(iconName, variant) {
+    if (!iconName) {
+      if (variant === 'danger') iconName = 'trash';
+      else if (variant === 'warning') iconName = 'warning';
+      else if (variant === 'error') iconName = 'error';
+      else if (variant === 'success') iconName = 'success';
+      else iconName = 'info';
+    }
+
+    if (typeof iconName === 'string' && (iconName.trim().startsWith('<svg') || !/^[a-z0-9_-]+$/i.test(iconName))) {
+      return iconName;
+    }
+
+    switch (iconName) {
+      case 'trash':
+      case 'delete':
+        return `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="3 6 5 6 21 6"></polyline>
+          <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+          <line x1="10" y1="11" x2="10" y2="17"></line>
+          <line x1="14" y1="11" x2="14" y2="17"></line>
+        </svg>`;
+      case 'warning':
+        return `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+          <line x1="12" y1="9" x2="12" y2="13"></line>
+          <line x1="12" y1="17" x2="12.01" y2="17"></line>
+        </svg>`;
+      case 'reset':
+      case 'refresh':
+        return `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="1 4 1 10 7 10"></polyline>
+          <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
+        </svg>`;
+      case 'error':
+        return `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="15" y1="9" x2="9" y2="15"></line>
+          <line x1="9" y1="15" x2="15" y2="15"></line>
+        </svg>`;
+      case 'success':
+        return `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+          <polyline points="22 4 12 14.01 9 11.01"></polyline>
+        </svg>`;
+      case 'question':
+      case 'help':
+        return `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"></circle>
+          <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+          <line x1="12" y1="17" x2="12.01" y2="17"></line>
+        </svg>`;
+      case 'info':
+      default:
+        return `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="16" x2="12" y2="12"></line>
+          <line x1="12" y1="8" x2="12.01" y2="8"></line>
+        </svg>`;
+    }
+  }
+
+  showConfirm(options = {}) {
+    if (typeof options === 'string') {
+      options = { message: options };
+    }
+    return this.openDialog({
+      mode: 'confirm',
+      title: options.title || 'Confirm Action',
+      message: options.message || 'Are you sure you want to proceed?',
+      confirmText: options.confirmText || 'Confirm',
+      cancelText: options.cancelText || 'Cancel',
+      variant: options.variant || 'primary',
+      icon: options.icon || (options.variant === 'danger' ? 'trash' : (options.variant === 'warning' ? 'warning' : 'question'))
+    });
+  }
+
+  showAlert(options = {}) {
+    if (typeof options === 'string') {
+      const isErr = /could not|error|fail/i.test(options);
+      options = {
+        message: options,
+        title: isErr ? 'Notice' : 'Information',
+        variant: isErr ? 'error' : 'info',
+        icon: isErr ? 'error' : 'info'
+      };
+    }
+    return this.openDialog({
+      mode: 'alert',
+      title: options.title || 'Notice',
+      message: options.message || '',
+      confirmText: options.confirmText || options.buttonText || 'OK',
+      cancelText: '',
+      variant: options.variant || 'info',
+      icon: options.icon || 'info'
+    });
+  }
+
+  openDialog(config) {
+    return new Promise((resolve) => {
+      if (this.dialogResolve) {
+        this.dialogResolve(false);
+      }
+
+      this.dialogResolve = resolve;
+      this.dialogPreviousFocus = document.activeElement;
+
+      const modalDialog = document.getElementById('modal-dialog');
+      const titleEl = document.getElementById('dialog-title');
+      const msgEl = document.getElementById('dialog-message');
+      const iconWrapper = document.getElementById('dialog-icon-wrapper');
+      const btnCancel = document.getElementById('btn-dialog-cancel');
+      const btnConfirm = document.getElementById('btn-dialog-confirm');
+
+      if (!modalDialog || !titleEl || !msgEl || !iconWrapper || !btnConfirm) {
+        resolve(config.mode === 'confirm' ? window.confirm(config.message) : (window.alert(config.message), true));
+        return;
+      }
+
+      titleEl.textContent = config.title;
+      msgEl.textContent = config.message;
+
+      iconWrapper.className = `dialog-icon-wrapper variant-${config.variant}`;
+      iconWrapper.innerHTML = this.getDialogIconSvg(config.icon, config.variant);
+
+      btnConfirm.textContent = config.confirmText || 'Confirm';
+      btnConfirm.className = 'dialog-btn';
+      if (config.variant === 'danger') {
+        btnConfirm.classList.add('btn-danger');
+      } else if (config.variant === 'warning') {
+        btnConfirm.classList.add('btn-warning');
+      } else {
+        btnConfirm.classList.add('btn-primary');
+      }
+
+      if (config.mode === 'alert') {
+        btnCancel.style.display = 'none';
+      } else {
+        btnCancel.style.display = '';
+        btnCancel.textContent = config.cancelText || 'Cancel';
+      }
+
+      modalDialog.classList.remove('hidden');
+
+      setTimeout(() => {
+        if (config.mode === 'confirm' && config.variant === 'danger') {
+          btnCancel.focus();
+        } else {
+          btnConfirm.focus();
+        }
+      }, 30);
+    });
+  }
+
+  closeDialog(result) {
+    const modalDialog = document.getElementById('modal-dialog');
+    if (modalDialog && !modalDialog.classList.contains('hidden')) {
+      modalDialog.classList.add('hidden');
+    }
+    if (this.dialogResolve) {
+      const res = this.dialogResolve;
+      this.dialogResolve = null;
+      res(result);
+    }
+    if (this.dialogPreviousFocus && typeof this.dialogPreviousFocus.focus === 'function') {
+      try {
+        this.dialogPreviousFocus.focus();
+      } catch (_) { }
+      this.dialogPreviousFocus = null;
+    }
   }
 }
 
@@ -3745,24 +4028,24 @@ class FallbackJsController {
           { number: 10, hex: '#F72585', name: 'Sakura Pink', total_count: 4, filled_count: 0, is_completed: false },
         ],
         regions: [
-          { id: 0, number: 9, color_hex: '#577590', is_filled: false, polygon: [{x:180,y:310},{x:330,y:335},{x:325,y:342}], centroid: {x:278,y:329} },
-          { id: 1, number: 9, color_hex: '#577590', is_filled: false, polygon: [{x:180,y:310},{x:325,y:342},{x:310,y:350}], centroid: {x:271,y:334} },
-          { id: 2, number: 4, color_hex: '#2A9D8F', is_filled: false, polygon: [{x:330,y:335},{x:380,y:300},{x:395,y:330},{x:335,y:345}], centroid: {x:360,y:327} },
-          { id: 3, number: 4, color_hex: '#2A9D8F', is_filled: false, polygon: [{x:380,y:300},{x:430,y:315},{x:420,y:345},{x:395,y:330}], centroid: {x:406,y:322} },
-          { id: 4, number: 5, color_hex: '#48CAE4', is_filled: false, polygon: [{x:335,y:345},{x:395,y:330},{x:385,y:370}], centroid: {x:371,y:348} },
-          { id: 5, number: 9, color_hex: '#577590', is_filled: false, polygon: [{x:365,y:330},{x:375,y:325},{x:380,y:335},{x:370,y:340}], centroid: {x:372,y:332} },
-          { id: 6, number: 1, color_hex: '#E63946', is_filled: false, polygon: [{x:335,y:345},{x:385,y:370},{x:355,y:400}], centroid: {x:358,y:371} },
-          { id: 7, number: 1, color_hex: '#E63946', is_filled: false, polygon: [{x:385,y:370},{x:415,y:390},{x:375,y:420},{x:355,y:400}], centroid: {x:382,y:395} },
-          { id: 8, number: 2, color_hex: '#F4A261', is_filled: false, polygon: [{x:415,y:390},{x:455,y:400},{x:420,y:435},{x:375,y:420}], centroid: {x:416,y:411} },
-          { id: 9, number: 3, color_hex: '#E76F51', is_filled: false, polygon: [{x:355,y:400},{x:375,y:420},{x:350,y:460}], centroid: {x:360,y:426} },
-          { id: 10, number: 6, color_hex: '#0077B6', is_filled: false, polygon: [{x:420,y:345},{x:490,y:240},{x:460,y:340}], centroid: {x:456,y:308} },
-          { id: 11, number: 5, color_hex: '#48CAE4', is_filled: false, polygon: [{x:490,y:240},{x:560,y:160},{x:515,y:255},{x:460,y:340}], centroid: {x:506,y:248} },
-          { id: 12, number: 6, color_hex: '#0077B6', is_filled: false, polygon: [{x:560,y:160},{x:630,y:100},{x:585,y:185},{x:515,y:255}], centroid: {x:572,y:175} },
-          { id: 13, number: 4, color_hex: '#2A9D8F', is_filled: false, polygon: [{x:630,y:100},{x:700,y:50},{x:650,y:130},{x:585,y:185}], centroid: {x:641,y:116} },
-          { id: 14, number: 7, color_hex: '#90BE6D', is_filled: false, polygon: [{x:700,y:50},{x:720,y:40},{x:675,y:120},{x:650,y:130}], centroid: {x:686,y:85} },
-          { id: 15, number: 4, color_hex: '#2A9D8F', is_filled: false, polygon: [{x:460,y:340},{x:515,y:255},{x:550,y:290},{x:485,y:375}], centroid: {x:502,y:315} },
-          { id: 16, number: 8, color_hex: '#43AA8B', is_filled: false, polygon: [{x:515,y:255},{x:585,y:185},{x:615,y:230},{x:550,y:290}], centroid: {x:566,y:240} },
-          { id: 17, number: 7, color_hex: '#90BE6D', is_filled: false, polygon: [{x:585,y:185},{x:650,y:130},{x:670,y:180},{x:615,y:230}], centroid: {x:630,y:181} },
+          { id: 0, number: 9, color_hex: '#577590', is_filled: false, polygon: [{ x: 180, y: 310 }, { x: 330, y: 335 }, { x: 325, y: 342 }], centroid: { x: 278, y: 329 } },
+          { id: 1, number: 9, color_hex: '#577590', is_filled: false, polygon: [{ x: 180, y: 310 }, { x: 325, y: 342 }, { x: 310, y: 350 }], centroid: { x: 271, y: 334 } },
+          { id: 2, number: 4, color_hex: '#2A9D8F', is_filled: false, polygon: [{ x: 330, y: 335 }, { x: 380, y: 300 }, { x: 395, y: 330 }, { x: 335, y: 345 }], centroid: { x: 360, y: 327 } },
+          { id: 3, number: 4, color_hex: '#2A9D8F', is_filled: false, polygon: [{ x: 380, y: 300 }, { x: 430, y: 315 }, { x: 420, y: 345 }, { x: 395, y: 330 }], centroid: { x: 406, y: 322 } },
+          { id: 4, number: 5, color_hex: '#48CAE4', is_filled: false, polygon: [{ x: 335, y: 345 }, { x: 395, y: 330 }, { x: 385, y: 370 }], centroid: { x: 371, y: 348 } },
+          { id: 5, number: 9, color_hex: '#577590', is_filled: false, polygon: [{ x: 365, y: 330 }, { x: 375, y: 325 }, { x: 380, y: 335 }, { x: 370, y: 340 }], centroid: { x: 372, y: 332 } },
+          { id: 6, number: 1, color_hex: '#E63946', is_filled: false, polygon: [{ x: 335, y: 345 }, { x: 385, y: 370 }, { x: 355, y: 400 }], centroid: { x: 358, y: 371 } },
+          { id: 7, number: 1, color_hex: '#E63946', is_filled: false, polygon: [{ x: 385, y: 370 }, { x: 415, y: 390 }, { x: 375, y: 420 }, { x: 355, y: 400 }], centroid: { x: 382, y: 395 } },
+          { id: 8, number: 2, color_hex: '#F4A261', is_filled: false, polygon: [{ x: 415, y: 390 }, { x: 455, y: 400 }, { x: 420, y: 435 }, { x: 375, y: 420 }], centroid: { x: 416, y: 411 } },
+          { id: 9, number: 3, color_hex: '#E76F51', is_filled: false, polygon: [{ x: 355, y: 400 }, { x: 375, y: 420 }, { x: 350, y: 460 }], centroid: { x: 360, y: 426 } },
+          { id: 10, number: 6, color_hex: '#0077B6', is_filled: false, polygon: [{ x: 420, y: 345 }, { x: 490, y: 240 }, { x: 460, y: 340 }], centroid: { x: 456, y: 308 } },
+          { id: 11, number: 5, color_hex: '#48CAE4', is_filled: false, polygon: [{ x: 490, y: 240 }, { x: 560, y: 160 }, { x: 515, y: 255 }, { x: 460, y: 340 }], centroid: { x: 506, y: 248 } },
+          { id: 12, number: 6, color_hex: '#0077B6', is_filled: false, polygon: [{ x: 560, y: 160 }, { x: 630, y: 100 }, { x: 585, y: 185 }, { x: 515, y: 255 }], centroid: { x: 572, y: 175 } },
+          { id: 13, number: 4, color_hex: '#2A9D8F', is_filled: false, polygon: [{ x: 630, y: 100 }, { x: 700, y: 50 }, { x: 650, y: 130 }, { x: 585, y: 185 }], centroid: { x: 641, y: 116 } },
+          { id: 14, number: 7, color_hex: '#90BE6D', is_filled: false, polygon: [{ x: 700, y: 50 }, { x: 720, y: 40 }, { x: 675, y: 120 }, { x: 650, y: 130 }], centroid: { x: 686, y: 85 } },
+          { id: 15, number: 4, color_hex: '#2A9D8F', is_filled: false, polygon: [{ x: 460, y: 340 }, { x: 515, y: 255 }, { x: 550, y: 290 }, { x: 485, y: 375 }], centroid: { x: 502, y: 315 } },
+          { id: 16, number: 8, color_hex: '#43AA8B', is_filled: false, polygon: [{ x: 515, y: 255 }, { x: 585, y: 185 }, { x: 615, y: 230 }, { x: 550, y: 290 }], centroid: { x: 566, y: 240 } },
+          { id: 17, number: 7, color_hex: '#90BE6D', is_filled: false, polygon: [{ x: 585, y: 185 }, { x: 650, y: 130 }, { x: 670, y: 180 }, { x: 615, y: 230 }], centroid: { x: 630, y: 181 } },
         ]
       };
     }

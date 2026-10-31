@@ -2385,6 +2385,170 @@ html, body {
 }
 
 /* ==========================================================================
+   Alert & Confirm Dialog Modal
+   ========================================================================== */
+.modal-dialog-overlay {
+  z-index: 2500; /* Stays above all other modals (gallery, victory, resolution picker) */
+  background: rgba(4, 6, 14, 0.84);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+.dialog-card {
+  position: relative;
+  max-width: 420px;
+  width: 90%;
+  background: #111827;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 20px;
+  padding: 28px 24px 22px 24px;
+  box-shadow: 0 25px 60px -10px rgba(0, 0, 0, 0.85), 0 0 35px rgba(99, 102, 241, 0.18);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 16px;
+  user-select: text;
+}
+
+.modal-dialog-overlay:not(.hidden) .dialog-card {
+  animation: dialogScaleIn 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes dialogScaleIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.92) translateY(8px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.dialog-close-btn {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+}
+
+.dialog-icon-wrapper {
+  width: 58px;
+  height: 58px;
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 4px;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+}
+
+.dialog-icon-wrapper svg {
+  display: block;
+}
+
+.dialog-icon-wrapper.variant-danger {
+  background: rgba(239, 68, 68, 0.15);
+  color: #f87171;
+  border: 1px solid rgba(239, 68, 68, 0.35);
+  box-shadow: 0 0 25px rgba(239, 68, 68, 0.25);
+}
+
+.dialog-icon-wrapper.variant-warning {
+  background: rgba(245, 158, 11, 0.15);
+  color: #fbbf24;
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  box-shadow: 0 0 25px rgba(245, 158, 11, 0.25);
+}
+
+.dialog-icon-wrapper.variant-primary,
+.dialog-icon-wrapper.variant-info {
+  background: rgba(99, 102, 241, 0.15);
+  color: #a5b4fc;
+  border: 1px solid rgba(99, 102, 241, 0.35);
+  box-shadow: 0 0 25px rgba(99, 102, 241, 0.25);
+}
+
+.dialog-icon-wrapper.variant-success {
+  background: rgba(16, 185, 129, 0.15);
+  color: #34d399;
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  box-shadow: 0 0 25px rgba(16, 185, 129, 0.25);
+}
+
+.dialog-body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+.dialog-title {
+  font-size: 19px;
+  font-weight: 800;
+  color: var(--text-main);
+  letter-spacing: -0.01em;
+  margin: 0;
+}
+
+.dialog-message {
+  font-size: 13.5px;
+  color: var(--text-muted);
+  line-height: 1.55;
+  margin: 0;
+  word-break: break-word;
+}
+
+.dialog-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  margin-top: 6px;
+}
+
+.dialog-btn {
+  flex: 1;
+  height: 42px;
+  font-size: 13.5px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0 16px;
+  transition: all 0.2s ease;
+}
+
+.dialog-btn.btn-danger {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 4px 14px rgba(220, 38, 38, 0.4);
+}
+
+.dialog-btn.btn-danger:hover {
+  background: linear-gradient(135deg, #f87171 0%, #ef4444 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(220, 38, 38, 0.55);
+}
+
+.dialog-btn.btn-warning {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 4px 14px rgba(217, 119, 6, 0.4);
+}
+
+.dialog-btn.btn-warning:hover {
+  background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(217, 119, 6, 0.55);
+}
+
+/* ==========================================================================
    Comprehensive Responsive Adaptations for Mobile Devices
    ========================================================================== */
 
@@ -2921,6 +3085,23 @@ html, body {
   .modal-actions button {
     width: 100%;
     justify-content: center;
+    height: 40px;
+  }
+
+  .dialog-card {
+    width: 95%;
+    max-width: 380px;
+    padding: 22px 18px 18px 18px;
+    gap: 14px;
+  }
+
+  .dialog-actions {
+    flex-direction: column-reverse;
+    gap: 8px;
+  }
+
+  .dialog-actions .dialog-btn {
+    width: 100%;
     height: 40px;
   }
 }

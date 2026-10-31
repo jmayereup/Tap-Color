@@ -580,6 +580,22 @@
         </div>
       </div>
     </div>
+
+    <!-- Confirm / Alert Dialog Modal -->
+    <div id="modal-dialog" class="modal-overlay modal-dialog-overlay hidden" role="alertdialog" aria-modal="true" aria-labelledby="dialog-title" aria-describedby="dialog-message">
+      <div class="modal-card dialog-card">
+        <button id="btn-dialog-close" class="btn-close dialog-close-btn" aria-label="Close dialog" title="Close dialog">&times;</button>
+        <div id="dialog-icon-wrapper" class="dialog-icon-wrapper" aria-hidden="true"></div>
+        <div class="dialog-body">
+          <h3 id="dialog-title" class="dialog-title">Confirm Action</h3>
+          <p id="dialog-message" class="dialog-message"></p>
+        </div>
+        <div id="dialog-actions" class="dialog-actions">
+          <button id="btn-dialog-cancel" class="btn-secondary dialog-btn" type="button">Cancel</button>
+          <button id="btn-dialog-confirm" class="btn-primary dialog-btn" type="button">Confirm</button>
+        </div>
+      </div>
+    </div>
   </div>
 
   <script type="module" src="/src/app.js"></script>
