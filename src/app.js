@@ -1389,7 +1389,7 @@ class TapColorApp {
             } else if (this.controller && this.controller.artwork) {
               totalPieces = this.controller.artwork.regions?.length || 0;
             }
-          } catch (e) { }
+          } catch (e) {}
           this.showVictoryModal(totalPieces);
         }
       });
@@ -1521,7 +1521,7 @@ class TapColorApp {
         this.pendingStylusAction = null;
         this.canvas.style.cursor = 'grabbing';
         if (navigator.vibrate) {
-          try { navigator.vibrate(12); } catch (_) { }
+          try { navigator.vibrate(12); } catch (_) {}
         }
         this.showStylusPanFeedback(e.clientX, e.clientY);
       }, 260);
@@ -3258,7 +3258,7 @@ class TapColorApp {
         try {
           const info = JSON.parse(this.controller.get_artwork_info_json());
           count = info.total_regions || 0;
-        } catch (_) { }
+        } catch (_) {}
       }
       labelRes.textContent = isDiamond ? `Diamond (${count.toLocaleString()} drills)` : `Paint (${count.toLocaleString()} pcs)`;
       btnRes.classList.remove('hidden');
@@ -3301,7 +3301,7 @@ class TapColorApp {
         const isActive = this.currentArtworkVariant && this.currentArtworkVariant.id === v.id;
         const item = document.createElement('div');
         item.className = `quick-dropdown-item ${isMetaDiamond ? 'diamond-item' : ''} ${isActive ? 'active' : ''}`;
-
+        
         let icon = '🟡';
         if (v.id.includes('80') || v.id.includes('detailed')) icon = '🟢';
         if (v.id.includes('160') || v.id.includes('masterpiece')) icon = '🟣';
@@ -3606,7 +3606,7 @@ class TapColorApp {
     if (!artwork && this.controller && typeof this.controller.get_artwork_json === 'function') {
       try {
         artwork = JSON.parse(this.controller.get_artwork_json());
-      } catch (e) { }
+      } catch (e) {}
     }
     if (!artwork || !artwork.regions) return;
 
@@ -3923,7 +3923,7 @@ class TapColorApp {
     if (this.dialogPreviousFocus && typeof this.dialogPreviousFocus.focus === 'function') {
       try {
         this.dialogPreviousFocus.focus();
-      } catch (_) { }
+      } catch (_) {}
       this.dialogPreviousFocus = null;
     }
   }
@@ -4028,24 +4028,24 @@ class FallbackJsController {
           { number: 10, hex: '#F72585', name: 'Sakura Pink', total_count: 4, filled_count: 0, is_completed: false },
         ],
         regions: [
-          { id: 0, number: 9, color_hex: '#577590', is_filled: false, polygon: [{ x: 180, y: 310 }, { x: 330, y: 335 }, { x: 325, y: 342 }], centroid: { x: 278, y: 329 } },
-          { id: 1, number: 9, color_hex: '#577590', is_filled: false, polygon: [{ x: 180, y: 310 }, { x: 325, y: 342 }, { x: 310, y: 350 }], centroid: { x: 271, y: 334 } },
-          { id: 2, number: 4, color_hex: '#2A9D8F', is_filled: false, polygon: [{ x: 330, y: 335 }, { x: 380, y: 300 }, { x: 395, y: 330 }, { x: 335, y: 345 }], centroid: { x: 360, y: 327 } },
-          { id: 3, number: 4, color_hex: '#2A9D8F', is_filled: false, polygon: [{ x: 380, y: 300 }, { x: 430, y: 315 }, { x: 420, y: 345 }, { x: 395, y: 330 }], centroid: { x: 406, y: 322 } },
-          { id: 4, number: 5, color_hex: '#48CAE4', is_filled: false, polygon: [{ x: 335, y: 345 }, { x: 395, y: 330 }, { x: 385, y: 370 }], centroid: { x: 371, y: 348 } },
-          { id: 5, number: 9, color_hex: '#577590', is_filled: false, polygon: [{ x: 365, y: 330 }, { x: 375, y: 325 }, { x: 380, y: 335 }, { x: 370, y: 340 }], centroid: { x: 372, y: 332 } },
-          { id: 6, number: 1, color_hex: '#E63946', is_filled: false, polygon: [{ x: 335, y: 345 }, { x: 385, y: 370 }, { x: 355, y: 400 }], centroid: { x: 358, y: 371 } },
-          { id: 7, number: 1, color_hex: '#E63946', is_filled: false, polygon: [{ x: 385, y: 370 }, { x: 415, y: 390 }, { x: 375, y: 420 }, { x: 355, y: 400 }], centroid: { x: 382, y: 395 } },
-          { id: 8, number: 2, color_hex: '#F4A261', is_filled: false, polygon: [{ x: 415, y: 390 }, { x: 455, y: 400 }, { x: 420, y: 435 }, { x: 375, y: 420 }], centroid: { x: 416, y: 411 } },
-          { id: 9, number: 3, color_hex: '#E76F51', is_filled: false, polygon: [{ x: 355, y: 400 }, { x: 375, y: 420 }, { x: 350, y: 460 }], centroid: { x: 360, y: 426 } },
-          { id: 10, number: 6, color_hex: '#0077B6', is_filled: false, polygon: [{ x: 420, y: 345 }, { x: 490, y: 240 }, { x: 460, y: 340 }], centroid: { x: 456, y: 308 } },
-          { id: 11, number: 5, color_hex: '#48CAE4', is_filled: false, polygon: [{ x: 490, y: 240 }, { x: 560, y: 160 }, { x: 515, y: 255 }, { x: 460, y: 340 }], centroid: { x: 506, y: 248 } },
-          { id: 12, number: 6, color_hex: '#0077B6', is_filled: false, polygon: [{ x: 560, y: 160 }, { x: 630, y: 100 }, { x: 585, y: 185 }, { x: 515, y: 255 }], centroid: { x: 572, y: 175 } },
-          { id: 13, number: 4, color_hex: '#2A9D8F', is_filled: false, polygon: [{ x: 630, y: 100 }, { x: 700, y: 50 }, { x: 650, y: 130 }, { x: 585, y: 185 }], centroid: { x: 641, y: 116 } },
-          { id: 14, number: 7, color_hex: '#90BE6D', is_filled: false, polygon: [{ x: 700, y: 50 }, { x: 720, y: 40 }, { x: 675, y: 120 }, { x: 650, y: 130 }], centroid: { x: 686, y: 85 } },
-          { id: 15, number: 4, color_hex: '#2A9D8F', is_filled: false, polygon: [{ x: 460, y: 340 }, { x: 515, y: 255 }, { x: 550, y: 290 }, { x: 485, y: 375 }], centroid: { x: 502, y: 315 } },
-          { id: 16, number: 8, color_hex: '#43AA8B', is_filled: false, polygon: [{ x: 515, y: 255 }, { x: 585, y: 185 }, { x: 615, y: 230 }, { x: 550, y: 290 }], centroid: { x: 566, y: 240 } },
-          { id: 17, number: 7, color_hex: '#90BE6D', is_filled: false, polygon: [{ x: 585, y: 185 }, { x: 650, y: 130 }, { x: 670, y: 180 }, { x: 615, y: 230 }], centroid: { x: 630, y: 181 } },
+          { id: 0, number: 9, color_hex: '#577590', is_filled: false, polygon: [{x:180,y:310},{x:330,y:335},{x:325,y:342}], centroid: {x:278,y:329} },
+          { id: 1, number: 9, color_hex: '#577590', is_filled: false, polygon: [{x:180,y:310},{x:325,y:342},{x:310,y:350}], centroid: {x:271,y:334} },
+          { id: 2, number: 4, color_hex: '#2A9D8F', is_filled: false, polygon: [{x:330,y:335},{x:380,y:300},{x:395,y:330},{x:335,y:345}], centroid: {x:360,y:327} },
+          { id: 3, number: 4, color_hex: '#2A9D8F', is_filled: false, polygon: [{x:380,y:300},{x:430,y:315},{x:420,y:345},{x:395,y:330}], centroid: {x:406,y:322} },
+          { id: 4, number: 5, color_hex: '#48CAE4', is_filled: false, polygon: [{x:335,y:345},{x:395,y:330},{x:385,y:370}], centroid: {x:371,y:348} },
+          { id: 5, number: 9, color_hex: '#577590', is_filled: false, polygon: [{x:365,y:330},{x:375,y:325},{x:380,y:335},{x:370,y:340}], centroid: {x:372,y:332} },
+          { id: 6, number: 1, color_hex: '#E63946', is_filled: false, polygon: [{x:335,y:345},{x:385,y:370},{x:355,y:400}], centroid: {x:358,y:371} },
+          { id: 7, number: 1, color_hex: '#E63946', is_filled: false, polygon: [{x:385,y:370},{x:415,y:390},{x:375,y:420},{x:355,y:400}], centroid: {x:382,y:395} },
+          { id: 8, number: 2, color_hex: '#F4A261', is_filled: false, polygon: [{x:415,y:390},{x:455,y:400},{x:420,y:435},{x:375,y:420}], centroid: {x:416,y:411} },
+          { id: 9, number: 3, color_hex: '#E76F51', is_filled: false, polygon: [{x:355,y:400},{x:375,y:420},{x:350,y:460}], centroid: {x:360,y:426} },
+          { id: 10, number: 6, color_hex: '#0077B6', is_filled: false, polygon: [{x:420,y:345},{x:490,y:240},{x:460,y:340}], centroid: {x:456,y:308} },
+          { id: 11, number: 5, color_hex: '#48CAE4', is_filled: false, polygon: [{x:490,y:240},{x:560,y:160},{x:515,y:255},{x:460,y:340}], centroid: {x:506,y:248} },
+          { id: 12, number: 6, color_hex: '#0077B6', is_filled: false, polygon: [{x:560,y:160},{x:630,y:100},{x:585,y:185},{x:515,y:255}], centroid: {x:572,y:175} },
+          { id: 13, number: 4, color_hex: '#2A9D8F', is_filled: false, polygon: [{x:630,y:100},{x:700,y:50},{x:650,y:130},{x:585,y:185}], centroid: {x:641,y:116} },
+          { id: 14, number: 7, color_hex: '#90BE6D', is_filled: false, polygon: [{x:700,y:50},{x:720,y:40},{x:675,y:120},{x:650,y:130}], centroid: {x:686,y:85} },
+          { id: 15, number: 4, color_hex: '#2A9D8F', is_filled: false, polygon: [{x:460,y:340},{x:515,y:255},{x:550,y:290},{x:485,y:375}], centroid: {x:502,y:315} },
+          { id: 16, number: 8, color_hex: '#43AA8B', is_filled: false, polygon: [{x:515,y:255},{x:585,y:185},{x:615,y:230},{x:550,y:290}], centroid: {x:566,y:240} },
+          { id: 17, number: 7, color_hex: '#90BE6D', is_filled: false, polygon: [{x:585,y:185},{x:650,y:130},{x:670,y:180},{x:615,y:230}], centroid: {x:630,y:181} },
         ]
       };
     }
