@@ -18,6 +18,8 @@ pub struct Region {
     pub number: usize,
     pub polygon: Vec<Point>,
     pub centroid: Point,
+    #[serde(default)]
+    pub label_radius: f64,
     pub color_hex: String,
     pub is_filled: bool,
     pub fill_anim: f64, // 0.0 to 1.0 animation transition

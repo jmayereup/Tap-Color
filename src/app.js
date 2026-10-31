@@ -666,16 +666,16 @@ class TapColorApp {
         title: 'Sweet Highland Calf',
         artist: 'Country Homestead',
         category: 'classic',
-        pieces: 333,
+        pieces: 494,
         desc: 'Gentle fluffy highland cow calf surrounded by meadow wildflowers and rustic pasture',
         defaultVariantId: 'fluffy_cow_pbn_intricate',
         selectedVariantId: 'fluffy_cow_pbn_intricate',
         originalAsset: 'assets/fluffy-cow-3.jpeg',
         thumbnailUrl: 'assets/converted/fluffy_cow_pbn_intricate_thumb.png',
         variants: [
-          { id: 'fluffy_cow_pbn_detailed', label: 'Detailed', name: 'Detailed', pieces: 198, colors: 15, complexity: 'detailed', jsonFile: 'assets/converted/fluffy_cow_pbn_detailed.json', thumbnailUrl: 'assets/converted/fluffy_cow_pbn_detailed_thumb.png' },
-          { id: 'fluffy_cow_pbn_intricate', label: 'Intricate', name: 'Intricate', pieces: 333, colors: 22, complexity: 'intricate', jsonFile: 'assets/converted/fluffy_cow_pbn_intricate.json', thumbnailUrl: 'assets/converted/fluffy_cow_pbn_intricate_thumb.png' },
-          { id: 'fluffy_cow_pbn_masterpiece', label: 'Masterpiece', name: 'Masterpiece', pieces: 759, colors: 31, complexity: 'masterpiece', jsonFile: 'assets/converted/fluffy_cow_pbn_masterpiece.json', thumbnailUrl: 'assets/converted/fluffy_cow_pbn_masterpiece_thumb.png' },
+          { id: 'fluffy_cow_pbn_detailed', label: 'Detailed', name: 'Detailed', pieces: 158, colors: 16, complexity: 'detailed', jsonFile: 'assets/converted/fluffy_cow_pbn_detailed.json', thumbnailUrl: 'assets/converted/fluffy_cow_pbn_detailed_thumb.png' },
+          { id: 'fluffy_cow_pbn_intricate', label: 'Intricate', name: 'Intricate', pieces: 494, colors: 24, complexity: 'intricate', jsonFile: 'assets/converted/fluffy_cow_pbn_intricate.json', thumbnailUrl: 'assets/converted/fluffy_cow_pbn_intricate_thumb.png' },
+          { id: 'fluffy_cow_pbn_masterpiece', label: 'Masterpiece', name: 'Masterpiece', pieces: 844, colors: 30, complexity: 'masterpiece', jsonFile: 'assets/converted/fluffy_cow_pbn_masterpiece.json', thumbnailUrl: 'assets/converted/fluffy_cow_pbn_masterpiece_thumb.png' },
         ],
       },
       {
@@ -683,16 +683,16 @@ class TapColorApp {
         title: 'Garden Hummingbird',
         artist: 'Sunlit Meadow',
         category: 'classic',
-        pieces: 248,
+        pieces: 208,
         desc: 'Vibrant hummingbird sipping sweet nectar among blooming country garden flora',
         defaultVariantId: 'hummingbird_pbn_intricate',
         selectedVariantId: 'hummingbird_pbn_intricate',
         originalAsset: 'assets/hummingbird.jpeg',
         thumbnailUrl: 'assets/converted/hummingbird_pbn_intricate_thumb.png',
         variants: [
-          { id: 'hummingbird_pbn_detailed', label: 'Detailed', name: 'Detailed', pieces: 140, colors: 15, complexity: 'detailed', jsonFile: 'assets/converted/hummingbird_pbn_detailed.json', thumbnailUrl: 'assets/converted/hummingbird_pbn_detailed_thumb.png' },
-          { id: 'hummingbird_pbn_intricate', label: 'Intricate', name: 'Intricate', pieces: 248, colors: 23, complexity: 'intricate', jsonFile: 'assets/converted/hummingbird_pbn_intricate.json', thumbnailUrl: 'assets/converted/hummingbird_pbn_intricate_thumb.png' },
-          { id: 'hummingbird_pbn_masterpiece', label: 'Masterpiece', name: 'Masterpiece', pieces: 586, colors: 31, complexity: 'masterpiece', jsonFile: 'assets/converted/hummingbird_pbn_masterpiece.json', thumbnailUrl: 'assets/converted/hummingbird_pbn_masterpiece_thumb.png' },
+          { id: 'hummingbird_pbn_detailed', label: 'Detailed', name: 'Detailed', pieces: 137, colors: 17, complexity: 'detailed', jsonFile: 'assets/converted/hummingbird_pbn_detailed.json', thumbnailUrl: 'assets/converted/hummingbird_pbn_detailed_thumb.png' },
+          { id: 'hummingbird_pbn_intricate', label: 'Intricate', name: 'Intricate', pieces: 208, colors: 24, complexity: 'intricate', jsonFile: 'assets/converted/hummingbird_pbn_intricate.json', thumbnailUrl: 'assets/converted/hummingbird_pbn_intricate_thumb.png' },
+          { id: 'hummingbird_pbn_masterpiece', label: 'Masterpiece', name: 'Masterpiece', pieces: 385, colors: 31, complexity: 'masterpiece', jsonFile: 'assets/converted/hummingbird_pbn_masterpiece.json', thumbnailUrl: 'assets/converted/hummingbird_pbn_masterpiece_thumb.png' },
         ],
       },
       {
@@ -700,16 +700,16 @@ class TapColorApp {
         title: 'Rustic Red Barn',
         artist: 'Heartland Heritage',
         category: 'classic',
-        pieces: 657,
+        pieces: 448,
         desc: 'Classic red country barn with silo, split-rail fence, and sunflowers under sunny blue sky',
         defaultVariantId: 'country_barn_pbn_intricate',
         selectedVariantId: 'country_barn_pbn_intricate',
         originalAsset: 'assets/country_barn.jpeg',
         thumbnailUrl: 'assets/converted/country_barn_pbn_intricate_thumb.png',
         variants: [
-          { id: 'country_barn_pbn_detailed', label: 'Detailed', name: 'Detailed', pieces: 318, colors: 16, complexity: 'detailed', jsonFile: 'assets/converted/country_barn_pbn_detailed.json', thumbnailUrl: 'assets/converted/country_barn_pbn_detailed_thumb.png' },
-          { id: 'country_barn_pbn_intricate', label: 'Intricate', name: 'Intricate', pieces: 657, colors: 24, complexity: 'intricate', jsonFile: 'assets/converted/country_barn_pbn_intricate.json', thumbnailUrl: 'assets/converted/country_barn_pbn_intricate_thumb.png' },
-          { id: 'country_barn_pbn_masterpiece', label: 'Masterpiece', name: 'Masterpiece', pieces: 1161, colors: 32, complexity: 'masterpiece', jsonFile: 'assets/converted/country_barn_pbn_masterpiece.json', thumbnailUrl: 'assets/converted/country_barn_pbn_masterpiece_thumb.png' },
+          { id: 'country_barn_pbn_detailed', label: 'Detailed', name: 'Detailed', pieces: 247, colors: 18, complexity: 'detailed', jsonFile: 'assets/converted/country_barn_pbn_detailed.json', thumbnailUrl: 'assets/converted/country_barn_pbn_detailed_thumb.png' },
+          { id: 'country_barn_pbn_intricate', label: 'Intricate', name: 'Intricate', pieces: 448, colors: 25, complexity: 'intricate', jsonFile: 'assets/converted/country_barn_pbn_intricate.json', thumbnailUrl: 'assets/converted/country_barn_pbn_intricate_thumb.png' },
+          { id: 'country_barn_pbn_masterpiece', label: 'Masterpiece', name: 'Masterpiece', pieces: 1106, colors: 33, complexity: 'masterpiece', jsonFile: 'assets/converted/country_barn_pbn_masterpiece.json', thumbnailUrl: 'assets/converted/country_barn_pbn_masterpiece_thumb.png' },
         ],
       },
       {
@@ -717,16 +717,16 @@ class TapColorApp {
         title: 'Morning Farm Rooster',
         artist: 'Sunrise Farmstead',
         category: 'classic',
-        pieces: 638,
+        pieces: 499,
         desc: 'Colorful country rooster greeting the morning sun from a rustic fence post',
         defaultVariantId: 'country_rooster_pbn_intricate',
         selectedVariantId: 'country_rooster_pbn_intricate',
         originalAsset: 'assets/country_rooster.jpeg',
         thumbnailUrl: 'assets/converted/country_rooster_pbn_intricate_thumb.png',
         variants: [
-          { id: 'country_rooster_pbn_detailed', label: 'Detailed', name: 'Detailed', pieces: 283, colors: 16, complexity: 'detailed', jsonFile: 'assets/converted/country_rooster_pbn_detailed.json', thumbnailUrl: 'assets/converted/country_rooster_pbn_detailed_thumb.png' },
-          { id: 'country_rooster_pbn_intricate', label: 'Intricate', name: 'Intricate', pieces: 638, colors: 24, complexity: 'intricate', jsonFile: 'assets/converted/country_rooster_pbn_intricate.json', thumbnailUrl: 'assets/converted/country_rooster_pbn_intricate_thumb.png' },
-          { id: 'country_rooster_pbn_masterpiece', label: 'Masterpiece', name: 'Masterpiece', pieces: 1092, colors: 32, complexity: 'masterpiece', jsonFile: 'assets/converted/country_rooster_pbn_masterpiece.json', thumbnailUrl: 'assets/converted/country_rooster_pbn_masterpiece_thumb.png' },
+          { id: 'country_rooster_pbn_detailed', label: 'Detailed', name: 'Detailed', pieces: 248, colors: 17, complexity: 'detailed', jsonFile: 'assets/converted/country_rooster_pbn_detailed.json', thumbnailUrl: 'assets/converted/country_rooster_pbn_detailed_thumb.png' },
+          { id: 'country_rooster_pbn_intricate', label: 'Intricate', name: 'Intricate', pieces: 499, colors: 24, complexity: 'intricate', jsonFile: 'assets/converted/country_rooster_pbn_intricate.json', thumbnailUrl: 'assets/converted/country_rooster_pbn_intricate_thumb.png' },
+          { id: 'country_rooster_pbn_masterpiece', label: 'Masterpiece', name: 'Masterpiece', pieces: 1019, colors: 34, complexity: 'masterpiece', jsonFile: 'assets/converted/country_rooster_pbn_masterpiece.json', thumbnailUrl: 'assets/converted/country_rooster_pbn_masterpiece_thumb.png' },
         ],
       },
       {
@@ -734,16 +734,16 @@ class TapColorApp {
         title: 'Vintage Harvest Truck',
         artist: 'Country Roads Studio',
         category: 'classic',
-        pieces: 436,
+        pieces: 502,
         desc: 'Classic turquoise vintage pickup truck filled with harvest pumpkins and sunflowers',
         defaultVariantId: 'country_truck_pbn_intricate',
         selectedVariantId: 'country_truck_pbn_intricate',
         originalAsset: 'assets/country_truck.jpeg',
         thumbnailUrl: 'assets/converted/country_truck_pbn_intricate_thumb.png',
         variants: [
-          { id: 'country_truck_pbn_detailed', label: 'Detailed', name: 'Detailed', pieces: 195, colors: 15, complexity: 'detailed', jsonFile: 'assets/converted/country_truck_pbn_detailed.json', thumbnailUrl: 'assets/converted/country_truck_pbn_detailed_thumb.png' },
-          { id: 'country_truck_pbn_intricate', label: 'Intricate', name: 'Intricate', pieces: 436, colors: 24, complexity: 'intricate', jsonFile: 'assets/converted/country_truck_pbn_intricate.json', thumbnailUrl: 'assets/converted/country_truck_pbn_intricate_thumb.png' },
-          { id: 'country_truck_pbn_masterpiece', label: 'Masterpiece', name: 'Masterpiece', pieces: 784, colors: 32, complexity: 'masterpiece', jsonFile: 'assets/converted/country_truck_pbn_masterpiece.json', thumbnailUrl: 'assets/converted/country_truck_pbn_masterpiece_thumb.png' },
+          { id: 'country_truck_pbn_detailed', label: 'Detailed', name: 'Detailed', pieces: 224, colors: 18, complexity: 'detailed', jsonFile: 'assets/converted/country_truck_pbn_detailed.json', thumbnailUrl: 'assets/converted/country_truck_pbn_detailed_thumb.png' },
+          { id: 'country_truck_pbn_intricate', label: 'Intricate', name: 'Intricate', pieces: 502, colors: 26, complexity: 'intricate', jsonFile: 'assets/converted/country_truck_pbn_intricate.json', thumbnailUrl: 'assets/converted/country_truck_pbn_intricate_thumb.png' },
+          { id: 'country_truck_pbn_masterpiece', label: 'Masterpiece', name: 'Masterpiece', pieces: 737, colors: 33, complexity: 'masterpiece', jsonFile: 'assets/converted/country_truck_pbn_masterpiece.json', thumbnailUrl: 'assets/converted/country_truck_pbn_masterpiece_thumb.png' },
         ],
       },
       {
@@ -751,16 +751,16 @@ class TapColorApp {
         title: 'Porch Golden Puppy',
         artist: 'Cottage Companions',
         category: 'classic',
-        pieces: 420,
+        pieces: 358,
         desc: 'Adorable golden retriever puppy in a red bandana enjoying a sunny farm morning',
         defaultVariantId: 'country_puppy_pbn_intricate',
         selectedVariantId: 'country_puppy_pbn_intricate',
         originalAsset: 'assets/country_puppy.jpeg',
         thumbnailUrl: 'assets/converted/country_puppy_pbn_intricate_thumb.png',
         variants: [
-          { id: 'country_puppy_pbn_detailed', label: 'Detailed', name: 'Detailed', pieces: 195, colors: 16, complexity: 'detailed', jsonFile: 'assets/converted/country_puppy_pbn_detailed.json', thumbnailUrl: 'assets/converted/country_puppy_pbn_detailed_thumb.png' },
-          { id: 'country_puppy_pbn_intricate', label: 'Intricate', name: 'Intricate', pieces: 420, colors: 24, complexity: 'intricate', jsonFile: 'assets/converted/country_puppy_pbn_intricate.json', thumbnailUrl: 'assets/converted/country_puppy_pbn_intricate_thumb.png' },
-          { id: 'country_puppy_pbn_masterpiece', label: 'Masterpiece', name: 'Masterpiece', pieces: 755, colors: 32, complexity: 'masterpiece', jsonFile: 'assets/converted/country_puppy_pbn_masterpiece.json', thumbnailUrl: 'assets/converted/country_puppy_pbn_masterpiece_thumb.png' },
+          { id: 'country_puppy_pbn_detailed', label: 'Detailed', name: 'Detailed', pieces: 189, colors: 16, complexity: 'detailed', jsonFile: 'assets/converted/country_puppy_pbn_detailed.json', thumbnailUrl: 'assets/converted/country_puppy_pbn_detailed_thumb.png' },
+          { id: 'country_puppy_pbn_intricate', label: 'Intricate', name: 'Intricate', pieces: 358, colors: 25, complexity: 'intricate', jsonFile: 'assets/converted/country_puppy_pbn_intricate.json', thumbnailUrl: 'assets/converted/country_puppy_pbn_intricate_thumb.png' },
+          { id: 'country_puppy_pbn_masterpiece', label: 'Masterpiece', name: 'Masterpiece', pieces: 1024, colors: 32, complexity: 'masterpiece', jsonFile: 'assets/converted/country_puppy_pbn_masterpiece.json', thumbnailUrl: 'assets/converted/country_puppy_pbn_masterpiece_thumb.png' },
         ],
       },
       {
@@ -768,16 +768,16 @@ class TapColorApp {
         title: 'Teacup Yorkie Ribbon',
         artist: 'Petite Paws Studio',
         category: 'classic',
-        pieces: 549,
+        pieces: 353,
         desc: 'Adorable teacup Yorkshire Terrier puppy with pink bow nestled in vintage porcelain',
         defaultVariantId: 'yorky_teacup_pbn_intricate',
         selectedVariantId: 'yorky_teacup_pbn_intricate',
         originalAsset: 'assets/yorky_teacup.jpeg',
         thumbnailUrl: 'assets/converted/yorky_teacup_pbn_intricate_thumb.png',
         variants: [
-          { id: 'yorky_teacup_pbn_detailed', label: 'Detailed', name: 'Detailed', pieces: 287, colors: 16, complexity: 'detailed', jsonFile: 'assets/converted/yorky_teacup_pbn_detailed.json', thumbnailUrl: 'assets/converted/yorky_teacup_pbn_detailed_thumb.png' },
-          { id: 'yorky_teacup_pbn_intricate', label: 'Intricate', name: 'Intricate', pieces: 549, colors: 24, complexity: 'intricate', jsonFile: 'assets/converted/yorky_teacup_pbn_intricate.json', thumbnailUrl: 'assets/converted/yorky_teacup_pbn_intricate_thumb.png' },
-          { id: 'yorky_teacup_pbn_masterpiece', label: 'Masterpiece', name: 'Masterpiece', pieces: 850, colors: 31, complexity: 'masterpiece', jsonFile: 'assets/converted/yorky_teacup_pbn_masterpiece.json', thumbnailUrl: 'assets/converted/yorky_teacup_pbn_masterpiece_thumb.png' },
+          { id: 'yorky_teacup_pbn_detailed', label: 'Detailed', name: 'Detailed', pieces: 213, colors: 18, complexity: 'detailed', jsonFile: 'assets/converted/yorky_teacup_pbn_detailed.json', thumbnailUrl: 'assets/converted/yorky_teacup_pbn_detailed_thumb.png' },
+          { id: 'yorky_teacup_pbn_intricate', label: 'Intricate', name: 'Intricate', pieces: 353, colors: 26, complexity: 'intricate', jsonFile: 'assets/converted/yorky_teacup_pbn_intricate.json', thumbnailUrl: 'assets/converted/yorky_teacup_pbn_intricate_thumb.png' },
+          { id: 'yorky_teacup_pbn_masterpiece', label: 'Masterpiece', name: 'Masterpiece', pieces: 1022, colors: 30, complexity: 'masterpiece', jsonFile: 'assets/converted/yorky_teacup_pbn_masterpiece.json', thumbnailUrl: 'assets/converted/yorky_teacup_pbn_masterpiece_thumb.png' },
         ],
       },
       {
@@ -785,16 +785,16 @@ class TapColorApp {
         title: 'Garden Blossom Yorkie',
         artist: 'Cottage Petals',
         category: 'classic',
-        pieces: 601,
+        pieces: 642,
         desc: 'Cheerful Yorkshire Terrier puppy surrounded by blooming pansies and meadow lavender',
         defaultVariantId: 'yorky_garden_pbn_intricate',
         selectedVariantId: 'yorky_garden_pbn_intricate',
         originalAsset: 'assets/yorky_garden.jpeg',
         thumbnailUrl: 'assets/converted/yorky_garden_pbn_intricate_thumb.png',
         variants: [
-          { id: 'yorky_garden_pbn_detailed', label: 'Detailed', name: 'Detailed', pieces: 243, colors: 16, complexity: 'detailed', jsonFile: 'assets/converted/yorky_garden_pbn_detailed.json', thumbnailUrl: 'assets/converted/yorky_garden_pbn_detailed_thumb.png' },
-          { id: 'yorky_garden_pbn_intricate', label: 'Intricate', name: 'Intricate', pieces: 601, colors: 24, complexity: 'intricate', jsonFile: 'assets/converted/yorky_garden_pbn_intricate.json', thumbnailUrl: 'assets/converted/yorky_garden_pbn_intricate_thumb.png' },
-          { id: 'yorky_garden_pbn_masterpiece', label: 'Masterpiece', name: 'Masterpiece', pieces: 1119, colors: 32, complexity: 'masterpiece', jsonFile: 'assets/converted/yorky_garden_pbn_masterpiece.json', thumbnailUrl: 'assets/converted/yorky_garden_pbn_masterpiece_thumb.png' },
+          { id: 'yorky_garden_pbn_detailed', label: 'Detailed', name: 'Detailed', pieces: 328, colors: 18, complexity: 'detailed', jsonFile: 'assets/converted/yorky_garden_pbn_detailed.json', thumbnailUrl: 'assets/converted/yorky_garden_pbn_detailed_thumb.png' },
+          { id: 'yorky_garden_pbn_intricate', label: 'Intricate', name: 'Intricate', pieces: 642, colors: 25, complexity: 'intricate', jsonFile: 'assets/converted/yorky_garden_pbn_intricate.json', thumbnailUrl: 'assets/converted/yorky_garden_pbn_intricate_thumb.png' },
+          { id: 'yorky_garden_pbn_masterpiece', label: 'Masterpiece', name: 'Masterpiece', pieces: 1470, colors: 33, complexity: 'masterpiece', jsonFile: 'assets/converted/yorky_garden_pbn_masterpiece.json', thumbnailUrl: 'assets/converted/yorky_garden_pbn_masterpiece_thumb.png' },
         ],
       },
       {
@@ -802,16 +802,16 @@ class TapColorApp {
         title: 'Cozy Autumn Yorkie',
         artist: 'Harvest Hearth',
         category: 'classic',
-        pieces: 432,
+        pieces: 349,
         desc: 'Sweet Yorkshire Terrier in a cozy red knit sweater among autumn maple leaves and pumpkins',
         defaultVariantId: 'yorky_autumn_pbn_intricate',
         selectedVariantId: 'yorky_autumn_pbn_intricate',
         originalAsset: 'assets/yorky_autumn.jpeg',
         thumbnailUrl: 'assets/converted/yorky_autumn_pbn_intricate_thumb.png',
         variants: [
-          { id: 'yorky_autumn_pbn_detailed', label: 'Detailed', name: 'Detailed', pieces: 139, colors: 15, complexity: 'detailed', jsonFile: 'assets/converted/yorky_autumn_pbn_detailed.json', thumbnailUrl: 'assets/converted/yorky_autumn_pbn_detailed_thumb.png' },
-          { id: 'yorky_autumn_pbn_intricate', label: 'Intricate', name: 'Intricate', pieces: 432, colors: 24, complexity: 'intricate', jsonFile: 'assets/converted/yorky_autumn_pbn_intricate.json', thumbnailUrl: 'assets/converted/yorky_autumn_pbn_intricate_thumb.png' },
-          { id: 'yorky_autumn_pbn_masterpiece', label: 'Masterpiece', name: 'Masterpiece', pieces: 816, colors: 32, complexity: 'masterpiece', jsonFile: 'assets/converted/yorky_autumn_pbn_masterpiece.json', thumbnailUrl: 'assets/converted/yorky_autumn_pbn_masterpiece_thumb.png' },
+          { id: 'yorky_autumn_pbn_detailed', label: 'Detailed', name: 'Detailed', pieces: 391, colors: 16, complexity: 'detailed', jsonFile: 'assets/converted/yorky_autumn_pbn_detailed.json', thumbnailUrl: 'assets/converted/yorky_autumn_pbn_detailed_thumb.png' },
+          { id: 'yorky_autumn_pbn_intricate', label: 'Intricate', name: 'Intricate', pieces: 349, colors: 22, complexity: 'intricate', jsonFile: 'assets/converted/yorky_autumn_pbn_intricate.json', thumbnailUrl: 'assets/converted/yorky_autumn_pbn_intricate_thumb.png' },
+          { id: 'yorky_autumn_pbn_masterpiece', label: 'Masterpiece', name: 'Masterpiece', pieces: 964, colors: 28, complexity: 'masterpiece', jsonFile: 'assets/converted/yorky_autumn_pbn_masterpiece.json', thumbnailUrl: 'assets/converted/yorky_autumn_pbn_masterpiece_thumb.png' },
         ],
       },
       {
@@ -819,16 +819,16 @@ class TapColorApp {
         title: 'Playful Meadow Yorkie',
         artist: 'Sunny Pastures',
         category: 'classic',
-        pieces: 363,
+        pieces: 530,
         desc: 'Joyful Yorkshire Terrier puppy in a polka dot bandana playing with a ball in buttercups',
         defaultVariantId: 'yorky_playful_pbn_intricate',
         selectedVariantId: 'yorky_playful_pbn_intricate',
         originalAsset: 'assets/yorky_playful.jpeg',
         thumbnailUrl: 'assets/converted/yorky_playful_pbn_intricate_thumb.png',
         variants: [
-          { id: 'yorky_playful_pbn_detailed', label: 'Detailed', name: 'Detailed', pieces: 181, colors: 15, complexity: 'detailed', jsonFile: 'assets/converted/yorky_playful_pbn_detailed.json', thumbnailUrl: 'assets/converted/yorky_playful_pbn_detailed_thumb.png' },
-          { id: 'yorky_playful_pbn_intricate', label: 'Intricate', name: 'Intricate', pieces: 363, colors: 24, complexity: 'intricate', jsonFile: 'assets/converted/yorky_playful_pbn_intricate.json', thumbnailUrl: 'assets/converted/yorky_playful_pbn_intricate_thumb.png' },
-          { id: 'yorky_playful_pbn_masterpiece', label: 'Masterpiece', name: 'Masterpiece', pieces: 810, colors: 31, complexity: 'masterpiece', jsonFile: 'assets/converted/yorky_playful_pbn_masterpiece.json', thumbnailUrl: 'assets/converted/yorky_playful_pbn_masterpiece_thumb.png' },
+          { id: 'yorky_playful_pbn_detailed', label: 'Detailed', name: 'Detailed', pieces: 288, colors: 18, complexity: 'detailed', jsonFile: 'assets/converted/yorky_playful_pbn_detailed.json', thumbnailUrl: 'assets/converted/yorky_playful_pbn_detailed_thumb.png' },
+          { id: 'yorky_playful_pbn_intricate', label: 'Intricate', name: 'Intricate', pieces: 530, colors: 26, complexity: 'intricate', jsonFile: 'assets/converted/yorky_playful_pbn_intricate.json', thumbnailUrl: 'assets/converted/yorky_playful_pbn_intricate_thumb.png' },
+          { id: 'yorky_playful_pbn_masterpiece', label: 'Masterpiece', name: 'Masterpiece', pieces: 962, colors: 32, complexity: 'masterpiece', jsonFile: 'assets/converted/yorky_playful_pbn_masterpiece.json', thumbnailUrl: 'assets/converted/yorky_playful_pbn_masterpiece_thumb.png' },
         ],
       },
     ];
@@ -2550,7 +2550,7 @@ class TapColorApp {
         const customTitle = (titleInput && titleInput.value.trim()) || 'My Painting';
 
         const complexity = document.getElementById('select-vector-complexity').value || 'balanced';
-        const customPaletteSize = parseInt(document.getElementById('select-vector-colors').value, 10) || 14;
+        const customPaletteSize = parseInt(document.getElementById('select-vector-colors').value, 10) || 26;
 
         modalConv.classList.remove('hidden');
         fillEl.style.width = '10%';
@@ -3013,9 +3013,9 @@ class TapColorApp {
       });
     } else {
       const pbnPresets = [
-        { complexity: 'cozy', colors: 10, name: 'Easy & Relaxing', icon: '🟢', desc: 'Larger spaces • 10 colors' },
-        { complexity: 'balanced', colors: 14, name: 'Standard', icon: '🟡', desc: 'Recommended • 14 colors' },
-        { complexity: 'detailed', colors: 24, name: 'Detailed', icon: '🟣', desc: 'Finer areas • 24 colors' }
+        { complexity: 'cozy', colors: 18, name: 'Detailed', icon: '🟢', desc: 'Smooth spaces • 18 colors' },
+        { complexity: 'balanced', colors: 26, name: 'Intricate', icon: '🟡', desc: 'Adult Coloring Book • 26 colors' },
+        { complexity: 'detailed', colors: 34, name: 'Masterpiece', icon: '🟣', desc: 'Ultra-fine detail • 34 colors' }
       ];
 
       pbnPresets.forEach(preset => {
@@ -3130,7 +3130,7 @@ class TapColorApp {
 
         try {
           const comp = this.lastCustomComplexity || 'balanced';
-          const colors = this.lastCustomPaletteSize || 14;
+          const colors = this.lastCustomPaletteSize || 26;
           const title = this.lastCustomTitle || 'Custom Painting';
 
           const { artwork, thumbnailBlob } = await vectorizeImage(this.lastCustomImage, {
@@ -3589,6 +3589,9 @@ class FallbackJsController {
       let targetS = 1.8;
       if (isDiamond) {
         targetS = Math.min(5.0, Math.max(1.8, 24.0 / drillWorldSize));
+      } else if (uncompleted.label_radius && uncompleted.label_radius > 0.5) {
+        const d = Math.max(4, uncompleted.label_radius * 2);
+        targetS = Math.min(4.5, Math.max(1.35, 26.0 / d));
       } else {
         let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
         if (uncompleted.polygon) {
@@ -3884,26 +3887,31 @@ class FallbackJsController {
       let regionWorldSize = drillWorldSize;
       let regionScreenSize = drillScreenSize;
       if (!isDiamond) {
-        let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
-        if (region.polygon) {
-          for (let i = 0; i < region.polygon.length; i++) {
-            const pt = region.polygon[i];
-            if (pt.x < minX) minX = pt.x;
-            if (pt.x > maxX) maxX = pt.x;
-            if (pt.y < minY) minY = pt.y;
-            if (pt.y > maxY) maxY = pt.y;
+        if (region.label_radius && region.label_radius > 0.5) {
+          regionWorldSize = region.label_radius * 2.0;
+          regionScreenSize = regionWorldSize * this.scale;
+        } else {
+          let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+          if (region.polygon) {
+            for (let i = 0; i < region.polygon.length; i++) {
+              const pt = region.polygon[i];
+              if (pt.x < minX) minX = pt.x;
+              if (pt.x > maxX) maxX = pt.x;
+              if (pt.y < minY) minY = pt.y;
+              if (pt.y > maxY) maxY = pt.y;
+            }
           }
+          const spanW = Math.max(1, maxX - minX);
+          const spanH = Math.max(1, maxY - minY);
+          regionWorldSize = Math.min(spanW, spanH);
+          regionScreenSize = regionWorldSize * this.scale;
         }
-        const spanW = Math.max(1, maxX - minX);
-        const spanH = Math.max(1, maxY - minY);
-        regionWorldSize = Math.max(Math.min(spanW, spanH), Math.max(spanW, spanH) * 0.45);
-        regionScreenSize = regionWorldSize * this.scale;
       }
 
       if (isHinted) {
         const ringR = isDiamond
           ? Math.max(12 / this.scale, drillWorldSize * (0.85 + pulse * 0.25))
-          : Math.min(28 / this.scale, Math.max(10 / this.scale, regionWorldSize * 0.75));
+          : Math.min(28 / this.scale, Math.max(10 / this.scale, regionWorldSize * 0.65));
         const ringW = isDiamond
           ? Math.min(drillWorldSize * 0.22, 2.2 / this.scale)
           : Math.min(regionWorldSize * 0.2, 2.4 / this.scale);
@@ -3915,7 +3923,8 @@ class FallbackJsController {
       }
 
       // Level of Detail: when zoomed out on high-res artworks, only draw indicator dots
-      if (regionScreenSize < 13.0) {
+      const minScreenForText = isDiamond ? 13.0 : 7.5;
+      if (regionScreenSize < minScreenForText) {
         if (isHinted || isActiveTarget) {
           const dotR = Math.max(1.2 / this.scale, Math.min(3.5 / this.scale, regionWorldSize * 0.35));
           this.ctx.beginPath();
@@ -3926,12 +3935,13 @@ class FallbackJsController {
       } else {
         const digits = region.number >= 100 ? 3 : (region.number >= 10 ? 2 : 1);
         const fontScale = digits >= 3 ? 0.34 : (digits === 2 ? 0.44 : 0.56);
-        const maxFontWorld = 18 / this.scale;
+        const maxFontWorld = 15 / this.scale;
+        const baseFont = Math.min(maxFontWorld, regionWorldSize * fontScale);
         const fontSize = isDiamond
           ? (isHinted ? Math.min(drillWorldSize * 0.68, drillWorldSize * fontScale * 1.15) : drillWorldSize * fontScale)
-          : (isHinted ? Math.min(maxFontWorld * 1.15, regionWorldSize * fontScale * 1.15) : Math.min(maxFontWorld, regionWorldSize * fontScale));
+          : (isHinted ? Math.min(regionWorldSize * 0.56, baseFont * 1.12) : baseFont);
         this.ctx.font = `${isHinted || isActiveTarget ? 'bold' : '600'} ${fontSize.toFixed(2)}px 'Outfit', sans-serif`;
-        this.ctx.fillStyle = isHinted ? '#B45309' : (isActiveTarget ? '#3730A3' : 'rgba(71, 85, 105, 0.75)');
+        this.ctx.fillStyle = isHinted ? '#B45309' : (isActiveTarget ? '#3730A3' : 'rgba(71, 85, 105, 0.78)');
         this.ctx.fillText(String(region.number), cx, cy);
       }
     });

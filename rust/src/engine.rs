@@ -286,6 +286,9 @@ impl GameEngine {
             };
             let target_s = if is_diamond_art {
                 (24.0 / drill_world_size).clamp(1.8, 5.0)
+            } else if reg.label_radius > 0.5 {
+                let d = (reg.label_radius * 2.0).max(4.0);
+                (26.0 / d).clamp(1.35, 4.5)
             } else {
                 let mut min_x = f64::INFINITY;
                 let mut max_x = f64::NEG_INFINITY;
@@ -908,6 +911,9 @@ impl GameEngine {
 
             let (region_world_size, region_screen_size) = if is_diamond_art {
                 (drill_world_size, drill_screen_size)
+            } else if region.label_radius > 0.5 {
+                let rw = region.label_radius * 2.0;
+                (rw, rw * self.scale)
             } else {
                 let mut min_x = f64::INFINITY;
                 let mut max_x = f64::NEG_INFINITY;
@@ -921,7 +927,7 @@ impl GameEngine {
                 }
                 let span_w = (max_x - min_x).max(1.0);
                 let span_h = (max_y - min_y).max(1.0);
-                let rw = span_w.min(span_h).max(span_w.max(span_h) * 0.45);
+                let rw = span_w.min(span_h);
                 (rw, rw * self.scale)
             };
 
@@ -930,7 +936,7 @@ impl GameEngine {
                 let ring_r = if is_diamond_art {
                     (drill_world_size * (0.85 + active_pulse * 0.25)).max(12.0 / self.scale)
                 } else {
-                    (region_world_size * 0.75).clamp(10.0 / self.scale, 28.0 / self.scale)
+                    (region_world_size * 0.65).clamp(10.0 / self.scale, 28.0 / self.scale)
                 };
                 let ring_w = if is_diamond_art {
                     (2.2 / self.scale).min(drill_world_size * 0.22)
@@ -945,7 +951,8 @@ impl GameEngine {
             }
 
             // Level of Detail: when zoomed out on high-res artworks, only draw indicator dots on tiny regions
-            if region_screen_size < 13.0 {
+            let min_screen_for_text = if is_diamond_art { 13.0 } else { 7.5 };
+            if region_screen_size < min_screen_for_text {
                 if is_hinted || is_active_target {
                     let dot_r = (region_world_size * 0.35).min(3.5 / self.scale).max(1.2 / self.scale);
                     ctx.begin_path();
@@ -969,7 +976,7 @@ impl GameEngine {
                 } else {
                     0.56
                 };
-                let max_font_world = 18.0 / self.scale;
+                let max_font_world = 15.0 / self.scale;
                 let font_size = if is_diamond_art {
                     if is_hinted {
                         (drill_world_size * font_scale * 1.15).min(drill_world_size * 0.68)
@@ -978,7 +985,7 @@ impl GameEngine {
                     }
                 } else {
                     let base = (region_world_size * font_scale).min(max_font_world);
-                    if is_hinted { base * 1.15 } else { base }
+                    if is_hinted { (base * 1.12).min(region_world_size * 0.56) } else { base }
                 };
                 let font_weight = if is_hinted || is_active_target { "bold" } else { "600" };
                 ctx.set_font(&format!("{} {:.2}px 'Outfit', sans-serif", font_weight, font_size));
@@ -988,7 +995,7 @@ impl GameEngine {
                 } else if is_active_target {
                     ctx.set_fill_style_str("#3730A3");
                 } else {
-                    ctx.set_fill_style_str("rgba(71, 85, 105, 0.75)");
+                    ctx.set_fill_style_str("rgba(71, 85, 105, 0.78)");
                 }
                 let _ = ctx.fill_text(&num_str, cx, cy);
             }
