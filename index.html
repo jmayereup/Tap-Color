@@ -1,25 +1,32 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>Tap Color • WebAssembly Art Studio</title>
-  <meta name="description" content="A gorgeous, relaxing tap-to-color game compiled to WebAssembly with Rust and HTML5 Canvas.">
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Coloring Studio</title>
+  <meta name="description"
+    content="A gorgeous, relaxing tap-to-color game compiled to WebAssembly with Rust and HTML5 Canvas.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700&display=swap"
+    rel="stylesheet">
   <link rel="stylesheet" href="/src/style.css">
 </head>
+
 <body>
   <div id="app" class="app-container">
     <!-- Top Navigation Bar -->
     <header class="header-bar">
       <div class="header-left">
         <button id="btn-gallery" class="btn-icon" title="Open Artwork Library">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
-            <circle cx="8.5" cy="8.5" r="1.5"/>
-            <polyline points="21 15 16 10 5 21"/>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+            <circle cx="8.5" cy="8.5" r="1.5" />
+            <polyline points="21 15 16 10 5 21" />
           </svg>
           <span class="btn-label">Library</span>
         </button>
@@ -28,18 +35,20 @@
           <span id="artwork-artist" class="artwork-artist">Country Homestead</span>
         </div>
         <div class="header-res-dropdown-wrap" id="header-res-dropdown-wrap">
-          <button id="btn-resolution-switcher" class="btn-res-pill diamond-mode" title="Change Art Style & Detail Level" aria-haspopup="true" aria-expanded="false">
+          <button id="btn-resolution-switcher" class="btn-res-pill diamond-mode" title="Change Art Style & Detail Level"
+            aria-haspopup="true" aria-expanded="false">
             <span class="res-icon" id="res-icon-indicator">💎</span>
             <span id="label-current-resolution">Diamond • Standard Kit (14,400 pcs)</span>
             <span class="res-caret">▾</span>
           </button>
-          
+
           <div id="quick-dropdown-backdrop" class="quick-dropdown-backdrop hidden"></div>
           <div id="quick-style-dropdown" class="quick-style-dropdown hidden" role="menu">
             <div class="quick-dropdown-header">
               <div class="quick-dropdown-title-row">
                 <span class="quick-dropdown-title" id="quick-dropdown-art-title">Art Style & Detail Level</span>
-                <button type="button" id="btn-close-quick-dropdown" class="btn-close-quick" aria-label="Close menu">&times;</button>
+                <button type="button" id="btn-close-quick-dropdown" class="btn-close-quick"
+                  aria-label="Close menu">&times;</button>
               </div>
               <span class="quick-dropdown-subtitle">Switch style or detail without leaving canvas</span>
             </div>
@@ -82,76 +91,83 @@
         <div class="tool-mode-group">
           <button id="btn-mode-pen" class="btn-icon active" title="Diamond Pen (P): Touch or Click to Place Drills">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
             </svg>
             <span class="btn-label">Pen</span>
           </button>
           <button id="btn-mode-erase" class="btn-icon" title="Eraser (E): Touch or Click to Clear Tiles">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="m7 21-4.3-4.3c-1-1-1-2.5 0-3.4l9.6-9.6c1-1 2.5-1 3.4 0l5.6 5.6c1 1 1 2.5 0 3.4L13 21"/>
-              <path d="M22 21H7"/>
-              <path d="m5 11 9 9"/>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="m7 21-4.3-4.3c-1-1-1-2.5 0-3.4l9.6-9.6c1-1 2.5-1 3.4 0l5.6 5.6c1 1 1 2.5 0 3.4L13 21" />
+              <path d="M22 21H7" />
+              <path d="m5 11 9 9" />
             </svg>
             <span class="btn-label">Eraser</span>
           </button>
           <button id="btn-mode-pan" class="btn-icon" title="Pan Canvas (H): Two-Fingers or Arrow Keys to Pan">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M18 11V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v0"/>
-              <path d="M14 10V4a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v2"/>
-              <path d="M10 10.5V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v8"/>
-              <path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.83L7 15"/>
+              <path d="M18 11V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v0" />
+              <path d="M14 10V4a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v2" />
+              <path d="M10 10.5V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v8" />
+              <path
+                d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.83L7 15" />
             </svg>
             <span class="btn-label">Pan</span>
           </button>
         </div>
 
         <button id="btn-clear-canvas" class="btn-icon" title="Clear All Placed Tiles">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M3 6h18"/>
-            <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/>
-            <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/>
-            <line x1="10" y1="11" x2="10" y2="17"/>
-            <line x1="14" y1="11" x2="14" y2="17"/>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 6h18" />
+            <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
+            <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
+            <line x1="10" y1="11" x2="10" y2="17" />
+            <line x1="14" y1="11" x2="14" y2="17" />
           </svg>
           <span class="btn-label">Clear</span>
         </button>
 
         <button id="btn-export-header" class="btn-icon" title="Export Full Artwork Image (PNG)">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-            <polyline points="7 10 12 15 17 10"/>
-            <line x1="12" y1="15" x2="12" y2="3"/>
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+            <polyline points="7 10 12 15 17 10" />
+            <line x1="12" y1="15" x2="12" y2="3" />
           </svg>
           <span class="btn-label">Export</span>
         </button>
 
         <button id="btn-sound" class="btn-icon" title="Toggle Sound">
-          <svg id="icon-sound-on" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
-            <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/>
+          <svg id="icon-sound-on" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+            <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07" />
           </svg>
         </button>
 
         <button id="btn-outline" class="btn-icon active" title="Toggle Outlines (O)">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="12" r="10"/>
-            <line x1="12" y1="2" x2="12" y2="22"/>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10" />
+            <line x1="12" y1="2" x2="12" y2="22" />
           </svg>
           <span class="btn-label">Lines</span>
         </button>
 
         <button id="btn-wand" class="btn-icon btn-accent" title="Magic Fill (Complete Color)">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="m15 4 5 2-5 2-2 5-2-5-5-2 5-2 2-5 2 5z"/>
-            <path d="m14 14 1 3 3 1-3 1-1 3-1-3-3-1 3-1 1-3z"/>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="m15 4 5 2-5 2-2 5-2-5-5-2 5-2 2-5 2 5z" />
+            <path d="m14 14 1 3 3 1-3 1-1 3-1-3-3-1 3-1 1-3z" />
           </svg>
           <span class="btn-label">Fill Color</span>
         </button>
 
         <button id="btn-hint" class="btn-icon" title="Toggle Matching Tile Highlights (Space / H)">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="11" cy="11" r="8"/>
-            <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8" />
+            <line x1="21" y1="21" x2="16.65" y2="16.65" />
           </svg>
           <span class="btn-label">Hint</span>
           <span id="hint-badge" class="badge">OFF</span>
@@ -190,14 +206,16 @@
             <h2>Artwork Library</h2>
             <p class="modal-header-subtitle">Choose a sparkling diamond painting or classic canvas to begin</p>
           </div>
-          <button id="btn-close-gallery" class="btn-close" title="Resume Art Studio" aria-label="Close Library">&times;</button>
+          <button id="btn-close-gallery" class="btn-close" title="Resume Art Studio"
+            aria-label="Close Library">&times;</button>
         </div>
 
         <!-- Gallery Category Tabs -->
         <div class="gallery-tabs">
           <button class="gallery-tab active" data-tab="diamond">💎 Diamond Painting</button>
           <button class="gallery-tab" data-tab="classic">🎨 Paint by Number</button>
-          <button class="gallery-tab" data-tab="saved" id="tab-saved-btn">🖼️ My Pictures <span class="tab-badge" id="saved-badge">0</span></button>
+          <button class="gallery-tab" data-tab="saved" id="tab-saved-btn">🖼️ My Pictures <span class="tab-badge"
+              id="saved-badge">0</span></button>
           <button class="gallery-tab" data-tab="custom">📸 Make from Photo</button>
         </div>
 
@@ -269,7 +287,8 @@
           <div id="saved-gallery-empty" class="saved-empty-panel hidden">
             <div class="empty-gallery-icon">🌸</div>
             <h3>No Pictures in Your Gallery Yet</h3>
-            <p>Start coloring any picture from the gallery or turn your photo into custom art! Your progress will autosave right here at the top of My Pictures.</p>
+            <p>Start coloring any picture from the gallery or turn your photo into custom art! Your progress will
+              autosave right here at the top of My Pictures.</p>
             <div class="saved-empty-actions">
               <button class="btn-primary" id="btn-browse-from-empty">🎨 Browse Library</button>
               <button class="btn-secondary" id="btn-open-studio-from-empty">📸 Make Art from a Photo</button>
@@ -282,7 +301,8 @@
         <div id="tab-custom-panel" class="custom-panel hidden">
           <div class="custom-studio-intro">
             <h3>Turn Any Photo into Art</h3>
-            <p class="subtitle">Pick a picture below or choose one from your device to create your own coloring page:</p>
+            <p class="subtitle">Pick a picture below or choose one from your device to create your own coloring page:
+            </p>
           </div>
 
           <!-- Step 1: Studio Mode Switcher -->
@@ -309,7 +329,8 @@
             </div>
             <div class="studio-mode-banner" id="studio-mode-banner">
               <span class="mode-banner-badge" id="mode-banner-badge">💎 Diamond Painting Active</span>
-              <span class="mode-banner-text" id="mode-banner-text">Diamond mode active: Sparkly gemstone drills mapped onto a precision mosaic grid.</span>
+              <span class="mode-banner-text" id="mode-banner-text">Diamond mode active: Sparkly gemstone drills mapped
+                onto a precision mosaic grid.</span>
             </div>
           </div>
 
@@ -326,16 +347,37 @@
                   <span class="collection-hint">Clean lines & solid colors — ready to paint:</span>
                 </div>
                 <div class="preset-buttons asset-preset-buttons">
-                  <button class="btn-preset active" data-preset="asset:fluffy_cow" data-asset="assets/fluffy-cow-3.jpeg" data-key="fluffy_cow" data-title="Sweet Highland Calf">🐮 Highland Calf</button>
-                  <button class="btn-preset" data-preset="asset:hummingbird" data-asset="assets/hummingbird.jpeg" data-key="hummingbird" data-title="Garden Hummingbird">🐦 Hummingbird</button>
-                  <button class="btn-preset" data-preset="asset:country_barn" data-asset="assets/country_barn.jpeg" data-key="country_barn" data-title="Rustic Red Barn">🏡 Red Barn</button>
-                  <button class="btn-preset" data-preset="asset:country_rooster" data-asset="assets/country_rooster.jpeg" data-key="country_rooster" data-title="Morning Farm Rooster">🐓 Rooster</button>
-                  <button class="btn-preset" data-preset="asset:country_truck" data-asset="assets/country_truck.jpeg" data-key="country_truck" data-title="Vintage Harvest Truck">🛻 Harvest Truck</button>
-                  <button class="btn-preset" data-preset="asset:country_puppy" data-asset="assets/country_puppy.jpeg" data-key="country_puppy" data-title="Porch Golden Puppy">🐶 Porch Puppy</button>
-                  <button class="btn-preset" data-preset="asset:yorky_teacup" data-asset="assets/yorky_teacup.jpeg" data-key="yorky_teacup" data-title="Teacup Yorkie Ribbon">🎀 Teacup Yorkie</button>
-                  <button class="btn-preset" data-preset="asset:yorky_garden" data-asset="assets/yorky_garden.jpeg" data-key="yorky_garden" data-title="Garden Blossom Yorkie">🌸 Garden Yorkie</button>
-                  <button class="btn-preset" data-preset="asset:yorky_autumn" data-asset="assets/yorky_autumn.jpeg" data-key="yorky_autumn" data-title="Cozy Autumn Yorkie">🍂 Autumn Yorkie</button>
-                  <button class="btn-preset" data-preset="asset:yorky_playful" data-asset="assets/yorky_playful.jpeg" data-key="yorky_playful" data-title="Playful Meadow Yorkie">🎾 Playful Yorkie</button>
+                  <button class="btn-preset active" data-preset="asset:fluffy_cow" data-asset="assets/fluffy-cow-3.jpeg"
+                    data-key="fluffy_cow" data-title="Sweet Highland Calf">🐮 Highland Calf</button>
+                  <button class="btn-preset" data-preset="asset:hummingbird" data-asset="assets/hummingbird.jpeg"
+                    data-key="hummingbird" data-title="Garden Hummingbird">🐦 Hummingbird</button>
+                  <button class="btn-preset" data-preset="asset:country_barn" data-asset="assets/country_barn.jpeg"
+                    data-key="country_barn" data-title="Rustic Red Barn">🏡 Red Barn</button>
+                  <button class="btn-preset" data-preset="asset:country_rooster"
+                    data-asset="assets/country_rooster.jpeg" data-key="country_rooster"
+                    data-title="Morning Farm Rooster">🐓 Rooster</button>
+                  <button class="btn-preset" data-preset="asset:country_truck" data-asset="assets/country_truck.jpeg"
+                    data-key="country_truck" data-title="Vintage Harvest Truck">🛻 Harvest Truck</button>
+                  <button class="btn-preset" data-preset="asset:country_puppy" data-asset="assets/country_puppy.jpeg"
+                    data-key="country_puppy" data-title="Porch Golden Puppy">🐶 Porch Puppy</button>
+                  <button class="btn-preset" data-preset="asset:yorky_teacup" data-asset="assets/yorky_teacup.jpeg"
+                    data-key="yorky_teacup" data-title="Teacup Yorkie Ribbon">🎀 Teacup Yorkie</button>
+                  <button class="btn-preset" data-preset="asset:yorky_garden" data-asset="assets/yorky_garden.jpeg"
+                    data-key="yorky_garden" data-title="Garden Blossom Yorkie">🌸 Garden Yorkie</button>
+                  <button class="btn-preset" data-preset="asset:yorky_autumn" data-asset="assets/yorky_autumn.jpeg"
+                    data-key="yorky_autumn" data-title="Cozy Autumn Yorkie">🍂 Autumn Yorkie</button>
+                  <button class="btn-preset" data-preset="asset:yorky_playful" data-asset="assets/yorky_playful.jpeg"
+                    data-key="yorky_playful" data-title="Playful Meadow Yorkie">🎾 Playful Yorkie</button>
+                  <button class="btn-preset" data-preset="asset:rural_windmill" data-asset="assets/rural_windmill.jpeg"
+                    data-key="rural_windmill" data-title="Prairie Windmill Sunset">🌾 Prairie Windmill</button>
+                  <button class="btn-preset" data-preset="asset:country_store" data-asset="assets/country_store.jpeg"
+                    data-key="country_store" data-title="Old Country Store">🏪 Country Store</button>
+                  <button class="btn-preset" data-preset="asset:pasture_horses" data-asset="assets/pasture_horses.jpeg"
+                    data-key="pasture_horses" data-title="Pasture Mare & Foal">🐴 Pasture Horses</button>
+                  <button class="btn-preset" data-preset="asset:vintage_tractor" data-asset="assets/vintage_tractor.jpeg"
+                    data-key="vintage_tractor" data-title="Heartland Antique Tractor">🚜 Antique Tractor</button>
+                  <button class="btn-preset" data-preset="asset:covered_bridge" data-asset="assets/covered_bridge.jpeg"
+                    data-key="covered_bridge" data-title="Rustic Covered Bridge">🌉 Covered Bridge</button>
                 </div>
 
                 <div class="upload-box">
@@ -357,7 +399,8 @@
 
                 <div class="setting-item title-input-wrap">
                   <label for="input-custom-title">Name your picture (Optional):</label>
-                  <input type="text" id="input-custom-title" class="styled-input" placeholder="e.g. Sweet Highland Calf, Sunny Porch">
+                  <input type="text" id="input-custom-title" class="styled-input"
+                    placeholder="e.g. Sweet Highland Calf, Sunny Porch">
                 </div>
               </div>
 
@@ -481,7 +524,8 @@
     <!-- Victory / Completion Celebration Modal -->
     <div id="modal-victory" class="modal-overlay hidden">
       <div class="modal-card celebration-card">
-        <button id="btn-close-victory" class="btn-close celebration-close-btn" aria-label="Close modal" title="Close and view picture">&times;</button>
+        <button id="btn-close-victory" class="btn-close celebration-close-btn" aria-label="Close modal"
+          title="Close and view picture">&times;</button>
         <div class="confetti-burst-icon">🎉</div>
         <h2 class="celebration-title">Masterpiece Complete!</h2>
         <p class="celebration-subtitle">You brought this artwork to life with vibrant colors.</p>
@@ -504,16 +548,16 @@
         <div class="modal-actions">
           <button id="btn-view-picture" class="btn-secondary" title="Close modal and view full artwork">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <circle cx="12" cy="12" r="3"/>
-              <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z"/>
+              <circle cx="12" cy="12" r="3" />
+              <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z" />
             </svg>
             View Picture
           </button>
           <button id="btn-export-png" class="btn-secondary" title="Export high-resolution image of full picture">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-              <polyline points="7 10 12 15 17 10"/>
-              <line x1="12" y1="15" x2="12" y2="3"/>
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+              <polyline points="7 10 12 15 17 10" />
+              <line x1="12" y1="15" x2="12" y2="3" />
             </svg>
             Export Image
           </button>
@@ -529,7 +573,8 @@
           <h3 id="res-picker-title">Switch Difficulty / Resolution</h3>
           <button id="btn-close-res-picker" class="btn-close">&times;</button>
         </div>
-        <p class="res-picker-subtitle" id="res-picker-subtitle">Select a resolution for this picture. You can color it at any detail level:</p>
+        <p class="res-picker-subtitle" id="res-picker-subtitle">Select a resolution for this picture. You can color it
+          at any detail level:</p>
         <div id="res-picker-options" class="res-picker-options">
           <!-- Dynamically populated options for Cozy / Standard / Detailed -->
         </div>
@@ -539,4 +584,5 @@
 
   <script type="module" src="/src/app.js"></script>
 </body>
+
 </html>

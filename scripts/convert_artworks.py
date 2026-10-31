@@ -943,6 +943,41 @@ def main():
             "title": "Playful Meadow Yorkie",
             "artist": "Sunny Pastures",
             "desc": "Joyful Yorkshire Terrier puppy in a polka dot bandana playing with a ball in buttercups"
+        },
+        {
+            "key": "rural_windmill",
+            "file": "rural_windmill.jpeg",
+            "title": "Prairie Windmill Sunset",
+            "artist": "Heartland Horizons",
+            "desc": "Classic American farm windmill standing tall above golden wheat fields and prairie sunflowers"
+        },
+        {
+            "key": "country_store",
+            "file": "country_store.jpeg",
+            "title": "Old Country Store",
+            "artist": "Heritage Homestead",
+            "desc": "Charming general store with wooden porch, rocking chairs, bushel of apples, and hanging lanterns"
+        },
+        {
+            "key": "pasture_horses",
+            "file": "pasture_horses.jpeg",
+            "title": "Pasture Mare & Foal",
+            "artist": "Meadow Run Stables",
+            "desc": "Loving chestnut farm mare and playful young foal beside a rustic split-rail pasture fence"
+        },
+        {
+            "key": "vintage_tractor",
+            "file": "vintage_tractor.jpeg",
+            "title": "Heartland Antique Tractor",
+            "artist": "Country Roads Studio",
+            "desc": "Classic vintage farm tractor in vibrant green and yellow beside summer cornfields and harvest crates"
+        },
+        {
+            "key": "covered_bridge",
+            "file": "covered_bridge.jpeg",
+            "title": "Rustic Covered Bridge",
+            "artist": "Valley Stream Folk",
+            "desc": "Historic red wooden covered bridge spanning a peaceful babbling stream surrounded by wildflowers"
         }
     ]
 

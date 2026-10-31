@@ -678,5 +678,345 @@
         "thumbnailUrl": "assets/converted/yorky_playful_pbn_masterpiece_thumb.png"
       }
     ]
+  },
+  {
+    "key": "rural_windmill",
+    "title": "Prairie Windmill Sunset",
+    "artist": "Heartland Horizons",
+    "desc": "Classic American farm windmill standing tall above golden wheat fields and prairie sunflowers",
+    "originalAsset": "assets/rural_windmill.jpeg",
+    "diamondVariants": [
+      {
+        "id": "rural_windmill_diamond_80",
+        "resolution": "Cozy (6.4k)",
+        "label": "80\u00d780",
+        "grid": 80,
+        "pieces": 6400,
+        "colors": 18,
+        "jsonFile": "assets/converted/rural_windmill_diamond_80.json",
+        "thumbnailUrl": "assets/converted/rural_windmill_diamond_80_thumb.png"
+      },
+      {
+        "id": "rural_windmill_diamond_120",
+        "resolution": "Standard (14.4k)",
+        "label": "120\u00d7120",
+        "grid": 120,
+        "pieces": 14400,
+        "colors": 26,
+        "jsonFile": "assets/converted/rural_windmill_diamond_120.json",
+        "thumbnailUrl": "assets/converted/rural_windmill_diamond_120_thumb.png"
+      },
+      {
+        "id": "rural_windmill_diamond_160",
+        "resolution": "Masterpiece (25.6k)",
+        "label": "160\u00d7160",
+        "grid": 160,
+        "pieces": 25600,
+        "colors": 36,
+        "jsonFile": "assets/converted/rural_windmill_diamond_160.json",
+        "thumbnailUrl": "assets/converted/rural_windmill_diamond_160_thumb.png"
+      }
+    ],
+    "pbnVariants": [
+      {
+        "id": "rural_windmill_pbn_detailed",
+        "resolution": "Detailed (800+)",
+        "complexity": "detailed",
+        "pieces": 503,
+        "colors": 18,
+        "jsonFile": "assets/converted/rural_windmill_pbn_detailed.json",
+        "thumbnailUrl": "assets/converted/rural_windmill_pbn_detailed_thumb.png"
+      },
+      {
+        "id": "rural_windmill_pbn_intricate",
+        "resolution": "Intricate (2,000+)",
+        "complexity": "intricate",
+        "pieces": 996,
+        "colors": 26,
+        "jsonFile": "assets/converted/rural_windmill_pbn_intricate.json",
+        "thumbnailUrl": "assets/converted/rural_windmill_pbn_intricate_thumb.png"
+      },
+      {
+        "id": "rural_windmill_pbn_masterpiece",
+        "resolution": "Masterpiece (4,000+)",
+        "complexity": "masterpiece",
+        "pieces": 1609,
+        "colors": 34,
+        "jsonFile": "assets/converted/rural_windmill_pbn_masterpiece.json",
+        "thumbnailUrl": "assets/converted/rural_windmill_pbn_masterpiece_thumb.png"
+      }
+    ]
+  },
+  {
+    "key": "country_store",
+    "title": "Old Country Store",
+    "artist": "Heritage Homestead",
+    "desc": "Charming general store with wooden porch, rocking chairs, bushel of apples, and hanging lanterns",
+    "originalAsset": "assets/country_store.jpeg",
+    "diamondVariants": [
+      {
+        "id": "country_store_diamond_80",
+        "resolution": "Cozy (6.4k)",
+        "label": "80\u00d780",
+        "grid": 80,
+        "pieces": 6400,
+        "colors": 18,
+        "jsonFile": "assets/converted/country_store_diamond_80.json",
+        "thumbnailUrl": "assets/converted/country_store_diamond_80_thumb.png"
+      },
+      {
+        "id": "country_store_diamond_120",
+        "resolution": "Standard (14.4k)",
+        "label": "120\u00d7120",
+        "grid": 120,
+        "pieces": 14400,
+        "colors": 26,
+        "jsonFile": "assets/converted/country_store_diamond_120.json",
+        "thumbnailUrl": "assets/converted/country_store_diamond_120_thumb.png"
+      },
+      {
+        "id": "country_store_diamond_160",
+        "resolution": "Masterpiece (25.6k)",
+        "label": "160\u00d7160",
+        "grid": 160,
+        "pieces": 25600,
+        "colors": 36,
+        "jsonFile": "assets/converted/country_store_diamond_160.json",
+        "thumbnailUrl": "assets/converted/country_store_diamond_160_thumb.png"
+      }
+    ],
+    "pbnVariants": [
+      {
+        "id": "country_store_pbn_detailed",
+        "resolution": "Detailed (800+)",
+        "complexity": "detailed",
+        "pieces": 573,
+        "colors": 18,
+        "jsonFile": "assets/converted/country_store_pbn_detailed.json",
+        "thumbnailUrl": "assets/converted/country_store_pbn_detailed_thumb.png"
+      },
+      {
+        "id": "country_store_pbn_intricate",
+        "resolution": "Intricate (2,000+)",
+        "complexity": "intricate",
+        "pieces": 1078,
+        "colors": 26,
+        "jsonFile": "assets/converted/country_store_pbn_intricate.json",
+        "thumbnailUrl": "assets/converted/country_store_pbn_intricate_thumb.png"
+      },
+      {
+        "id": "country_store_pbn_masterpiece",
+        "resolution": "Masterpiece (4,000+)",
+        "complexity": "masterpiece",
+        "pieces": 1694,
+        "colors": 34,
+        "jsonFile": "assets/converted/country_store_pbn_masterpiece.json",
+        "thumbnailUrl": "assets/converted/country_store_pbn_masterpiece_thumb.png"
+      }
+    ]
+  },
+  {
+    "key": "pasture_horses",
+    "title": "Pasture Mare & Foal",
+    "artist": "Meadow Run Stables",
+    "desc": "Loving chestnut farm mare and playful young foal beside a rustic split-rail pasture fence",
+    "originalAsset": "assets/pasture_horses.jpeg",
+    "diamondVariants": [
+      {
+        "id": "pasture_horses_diamond_80",
+        "resolution": "Cozy (6.4k)",
+        "label": "80\u00d780",
+        "grid": 80,
+        "pieces": 6400,
+        "colors": 18,
+        "jsonFile": "assets/converted/pasture_horses_diamond_80.json",
+        "thumbnailUrl": "assets/converted/pasture_horses_diamond_80_thumb.png"
+      },
+      {
+        "id": "pasture_horses_diamond_120",
+        "resolution": "Standard (14.4k)",
+        "label": "120\u00d7120",
+        "grid": 120,
+        "pieces": 14400,
+        "colors": 26,
+        "jsonFile": "assets/converted/pasture_horses_diamond_120.json",
+        "thumbnailUrl": "assets/converted/pasture_horses_diamond_120_thumb.png"
+      },
+      {
+        "id": "pasture_horses_diamond_160",
+        "resolution": "Masterpiece (25.6k)",
+        "label": "160\u00d7160",
+        "grid": 160,
+        "pieces": 25600,
+        "colors": 36,
+        "jsonFile": "assets/converted/pasture_horses_diamond_160.json",
+        "thumbnailUrl": "assets/converted/pasture_horses_diamond_160_thumb.png"
+      }
+    ],
+    "pbnVariants": [
+      {
+        "id": "pasture_horses_pbn_detailed",
+        "resolution": "Detailed (800+)",
+        "complexity": "detailed",
+        "pieces": 358,
+        "colors": 18,
+        "jsonFile": "assets/converted/pasture_horses_pbn_detailed.json",
+        "thumbnailUrl": "assets/converted/pasture_horses_pbn_detailed_thumb.png"
+      },
+      {
+        "id": "pasture_horses_pbn_intricate",
+        "resolution": "Intricate (2,000+)",
+        "complexity": "intricate",
+        "pieces": 561,
+        "colors": 26,
+        "jsonFile": "assets/converted/pasture_horses_pbn_intricate.json",
+        "thumbnailUrl": "assets/converted/pasture_horses_pbn_intricate_thumb.png"
+      },
+      {
+        "id": "pasture_horses_pbn_masterpiece",
+        "resolution": "Masterpiece (4,000+)",
+        "complexity": "masterpiece",
+        "pieces": 1044,
+        "colors": 34,
+        "jsonFile": "assets/converted/pasture_horses_pbn_masterpiece.json",
+        "thumbnailUrl": "assets/converted/pasture_horses_pbn_masterpiece_thumb.png"
+      }
+    ]
+  },
+  {
+    "key": "vintage_tractor",
+    "title": "Heartland Antique Tractor",
+    "artist": "Country Roads Studio",
+    "desc": "Classic vintage farm tractor in vibrant green and yellow beside summer cornfields and harvest crates",
+    "originalAsset": "assets/vintage_tractor.jpeg",
+    "diamondVariants": [
+      {
+        "id": "vintage_tractor_diamond_80",
+        "resolution": "Cozy (6.4k)",
+        "label": "80\u00d780",
+        "grid": 80,
+        "pieces": 6400,
+        "colors": 18,
+        "jsonFile": "assets/converted/vintage_tractor_diamond_80.json",
+        "thumbnailUrl": "assets/converted/vintage_tractor_diamond_80_thumb.png"
+      },
+      {
+        "id": "vintage_tractor_diamond_120",
+        "resolution": "Standard (14.4k)",
+        "label": "120\u00d7120",
+        "grid": 120,
+        "pieces": 14400,
+        "colors": 26,
+        "jsonFile": "assets/converted/vintage_tractor_diamond_120.json",
+        "thumbnailUrl": "assets/converted/vintage_tractor_diamond_120_thumb.png"
+      },
+      {
+        "id": "vintage_tractor_diamond_160",
+        "resolution": "Masterpiece (25.6k)",
+        "label": "160\u00d7160",
+        "grid": 160,
+        "pieces": 25600,
+        "colors": 36,
+        "jsonFile": "assets/converted/vintage_tractor_diamond_160.json",
+        "thumbnailUrl": "assets/converted/vintage_tractor_diamond_160_thumb.png"
+      }
+    ],
+    "pbnVariants": [
+      {
+        "id": "vintage_tractor_pbn_detailed",
+        "resolution": "Detailed (800+)",
+        "complexity": "detailed",
+        "pieces": 418,
+        "colors": 17,
+        "jsonFile": "assets/converted/vintage_tractor_pbn_detailed.json",
+        "thumbnailUrl": "assets/converted/vintage_tractor_pbn_detailed_thumb.png"
+      },
+      {
+        "id": "vintage_tractor_pbn_intricate",
+        "resolution": "Intricate (2,000+)",
+        "complexity": "intricate",
+        "pieces": 811,
+        "colors": 25,
+        "jsonFile": "assets/converted/vintage_tractor_pbn_intricate.json",
+        "thumbnailUrl": "assets/converted/vintage_tractor_pbn_intricate_thumb.png"
+      },
+      {
+        "id": "vintage_tractor_pbn_masterpiece",
+        "resolution": "Masterpiece (4,000+)",
+        "complexity": "masterpiece",
+        "pieces": 1548,
+        "colors": 34,
+        "jsonFile": "assets/converted/vintage_tractor_pbn_masterpiece.json",
+        "thumbnailUrl": "assets/converted/vintage_tractor_pbn_masterpiece_thumb.png"
+      }
+    ]
+  },
+  {
+    "key": "covered_bridge",
+    "title": "Rustic Covered Bridge",
+    "artist": "Valley Stream Folk",
+    "desc": "Historic red wooden covered bridge spanning a peaceful babbling stream surrounded by wildflowers",
+    "originalAsset": "assets/covered_bridge.jpeg",
+    "diamondVariants": [
+      {
+        "id": "covered_bridge_diamond_80",
+        "resolution": "Cozy (6.4k)",
+        "label": "80\u00d780",
+        "grid": 80,
+        "pieces": 6400,
+        "colors": 18,
+        "jsonFile": "assets/converted/covered_bridge_diamond_80.json",
+        "thumbnailUrl": "assets/converted/covered_bridge_diamond_80_thumb.png"
+      },
+      {
+        "id": "covered_bridge_diamond_120",
+        "resolution": "Standard (14.4k)",
+        "label": "120\u00d7120",
+        "grid": 120,
+        "pieces": 14400,
+        "colors": 26,
+        "jsonFile": "assets/converted/covered_bridge_diamond_120.json",
+        "thumbnailUrl": "assets/converted/covered_bridge_diamond_120_thumb.png"
+      },
+      {
+        "id": "covered_bridge_diamond_160",
+        "resolution": "Masterpiece (25.6k)",
+        "label": "160\u00d7160",
+        "grid": 160,
+        "pieces": 25600,
+        "colors": 36,
+        "jsonFile": "assets/converted/covered_bridge_diamond_160.json",
+        "thumbnailUrl": "assets/converted/covered_bridge_diamond_160_thumb.png"
+      }
+    ],
+    "pbnVariants": [
+      {
+        "id": "covered_bridge_pbn_detailed",
+        "resolution": "Detailed (800+)",
+        "complexity": "detailed",
+        "pieces": 506,
+        "colors": 18,
+        "jsonFile": "assets/converted/covered_bridge_pbn_detailed.json",
+        "thumbnailUrl": "assets/converted/covered_bridge_pbn_detailed_thumb.png"
+      },
+      {
+        "id": "covered_bridge_pbn_intricate",
+        "resolution": "Intricate (2,000+)",
+        "complexity": "intricate",
+        "pieces": 906,
+        "colors": 26,
+        "jsonFile": "assets/converted/covered_bridge_pbn_intricate.json",
+        "thumbnailUrl": "assets/converted/covered_bridge_pbn_intricate_thumb.png"
+      },
+      {
+        "id": "covered_bridge_pbn_masterpiece",
+        "resolution": "Masterpiece (4,000+)",
+        "complexity": "masterpiece",
+        "pieces": 1540,
+        "colors": 34,
+        "jsonFile": "assets/converted/covered_bridge_pbn_masterpiece.json",
+        "thumbnailUrl": "assets/converted/covered_bridge_pbn_masterpiece_thumb.png"
+      }
+    ]
   }
 ]
