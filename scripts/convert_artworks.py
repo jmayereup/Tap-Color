@@ -591,44 +591,194 @@ def refine_pole_in_poly(candidates, poly, dist_map, W, margin, scale):
                         improved = True
     return best_x, best_y, max(1.0, best_d)
 
+def detect_bg_and_ink_grid(grid_rgb, W):
+    """
+    Separates outer white background (mask=1) and thin dark ink outlines (mask=2)
+    from playable interior color pixels (mask=0) on a flat RGB tuple list.
+    """
+    total = W * W
+    mask = [0] * total
+
+    def is_white_bg(rgb):
+        return rgb[0] > 232 and rgb[1] > 232 and rgb[2] > 232
+
+    q = deque()
+    for x in range(W):
+        for y in (0, W - 1):
+            idx = y * W + x
+            if mask[idx] == 0 and is_white_bg(grid_rgb[idx]):
+                mask[idx] = 1
+                q.append(idx)
+    for y in range(1, W - 1):
+        for x in (0, W - 1):
+            idx = y * W + x
+            if mask[idx] == 0 and is_white_bg(grid_rgb[idx]):
+                mask[idx] = 1
+                q.append(idx)
+
+    while q:
+        curr = q.popleft()
+        cx = curr % W
+        cy = curr // W
+        if cx > 0 and mask[curr - 1] == 0 and is_white_bg(grid_rgb[curr - 1]):
+            mask[curr - 1] = 1
+            q.append(curr - 1)
+        if cx < W - 1 and mask[curr + 1] == 0 and is_white_bg(grid_rgb[curr + 1]):
+            mask[curr + 1] = 1
+            q.append(curr + 1)
+        if cy > 0 and mask[curr - W] == 0 and is_white_bg(grid_rgb[curr - W]):
+            mask[curr - W] = 1
+            q.append(curr - W)
+        if cy < W - 1 and mask[curr + W] == 0 and is_white_bg(grid_rgb[curr + W]):
+            mask[curr + W] = 1
+            q.append(curr + W)
+
+    dark = [False] * total
+    for i in range(total):
+        if mask[i] != 0:
+            continue
+        r, g, b = grid_rgb[i]
+        lum = get_luminance(r, g, b)
+        sat = max(r, g, b) - min(r, g, b)
+        if lum < 105 and sat < 55:
+            dark[i] = True
+
+    R = max(3, W // 100)
+    core = [False] * total
+    for y in range(R, W - R):
+        for x in range(R, W - R):
+            idx = y * W + x
+            if not dark[idx]:
+                continue
+            all_dark = True
+            for dy in range(-R, R + 1):
+                row_off = (y + dy) * W
+                for dx in range(-R, R + 1):
+                    if not dark[row_off + x + dx]:
+                        all_dark = False
+                        break
+                if not all_dark:
+                    break
+            if all_dark:
+                core[idx] = True
+
+    solid_dark = [False] * total
+    for y in range(W):
+        for x in range(W):
+            if core[y * W + x]:
+                y0, y1 = max(0, y - R), min(W - 1, y + R)
+                x0, x1 = max(0, x - R), min(W - 1, x + R)
+                for ny in range(y0, y1 + 1):
+                    row_off = ny * W
+                    for nx in range(x0, x1 + 1):
+                        if dark[row_off + nx]:
+                            solid_dark[row_off + nx] = True
+
+    for i in range(total):
+        if dark[i] and not solid_dark[i]:
+            mask[i] = 2
+
+    return mask
+
+
+def merge_similar_palette(centers, counts, min_dist):
+    """Merges visually redundant palette centers within min_dist perceptual RGB distance."""
+    active = [[list(c), cnt] for c, cnt in zip(centers, counts) if cnt > 0]
+    while len(active) > 4:
+        best_i, best_j, best_d = -1, -1, float('inf')
+        for i in range(len(active)):
+            ci = active[i][0]
+            for j in range(i + 1, len(active)):
+                cj = active[j][0]
+                dr = ci[0] - cj[0]
+                dg = ci[1] - cj[1]
+                db = ci[2] - cj[2]
+                d = math.sqrt(2 * dr * dr + 4 * dg * dg + 3 * db * db) / 3.0
+                if d < best_d:
+                    best_d = d
+                    best_i, best_j = i, j
+        if best_d >= min_dist or best_i == -1:
+            break
+        wi, wj = active[best_i][1], active[best_j][1]
+        tot = wi + wj
+        ci, cj = active[best_i][0], active[best_j][0]
+        active[best_i][0] = [
+            round((ci[0] * wi + cj[0] * wj) / tot),
+            round((ci[1] * wi + cj[1] * wj) / tot),
+            round((ci[2] * wi + cj[2] * wj) / tot),
+        ]
+        active[best_i][1] = tot
+        active.pop(best_j)
+    return [a[0] for a in active]
+
+
 def convert_to_paint_by_number(img_path, complexity, title, artist, output_id, output_dir):
     json_path = os.path.join(output_dir, f"{output_id}.json")
     thumb_path = os.path.join(output_dir, f"{output_id}_thumb.png")
 
     presets = {
-        'detailed': {'K': 18, 'W': 420, 'min_pixels': 22, 'min_thickness': 2, 'epsilon': 0.44},
-        'intricate': {'K': 26, 'W': 540, 'min_pixels': 18, 'min_thickness': 2, 'epsilon': 0.38},
-        'masterpiece': {'K': 34, 'W': 660, 'min_pixels': 14, 'min_thickness': 2, 'epsilon': 0.34},
+        'detailed':    {'K': 14, 'W': 360, 'min_pixels': 130, 'min_thickness': 3, 'merge_dist': 26.0, 'epsilon': 0.65},
+        'intricate':   {'K': 20, 'W': 440, 'min_pixels': 70,  'min_thickness': 2, 'merge_dist': 20.0, 'epsilon': 0.50},
+        'masterpiece': {'K': 28, 'W': 540, 'min_pixels': 30,  'min_thickness': 2, 'merge_dist': 14.0, 'epsilon': 0.40},
     }
     cfg = presets[complexity]
-    K, W, min_pixels, min_thickness, epsilon = (
-        cfg['K'], cfg['W'], cfg['min_pixels'], cfg['min_thickness'], cfg['epsilon']
+    K, W, min_pixels, min_thickness, merge_dist, epsilon = (
+        cfg['K'], cfg['W'], cfg['min_pixels'], cfg['min_thickness'], cfg['merge_dist'], cfg['epsilon']
     )
 
     grid_rgb = load_framed_rgb_grid(img_path, W)
     # Edge-preserving bilateral smoothing
     grid_rgb = bilateral_smooth_rgb(grid_rgb, W, W)
 
-    # Sample pixels for k-means++
-    samples = []
-    step = max(1, W // 50)
-    for y in range(0, W, step):
-        for x in range(0, W, step):
-            samples.append(grid_rgb[y * W + x])
+    mask = detect_bg_and_ink_grid(grid_rgb, W)
 
-    centers = kmeans_pp(samples, K, max_iter=12)
+    # Sample only clean interior pixels for k-means++
+    samples = []
+    step = max(1, W // 55)
+    for y in range(2, W - 2, step):
+        for x in range(2, W - 2, step):
+            idx = y * W + x
+            if mask[idx] != 0:
+                continue
+            if mask[idx - 1] != 0 or mask[idx + 1] != 0 or mask[idx - W] != 0 or mask[idx + W] != 0:
+                continue
+            samples.append(grid_rgb[idx])
+
+    if len(samples) < K * 4:
+        for y in range(0, W, step):
+            for x in range(0, W, step):
+                idx = y * W + x
+                if mask[idx] == 0:
+                    samples.append(grid_rgb[idx])
+    if not samples:
+        samples = [grid_rgb[(W // 2) * W + (W // 2)]]
+
+    K_eff = min(K, len(samples))
+    centers = kmeans_pp(samples, K_eff, max_iter=12)
+
+    counts = [0] * len(centers)
+    for s in samples:
+        best_k = min(range(len(centers)), key=lambda k: (s[0]-centers[k][0])**2 + (s[1]-centers[k][1])**2 + (s[2]-centers[k][2])**2)
+        counts[best_k] += 1
+    centers = merge_similar_palette(centers, counts, merge_dist)
+    K_eff = len(centers)
     centers.sort(key=lambda c: get_luminance(*c), reverse=True)
 
     cR = [c[0] for c in centers]
     cG = [c[1] for c in centers]
     cB = [c[2] for c in centers]
 
-    grid = [0] * (W * W)
+    grid = [-1] * (W * W)
     for idx, (pr, pg, pb) in enumerate(grid_rgb):
-        best_k = min(range(K), key=lambda k: (pr-cR[k])**2 + (pg-cG[k])**2 + (pb-cB[k])**2)
-        grid[idx] = best_k
+        if mask[idx] == 1:
+            grid[idx] = -1
+        elif mask[idx] == 2:
+            grid[idx] = -2
+        else:
+            best_k = min(range(K_eff), key=lambda k: (pr-cR[k])**2 + (pg-cG[k])**2 + (pb-cB[k])**2)
+            grid[idx] = best_k
 
-    # 2 passes of majority filter (mode >= 5) to smooth ragged pixel boundaries
+    # 2 passes of majority filter (mode >= 5) on playable pixels
     for _ in range(2):
         new_grid = list(grid)
         for y in range(1, W - 1):
@@ -636,15 +786,52 @@ def convert_to_paint_by_number(img_path, complexity, title, artist, output_id, o
             for x in range(1, W - 1):
                 idx = row + x
                 cur = grid[idx]
-                counts = Counter()
+                if cur < 0:
+                    continue
+                counts_nbr = Counter()
                 for dy in (-1, 0, 1):
                     nrow = (y + dy) * W
                     for dx in (-1, 0, 1):
-                        counts[grid[nrow + x + dx]] += 1
-                dom, count = counts.most_common(1)[0]
-                if count >= 5 and dom != cur:
-                    new_grid[idx] = dom
+                        val = grid[nrow + x + dx]
+                        if val >= 0:
+                            counts_nbr[val] += 1
+                if counts_nbr:
+                    dom, count = counts_nbr.most_common(1)[0]
+                    if count >= 5 and dom != cur:
+                        new_grid[idx] = dom
         grid = new_grid
+
+    # Multi-source BFS: propagate adjacent interior colors into thin ink lines (-2)
+    ink_q = deque()
+    for y in range(W):
+        for x in range(W):
+            idx = y * W + x
+            if grid[idx] >= 0:
+                if (x > 0 and grid[idx - 1] == -2) or (x < W - 1 and grid[idx + 1] == -2) or \
+                   (y > 0 and grid[idx - W] == -2) or (y < W - 1 and grid[idx + W] == -2):
+                    ink_q.append(idx)
+
+    while ink_q:
+        curr = ink_q.popleft()
+        col = grid[curr]
+        cx = curr % W
+        cy = curr // W
+        if cx > 0 and grid[curr - 1] == -2:
+            grid[curr - 1] = col
+            ink_q.append(curr - 1)
+        if cx < W - 1 and grid[curr + 1] == -2:
+            grid[curr + 1] = col
+            ink_q.append(curr + 1)
+        if cy > 0 and grid[curr - W] == -2:
+            grid[curr - W] = col
+            ink_q.append(curr - W)
+        if cy < W - 1 and grid[curr + W] == -2:
+            grid[curr + W] = col
+            ink_q.append(curr + W)
+
+    for i in range(W * W):
+        if grid[i] == -2:
+            grid[i] = -1
 
     # Morphological cleanup of 1px spurs/hairs
     for _ in range(2):
@@ -653,14 +840,16 @@ def convert_to_paint_by_number(img_path, complexity, title, artist, output_id, o
             for x in range(1, W - 1):
                 idx = row + x
                 cur = grid[idx]
+                if cur < 0:
+                    continue
                 orth = [grid[idx - 1], grid[idx + 1], grid[idx - W], grid[idx + W]]
                 same = sum(1 for v in orth if v == cur)
                 if same <= 1:
-                    others = [v for v in orth if v != cur]
+                    others = [v for v in orth if v >= 0 and v != cur]
                     if others:
                         grid[idx] = Counter(others).most_common(1)[0][0]
 
-    # Watershed neighbor merge: absorb micro-regions (< min_pixels) AND thin 1px outline slivers (< min_thickness)
+    # Watershed neighbor merge: absorb micro-regions (< min_pixels) AND thin outline slivers (< min_thickness)
     for _ in range(6):
         labels = [-1] * (W * W)
         components = []
@@ -668,7 +857,7 @@ def convert_to_paint_by_number(img_path, complexity, title, artist, output_id, o
         for y in range(W):
             for x in range(W):
                 idx = y * W + x
-                if labels[idx] != -1:
+                if grid[idx] < 0 or labels[idx] != -1:
                     continue
                 color = grid[idx]
                 label = next_label
@@ -715,13 +904,13 @@ def convert_to_paint_by_number(img_path, complexity, title, artist, output_id, o
             for p in c['pixels']:
                 cx = p % W
                 cy = p // W
-                if cx > 0 and labels[p - 1] != c['label']:
+                if cx > 0 and labels[p - 1] != c['label'] and grid[p - 1] >= 0:
                     contact[grid[p - 1]] += 1
-                if cx < W - 1 and labels[p + 1] != c['label']:
+                if cx < W - 1 and labels[p + 1] != c['label'] and grid[p + 1] >= 0:
                     contact[grid[p + 1]] += 1
-                if cy > 0 and labels[p - W] != c['label']:
+                if cy > 0 and labels[p - W] != c['label'] and grid[p - W] >= 0:
                     contact[grid[p - W]] += 1
-                if cy < W - 1 and labels[p + W] != c['label']:
+                if cy < W - 1 and labels[p + W] != c['label'] and grid[p + W] >= 0:
                     contact[grid[p + W]] += 1
             if not contact:
                 continue
@@ -737,7 +926,7 @@ def convert_to_paint_by_number(img_path, complexity, title, artist, output_id, o
         if not merged_any:
             break
 
-    valid_components = [c for c in components if len(c['pixels']) >= 4]
+    valid_components = [c for c in components if len(c['pixels']) >= 8]
 
     width = 800
     height = 800
@@ -826,21 +1015,24 @@ def convert_to_paint_by_number(img_path, complexity, title, artist, output_id, o
     with open(json_path, 'w', encoding='utf-8') as f:
         json.dump(artwork, f, separators=(',', ':'))
 
-    # Render Thumbnail (280x200)
+    # Render Thumbnail (280x200, 2x supersampled with crisp dark ink outlines)
     thumb_w, thumb_h = 280, 200
-    ts = 0.22
-    tox = (thumb_w - width * ts) / 2
-    toy = (thumb_h - height * ts) / 2
+    ss = 2
+    ts = 0.23 * ss
+    tox = (thumb_w * ss - width * ts) / 2
+    toy = (thumb_h * ss - height * ts) / 2
 
     if HAS_PIL:
-        thumb_img = Image.new('RGB', (thumb_w, thumb_h), (15, 23, 42))
-        draw = ImageDraw.Draw(thumb_img)
+        thumb_hi = Image.new('RGB', (thumb_w * ss, thumb_h * ss), (248, 250, 252))
+        draw = ImageDraw.Draw(thumb_hi)
         for r in regions:
             poly_pts = [(tox + pt['x'] * ts, toy + pt['y'] * ts) for pt in r['polygon']]
             if len(poly_pts) >= 3:
                 hex_c = r['color_hex'].lstrip('#')
                 rgb_c = tuple(int(hex_c[i:i+2], 16) for i in (0, 2, 4))
-                draw.polygon(poly_pts, fill=rgb_c, outline=(240, 240, 240, 60))
+                draw.polygon(poly_pts, fill=rgb_c)
+                draw.line(poly_pts + [poly_pts[0]], fill=(30, 41, 59), width=2)
+        thumb_img = thumb_hi.resize((thumb_w, thumb_h), Image.Resampling.LANCZOS)
         thumb_img.save(thumb_path, 'PNG')
     else:
         surf = cairo.ImageSurface(cairo.FORMAT_ARGB32, thumb_w, thumb_h)

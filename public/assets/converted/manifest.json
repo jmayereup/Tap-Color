@@ -42,8 +42,8 @@
         "id": "fluffy_cow_pbn_detailed",
         "resolution": "Detailed (800+)",
         "complexity": "detailed",
-        "pieces": 158,
-        "colors": 16,
+        "pieces": 65,
+        "colors": 11,
         "jsonFile": "assets/converted/fluffy_cow_pbn_detailed.json",
         "thumbnailUrl": "assets/converted/fluffy_cow_pbn_detailed_thumb.png"
       },
@@ -51,8 +51,8 @@
         "id": "fluffy_cow_pbn_intricate",
         "resolution": "Intricate (2,000+)",
         "complexity": "intricate",
-        "pieces": 494,
-        "colors": 24,
+        "pieces": 96,
+        "colors": 13,
         "jsonFile": "assets/converted/fluffy_cow_pbn_intricate.json",
         "thumbnailUrl": "assets/converted/fluffy_cow_pbn_intricate_thumb.png"
       },
@@ -60,8 +60,8 @@
         "id": "fluffy_cow_pbn_masterpiece",
         "resolution": "Masterpiece (4,000+)",
         "complexity": "masterpiece",
-        "pieces": 844,
-        "colors": 30,
+        "pieces": 398,
+        "colors": 17,
         "jsonFile": "assets/converted/fluffy_cow_pbn_masterpiece.json",
         "thumbnailUrl": "assets/converted/fluffy_cow_pbn_masterpiece_thumb.png"
       }
@@ -110,8 +110,8 @@
         "id": "hummingbird_pbn_detailed",
         "resolution": "Detailed (800+)",
         "complexity": "detailed",
-        "pieces": 137,
-        "colors": 17,
+        "pieces": 58,
+        "colors": 11,
         "jsonFile": "assets/converted/hummingbird_pbn_detailed.json",
         "thumbnailUrl": "assets/converted/hummingbird_pbn_detailed_thumb.png"
       },
@@ -119,8 +119,8 @@
         "id": "hummingbird_pbn_intricate",
         "resolution": "Intricate (2,000+)",
         "complexity": "intricate",
-        "pieces": 208,
-        "colors": 24,
+        "pieces": 85,
+        "colors": 16,
         "jsonFile": "assets/converted/hummingbird_pbn_intricate.json",
         "thumbnailUrl": "assets/converted/hummingbird_pbn_intricate_thumb.png"
       },
@@ -128,8 +128,8 @@
         "id": "hummingbird_pbn_masterpiece",
         "resolution": "Masterpiece (4,000+)",
         "complexity": "masterpiece",
-        "pieces": 385,
-        "colors": 31,
+        "pieces": 212,
+        "colors": 22,
         "jsonFile": "assets/converted/hummingbird_pbn_masterpiece.json",
         "thumbnailUrl": "assets/converted/hummingbird_pbn_masterpiece_thumb.png"
       }
@@ -178,8 +178,8 @@
         "id": "country_barn_pbn_detailed",
         "resolution": "Detailed (800+)",
         "complexity": "detailed",
-        "pieces": 247,
-        "colors": 18,
+        "pieces": 50,
+        "colors": 13,
         "jsonFile": "assets/converted/country_barn_pbn_detailed.json",
         "thumbnailUrl": "assets/converted/country_barn_pbn_detailed_thumb.png"
       },
@@ -187,8 +187,8 @@
         "id": "country_barn_pbn_intricate",
         "resolution": "Intricate (2,000+)",
         "complexity": "intricate",
-        "pieces": 448,
-        "colors": 25,
+        "pieces": 113,
+        "colors": 15,
         "jsonFile": "assets/converted/country_barn_pbn_intricate.json",
         "thumbnailUrl": "assets/converted/country_barn_pbn_intricate_thumb.png"
       },
@@ -196,8 +196,8 @@
         "id": "country_barn_pbn_masterpiece",
         "resolution": "Masterpiece (4,000+)",
         "complexity": "masterpiece",
-        "pieces": 1106,
-        "colors": 33,
+        "pieces": 278,
+        "colors": 21,
         "jsonFile": "assets/converted/country_barn_pbn_masterpiece.json",
         "thumbnailUrl": "assets/converted/country_barn_pbn_masterpiece_thumb.png"
       }
@@ -246,8 +246,8 @@
         "id": "country_rooster_pbn_detailed",
         "resolution": "Detailed (800+)",
         "complexity": "detailed",
-        "pieces": 248,
-        "colors": 17,
+        "pieces": 74,
+        "colors": 13,
         "jsonFile": "assets/converted/country_rooster_pbn_detailed.json",
         "thumbnailUrl": "assets/converted/country_rooster_pbn_detailed_thumb.png"
       },
@@ -255,8 +255,8 @@
         "id": "country_rooster_pbn_intricate",
         "resolution": "Intricate (2,000+)",
         "complexity": "intricate",
-        "pieces": 499,
-        "colors": 24,
+        "pieces": 121,
+        "colors": 18,
         "jsonFile": "assets/converted/country_rooster_pbn_intricate.json",
         "thumbnailUrl": "assets/converted/country_rooster_pbn_intricate_thumb.png"
       },
@@ -264,8 +264,8 @@
         "id": "country_rooster_pbn_masterpiece",
         "resolution": "Masterpiece (4,000+)",
         "complexity": "masterpiece",
-        "pieces": 1019,
-        "colors": 34,
+        "pieces": 389,
+        "colors": 23,
         "jsonFile": "assets/converted/country_rooster_pbn_masterpiece.json",
         "thumbnailUrl": "assets/converted/country_rooster_pbn_masterpiece_thumb.png"
       }
@@ -314,8 +314,8 @@
         "id": "country_truck_pbn_detailed",
         "resolution": "Detailed (800+)",
         "complexity": "detailed",
-        "pieces": 224,
-        "colors": 18,
+        "pieces": 33,
+        "colors": 10,
         "jsonFile": "assets/converted/country_truck_pbn_detailed.json",
         "thumbnailUrl": "assets/converted/country_truck_pbn_detailed_thumb.png"
       },
@@ -323,8 +323,8 @@
         "id": "country_truck_pbn_intricate",
         "resolution": "Intricate (2,000+)",
         "complexity": "intricate",
-        "pieces": 502,
-        "colors": 26,
+        "pieces": 112,
+        "colors": 17,
         "jsonFile": "assets/converted/country_truck_pbn_intricate.json",
         "thumbnailUrl": "assets/converted/country_truck_pbn_intricate_thumb.png"
       },
@@ -332,8 +332,8 @@
         "id": "country_truck_pbn_masterpiece",
         "resolution": "Masterpiece (4,000+)",
         "complexity": "masterpiece",
-        "pieces": 737,
-        "colors": 33,
+        "pieces": 255,
+        "colors": 23,
         "jsonFile": "assets/converted/country_truck_pbn_masterpiece.json",
         "thumbnailUrl": "assets/converted/country_truck_pbn_masterpiece_thumb.png"
       }
@@ -382,8 +382,8 @@
         "id": "country_puppy_pbn_detailed",
         "resolution": "Detailed (800+)",
         "complexity": "detailed",
-        "pieces": 189,
-        "colors": 16,
+        "pieces": 46,
+        "colors": 12,
         "jsonFile": "assets/converted/country_puppy_pbn_detailed.json",
         "thumbnailUrl": "assets/converted/country_puppy_pbn_detailed_thumb.png"
       },
@@ -391,8 +391,8 @@
         "id": "country_puppy_pbn_intricate",
         "resolution": "Intricate (2,000+)",
         "complexity": "intricate",
-        "pieces": 358,
-        "colors": 25,
+        "pieces": 77,
+        "colors": 15,
         "jsonFile": "assets/converted/country_puppy_pbn_intricate.json",
         "thumbnailUrl": "assets/converted/country_puppy_pbn_intricate_thumb.png"
       },
@@ -400,8 +400,8 @@
         "id": "country_puppy_pbn_masterpiece",
         "resolution": "Masterpiece (4,000+)",
         "complexity": "masterpiece",
-        "pieces": 1024,
-        "colors": 32,
+        "pieces": 249,
+        "colors": 24,
         "jsonFile": "assets/converted/country_puppy_pbn_masterpiece.json",
         "thumbnailUrl": "assets/converted/country_puppy_pbn_masterpiece_thumb.png"
       }
@@ -450,8 +450,8 @@
         "id": "yorky_teacup_pbn_detailed",
         "resolution": "Detailed (800+)",
         "complexity": "detailed",
-        "pieces": 213,
-        "colors": 18,
+        "pieces": 49,
+        "colors": 10,
         "jsonFile": "assets/converted/yorky_teacup_pbn_detailed.json",
         "thumbnailUrl": "assets/converted/yorky_teacup_pbn_detailed_thumb.png"
       },
@@ -459,8 +459,8 @@
         "id": "yorky_teacup_pbn_intricate",
         "resolution": "Intricate (2,000+)",
         "complexity": "intricate",
-        "pieces": 353,
-        "colors": 26,
+        "pieces": 101,
+        "colors": 15,
         "jsonFile": "assets/converted/yorky_teacup_pbn_intricate.json",
         "thumbnailUrl": "assets/converted/yorky_teacup_pbn_intricate_thumb.png"
       },
@@ -468,8 +468,8 @@
         "id": "yorky_teacup_pbn_masterpiece",
         "resolution": "Masterpiece (4,000+)",
         "complexity": "masterpiece",
-        "pieces": 1022,
-        "colors": 30,
+        "pieces": 295,
+        "colors": 19,
         "jsonFile": "assets/converted/yorky_teacup_pbn_masterpiece.json",
         "thumbnailUrl": "assets/converted/yorky_teacup_pbn_masterpiece_thumb.png"
       }
@@ -518,8 +518,8 @@
         "id": "yorky_garden_pbn_detailed",
         "resolution": "Detailed (800+)",
         "complexity": "detailed",
-        "pieces": 328,
-        "colors": 18,
+        "pieces": 90,
+        "colors": 14,
         "jsonFile": "assets/converted/yorky_garden_pbn_detailed.json",
         "thumbnailUrl": "assets/converted/yorky_garden_pbn_detailed_thumb.png"
       },
@@ -527,8 +527,8 @@
         "id": "yorky_garden_pbn_intricate",
         "resolution": "Intricate (2,000+)",
         "complexity": "intricate",
-        "pieces": 642,
-        "colors": 25,
+        "pieces": 180,
+        "colors": 16,
         "jsonFile": "assets/converted/yorky_garden_pbn_intricate.json",
         "thumbnailUrl": "assets/converted/yorky_garden_pbn_intricate_thumb.png"
       },
@@ -536,8 +536,8 @@
         "id": "yorky_garden_pbn_masterpiece",
         "resolution": "Masterpiece (4,000+)",
         "complexity": "masterpiece",
-        "pieces": 1470,
-        "colors": 33,
+        "pieces": 365,
+        "colors": 23,
         "jsonFile": "assets/converted/yorky_garden_pbn_masterpiece.json",
         "thumbnailUrl": "assets/converted/yorky_garden_pbn_masterpiece_thumb.png"
       }
@@ -586,8 +586,8 @@
         "id": "yorky_autumn_pbn_detailed",
         "resolution": "Detailed (800+)",
         "complexity": "detailed",
-        "pieces": 391,
-        "colors": 16,
+        "pieces": 86,
+        "colors": 9,
         "jsonFile": "assets/converted/yorky_autumn_pbn_detailed.json",
         "thumbnailUrl": "assets/converted/yorky_autumn_pbn_detailed_thumb.png"
       },
@@ -595,8 +595,8 @@
         "id": "yorky_autumn_pbn_intricate",
         "resolution": "Intricate (2,000+)",
         "complexity": "intricate",
-        "pieces": 349,
-        "colors": 22,
+        "pieces": 100,
+        "colors": 12,
         "jsonFile": "assets/converted/yorky_autumn_pbn_intricate.json",
         "thumbnailUrl": "assets/converted/yorky_autumn_pbn_intricate_thumb.png"
       },
@@ -604,8 +604,8 @@
         "id": "yorky_autumn_pbn_masterpiece",
         "resolution": "Masterpiece (4,000+)",
         "complexity": "masterpiece",
-        "pieces": 964,
-        "colors": 28,
+        "pieces": 236,
+        "colors": 18,
         "jsonFile": "assets/converted/yorky_autumn_pbn_masterpiece.json",
         "thumbnailUrl": "assets/converted/yorky_autumn_pbn_masterpiece_thumb.png"
       }
@@ -654,8 +654,8 @@
         "id": "yorky_playful_pbn_detailed",
         "resolution": "Detailed (800+)",
         "complexity": "detailed",
-        "pieces": 288,
-        "colors": 18,
+        "pieces": 97,
+        "colors": 10,
         "jsonFile": "assets/converted/yorky_playful_pbn_detailed.json",
         "thumbnailUrl": "assets/converted/yorky_playful_pbn_detailed_thumb.png"
       },
@@ -663,8 +663,8 @@
         "id": "yorky_playful_pbn_intricate",
         "resolution": "Intricate (2,000+)",
         "complexity": "intricate",
-        "pieces": 530,
-        "colors": 26,
+        "pieces": 113,
+        "colors": 18,
         "jsonFile": "assets/converted/yorky_playful_pbn_intricate.json",
         "thumbnailUrl": "assets/converted/yorky_playful_pbn_intricate_thumb.png"
       },
@@ -672,8 +672,8 @@
         "id": "yorky_playful_pbn_masterpiece",
         "resolution": "Masterpiece (4,000+)",
         "complexity": "masterpiece",
-        "pieces": 962,
-        "colors": 32,
+        "pieces": 313,
+        "colors": 25,
         "jsonFile": "assets/converted/yorky_playful_pbn_masterpiece.json",
         "thumbnailUrl": "assets/converted/yorky_playful_pbn_masterpiece_thumb.png"
       }
@@ -722,8 +722,8 @@
         "id": "rural_windmill_pbn_detailed",
         "resolution": "Detailed (800+)",
         "complexity": "detailed",
-        "pieces": 503,
-        "colors": 18,
+        "pieces": 70,
+        "colors": 9,
         "jsonFile": "assets/converted/rural_windmill_pbn_detailed.json",
         "thumbnailUrl": "assets/converted/rural_windmill_pbn_detailed_thumb.png"
       },
@@ -731,8 +731,8 @@
         "id": "rural_windmill_pbn_intricate",
         "resolution": "Intricate (2,000+)",
         "complexity": "intricate",
-        "pieces": 996,
-        "colors": 26,
+        "pieces": 213,
+        "colors": 12,
         "jsonFile": "assets/converted/rural_windmill_pbn_intricate.json",
         "thumbnailUrl": "assets/converted/rural_windmill_pbn_intricate_thumb.png"
       },
@@ -740,8 +740,8 @@
         "id": "rural_windmill_pbn_masterpiece",
         "resolution": "Masterpiece (4,000+)",
         "complexity": "masterpiece",
-        "pieces": 1609,
-        "colors": 34,
+        "pieces": 733,
+        "colors": 22,
         "jsonFile": "assets/converted/rural_windmill_pbn_masterpiece.json",
         "thumbnailUrl": "assets/converted/rural_windmill_pbn_masterpiece_thumb.png"
       }
@@ -790,8 +790,8 @@
         "id": "country_store_pbn_detailed",
         "resolution": "Detailed (800+)",
         "complexity": "detailed",
-        "pieces": 573,
-        "colors": 18,
+        "pieces": 78,
+        "colors": 8,
         "jsonFile": "assets/converted/country_store_pbn_detailed.json",
         "thumbnailUrl": "assets/converted/country_store_pbn_detailed_thumb.png"
       },
@@ -799,8 +799,8 @@
         "id": "country_store_pbn_intricate",
         "resolution": "Intricate (2,000+)",
         "complexity": "intricate",
-        "pieces": 1078,
-        "colors": 26,
+        "pieces": 195,
+        "colors": 15,
         "jsonFile": "assets/converted/country_store_pbn_intricate.json",
         "thumbnailUrl": "assets/converted/country_store_pbn_intricate_thumb.png"
       },
@@ -808,8 +808,8 @@
         "id": "country_store_pbn_masterpiece",
         "resolution": "Masterpiece (4,000+)",
         "complexity": "masterpiece",
-        "pieces": 1694,
-        "colors": 34,
+        "pieces": 559,
+        "colors": 21,
         "jsonFile": "assets/converted/country_store_pbn_masterpiece.json",
         "thumbnailUrl": "assets/converted/country_store_pbn_masterpiece_thumb.png"
       }
@@ -858,8 +858,8 @@
         "id": "pasture_horses_pbn_detailed",
         "resolution": "Detailed (800+)",
         "complexity": "detailed",
-        "pieces": 358,
-        "colors": 18,
+        "pieces": 84,
+        "colors": 13,
         "jsonFile": "assets/converted/pasture_horses_pbn_detailed.json",
         "thumbnailUrl": "assets/converted/pasture_horses_pbn_detailed_thumb.png"
       },
@@ -867,8 +867,8 @@
         "id": "pasture_horses_pbn_intricate",
         "resolution": "Intricate (2,000+)",
         "complexity": "intricate",
-        "pieces": 561,
-        "colors": 26,
+        "pieces": 155,
+        "colors": 15,
         "jsonFile": "assets/converted/pasture_horses_pbn_intricate.json",
         "thumbnailUrl": "assets/converted/pasture_horses_pbn_intricate_thumb.png"
       },
@@ -876,8 +876,8 @@
         "id": "pasture_horses_pbn_masterpiece",
         "resolution": "Masterpiece (4,000+)",
         "complexity": "masterpiece",
-        "pieces": 1044,
-        "colors": 34,
+        "pieces": 330,
+        "colors": 22,
         "jsonFile": "assets/converted/pasture_horses_pbn_masterpiece.json",
         "thumbnailUrl": "assets/converted/pasture_horses_pbn_masterpiece_thumb.png"
       }
@@ -926,8 +926,8 @@
         "id": "vintage_tractor_pbn_detailed",
         "resolution": "Detailed (800+)",
         "complexity": "detailed",
-        "pieces": 418,
-        "colors": 17,
+        "pieces": 73,
+        "colors": 13,
         "jsonFile": "assets/converted/vintage_tractor_pbn_detailed.json",
         "thumbnailUrl": "assets/converted/vintage_tractor_pbn_detailed_thumb.png"
       },
@@ -935,8 +935,8 @@
         "id": "vintage_tractor_pbn_intricate",
         "resolution": "Intricate (2,000+)",
         "complexity": "intricate",
-        "pieces": 811,
-        "colors": 25,
+        "pieces": 156,
+        "colors": 16,
         "jsonFile": "assets/converted/vintage_tractor_pbn_intricate.json",
         "thumbnailUrl": "assets/converted/vintage_tractor_pbn_intricate_thumb.png"
       },
@@ -944,8 +944,8 @@
         "id": "vintage_tractor_pbn_masterpiece",
         "resolution": "Masterpiece (4,000+)",
         "complexity": "masterpiece",
-        "pieces": 1548,
-        "colors": 34,
+        "pieces": 420,
+        "colors": 25,
         "jsonFile": "assets/converted/vintage_tractor_pbn_masterpiece.json",
         "thumbnailUrl": "assets/converted/vintage_tractor_pbn_masterpiece_thumb.png"
       }
@@ -994,8 +994,8 @@
         "id": "covered_bridge_pbn_detailed",
         "resolution": "Detailed (800+)",
         "complexity": "detailed",
-        "pieces": 506,
-        "colors": 18,
+        "pieces": 84,
+        "colors": 11,
         "jsonFile": "assets/converted/covered_bridge_pbn_detailed.json",
         "thumbnailUrl": "assets/converted/covered_bridge_pbn_detailed_thumb.png"
       },
@@ -1003,8 +1003,8 @@
         "id": "covered_bridge_pbn_intricate",
         "resolution": "Intricate (2,000+)",
         "complexity": "intricate",
-        "pieces": 906,
-        "colors": 26,
+        "pieces": 203,
+        "colors": 15,
         "jsonFile": "assets/converted/covered_bridge_pbn_intricate.json",
         "thumbnailUrl": "assets/converted/covered_bridge_pbn_intricate_thumb.png"
       },
@@ -1012,8 +1012,8 @@
         "id": "covered_bridge_pbn_masterpiece",
         "resolution": "Masterpiece (4,000+)",
         "complexity": "masterpiece",
-        "pieces": 1540,
-        "colors": 34,
+        "pieces": 485,
+        "colors": 25,
         "jsonFile": "assets/converted/covered_bridge_pbn_masterpiece.json",
         "thumbnailUrl": "assets/converted/covered_bridge_pbn_masterpiece_thumb.png"
       }

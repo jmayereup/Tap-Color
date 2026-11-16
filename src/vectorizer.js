@@ -12,27 +12,30 @@ export { kmeans };
 export const COMPLEXITY_PRESETS = {
   cozy: {
     name: 'Cozy (Relaxing)',
-    paletteSize: 16,
-    minPixels: 22,
-    minThickness: 2,
-    workingSize: 420,
-    simplifyEpsilon: 0.44,
+    paletteSize: 14,
+    minPixels: 130,
+    minThickness: 3,
+    mergeDist: 26,
+    workingSize: 360,
+    simplifyEpsilon: 0.65,
   },
   balanced: {
     name: 'Balanced (Standard)',
-    paletteSize: 24,
-    minPixels: 18,
+    paletteSize: 20,
+    minPixels: 70,
     minThickness: 2,
-    workingSize: 540,
-    simplifyEpsilon: 0.38,
+    mergeDist: 20,
+    workingSize: 440,
+    simplifyEpsilon: 0.50,
   },
   detailed: {
     name: 'Detailed (Masterpiece)',
-    paletteSize: 32,
-    minPixels: 14,
+    paletteSize: 28,
+    minPixels: 30,
     minThickness: 2,
-    workingSize: 660,
-    simplifyEpsilon: 0.34,
+    mergeDist: 14,
+    workingSize: 540,
+    simplifyEpsilon: 0.40,
   },
 };
 
@@ -576,6 +579,111 @@ function refinePoleInPoly(candidates, poly, distMap, W, margin, scale) {
   return { x: bestX, y: bestY, radius: Math.max(1.0, bestD) };
 }
 
+function detectBgAndInk(sData, W, H) {
+  const total = W * H;
+  const mask = new Uint8Array(total); // 0 = interior, 1 = outer BG, 2 = ink outline
+  const isWhiteBg = (idx) => {
+    const o = idx * 4;
+    return sData[o] > 232 && sData[o + 1] > 232 && sData[o + 2] > 232;
+  };
+
+  const q = new Int32Array(total);
+  let head = 0, tail = 0;
+  for (let x = 0; x < W; x++) {
+    for (const y of [0, H - 1]) {
+      const idx = y * W + x;
+      if (mask[idx] === 0 && isWhiteBg(idx)) { mask[idx] = 1; q[tail++] = idx; }
+    }
+  }
+  for (let y = 1; y < H - 1; y++) {
+    for (const x of [0, W - 1]) {
+      const idx = y * W + x;
+      if (mask[idx] === 0 && isWhiteBg(idx)) { mask[idx] = 1; q[tail++] = idx; }
+    }
+  }
+  while (head < tail) {
+    const curr = q[head++];
+    const cx = curr % W, cy = Math.floor(curr / W);
+    if (cx > 0 && mask[curr - 1] === 0 && isWhiteBg(curr - 1)) { mask[curr - 1] = 1; q[tail++] = curr - 1; }
+    if (cx < W - 1 && mask[curr + 1] === 0 && isWhiteBg(curr + 1)) { mask[curr + 1] = 1; q[tail++] = curr + 1; }
+    if (cy > 0 && mask[curr - W] === 0 && isWhiteBg(curr - W)) { mask[curr - W] = 1; q[tail++] = curr - W; }
+    if (cy < H - 1 && mask[curr + W] === 0 && isWhiteBg(curr + W)) { mask[curr + W] = 1; q[tail++] = curr + W; }
+  }
+
+  const dark = new Uint8Array(total);
+  for (let i = 0; i < total; i++) {
+    if (mask[i] !== 0) continue;
+    const o = i * 4;
+    const r = sData[o], g = sData[o + 1], b = sData[o + 2];
+    const lum = 0.299 * r + 0.587 * g + 0.114 * b;
+    const sat = Math.max(r, g, b) - Math.min(r, g, b);
+    if (lum < 105 && sat < 55) dark[i] = 1;
+  }
+
+  const R = Math.max(3, Math.floor(W / 100));
+  const core = new Uint8Array(total);
+  for (let y = R; y < H - R; y++) {
+    for (let x = R; x < W - R; x++) {
+      const idx = y * W + x;
+      if (!dark[idx]) continue;
+      let allDark = true;
+      for (let dy = -R; dy <= R && allDark; dy++) {
+        const rowOff = (y + dy) * W;
+        for (let dx = -R; dx <= R; dx++) {
+          if (!dark[rowOff + x + dx]) { allDark = false; break; }
+        }
+      }
+      if (allDark) core[idx] = 1;
+    }
+  }
+
+  const solidDark = new Uint8Array(total);
+  for (let y = 0; y < H; y++) {
+    for (let x = 0; x < W; x++) {
+      if (!core[y * W + x]) continue;
+      const y0 = Math.max(0, y - R), y1 = Math.min(H - 1, y + R);
+      const x0 = Math.max(0, x - R), x1 = Math.min(W - 1, x + R);
+      for (let ny = y0; ny <= y1; ny++) {
+        const rowOff = ny * W;
+        for (let nx = x0; nx <= x1; nx++) {
+          if (dark[rowOff + nx]) solidDark[rowOff + nx] = 1;
+        }
+      }
+    }
+  }
+  for (let i = 0; i < total; i++) {
+    if (dark[i] && !solidDark[i]) mask[i] = 2;
+  }
+  return mask;
+}
+
+function mergeSimilarPalette(centers, counts, minDist) {
+  const active = centers.map((c, i) => ({ c: [c[0], c[1], c[2]], count: counts[i] || 0 })).filter(a => a.count > 0);
+  while (active.length > 4) {
+    let bestI = -1, bestJ = -1, bestD = Infinity;
+    for (let i = 0; i < active.length; i++) {
+      const ci = active[i].c;
+      for (let j = i + 1; j < active.length; j++) {
+        const cj = active[j].c;
+        const dr = ci[0] - cj[0], dg = ci[1] - cj[1], db = ci[2] - cj[2];
+        const d = Math.sqrt(2 * dr * dr + 4 * dg * dg + 3 * db * db) / 3.0;
+        if (d < bestD) { bestD = d; bestI = i; bestJ = j; }
+      }
+    }
+    if (bestD >= minDist || bestI === -1) break;
+    const wi = active[bestI].count, wj = active[bestJ].count, tot = wi + wj;
+    const ci = active[bestI].c, cj = active[bestJ].c;
+    active[bestI].c = [
+      Math.round((ci[0] * wi + cj[0] * wj) / tot),
+      Math.round((ci[1] * wi + cj[1] * wj) / tot),
+      Math.round((ci[2] * wi + cj[2] * wj) / tot),
+    ];
+    active[bestI].count = tot;
+    active.splice(bestJ, 1);
+  }
+  return active.map(a => a.c);
+}
+
 /**
  * Connected Component Labeling (4-connectivity) using fast typed array queue.
  */
@@ -588,7 +696,7 @@ function computeConnectedComponents(grid, W, H) {
   for (let y = 0; y < H; y++) {
     for (let x = 0; x < W; x++) {
       const idx = y * W + x;
-      if (labels[idx] !== -1) continue;
+      if (grid[idx] < 0 || labels[idx] !== -1) continue;
       const color = grid[idx];
       const label = nextLabel++;
       labels[idx] = label;
@@ -678,28 +786,28 @@ function mergeSmallRegions(grid, W, H, minPixels, minThickness, centers, maxPass
 
         if (cx > 0) {
           const n = p - 1;
-          if (labels[n] !== comp.label) {
+          if (labels[n] !== comp.label && grid[n] >= 0) {
             const col = grid[n];
             neighborCounts.set(col, (neighborCounts.get(col) || 0) + 1);
           }
         }
         if (cx < W - 1) {
           const n = p + 1;
-          if (labels[n] !== comp.label) {
+          if (labels[n] !== comp.label && grid[n] >= 0) {
             const col = grid[n];
             neighborCounts.set(col, (neighborCounts.get(col) || 0) + 1);
           }
         }
         if (cy > 0) {
           const n = p - W;
-          if (labels[n] !== comp.label) {
+          if (labels[n] !== comp.label && grid[n] >= 0) {
             const col = grid[n];
             neighborCounts.set(col, (neighborCounts.get(col) || 0) + 1);
           }
         }
         if (cy < H - 1) {
           const n = p + W;
-          if (labels[n] !== comp.label) {
+          if (labels[n] !== comp.label && grid[n] >= 0) {
             const col = grid[n];
             neighborCounts.set(col, (neighborCounts.get(col) || 0) + 1);
           }
@@ -783,25 +891,57 @@ export async function vectorizeImage(sourceImage, options = {}) {
   const smoothed = applyBilateralFilter(medianFiltered, 2, 2.5, 32.0);
   const sData = smoothed.data;
 
-  // 3. Subsample pixels for K-Means color clustering
+  // 3. Separate outer background and thin ink outlines, then sample clean interior pixels
   progress('Picking pretty paint colors...', 45);
   await new Promise(r => setTimeout(r, 20));
 
+  const mask = detectBgAndInk(sData, W, H);
   const samples = [];
-  for (let i = 0; i < sData.length; i += 16) {
-    samples.push([sData[i], sData[i + 1], sData[i + 2]]);
+  const step = Math.max(1, Math.floor(W / 55));
+  for (let y = 2; y < H - 2; y += step) {
+    for (let x = 2; x < W - 2; x += step) {
+      const idx = y * W + x;
+      if (mask[idx] !== 0) continue;
+      if (mask[idx - 1] !== 0 || mask[idx + 1] !== 0 || mask[idx - W] !== 0 || mask[idx + W] !== 0) continue;
+      const o = idx * 4;
+      samples.push([sData[o], sData[o + 1], sData[o + 2]]);
+    }
   }
+  if (samples.length < K * 4) {
+    for (let i = 0; i < W * H; i += 4) {
+      if (mask[i] === 0) {
+        const o = i * 4;
+        samples.push([sData[o], sData[o + 1], sData[o + 2]]);
+      }
+    }
+  }
+  if (samples.length === 0) samples.push([sData[0], sData[1], sData[2]]);
 
-  const km = kmeans(samples, K, {
+  const kEff = Math.min(K, samples.length);
+  const km = kmeans(samples, kEff, {
     initialization: 'kmeans++',
     maxIterations: 12,
   });
 
-  const centers = km.centroids.map(c => [
+  let centers = km.centroids.map(c => [
     Math.min(255, Math.max(0, Math.round(c[0]))),
     Math.min(255, Math.max(0, Math.round(c[1]))),
     Math.min(255, Math.max(0, Math.round(c[2]))),
   ]);
+
+  if (!options.customPaletteSize) {
+    const sampleCounts = new Array(centers.length).fill(0);
+    for (const s of samples) {
+      let bestDist = Infinity, bestK = 0;
+      for (let k = 0; k < centers.length; k++) {
+        const dr = s[0] - centers[k][0], dg = s[1] - centers[k][1], db = s[2] - centers[k][2];
+        const d = dr * dr + dg * dg + db * db;
+        if (d < bestDist) { bestDist = d; bestK = k; }
+      }
+      sampleCounts[bestK]++;
+    }
+    centers = mergeSimilarPalette(centers, sampleCounts, preset.mergeDist || 20);
+  }
 
   // Sort palette by perceived brightness
   centers.sort((a, b) => {
@@ -810,19 +950,21 @@ export async function vectorizeImage(sourceImage, options = {}) {
     return lumB - lumA;
   });
 
-  // 4. Map every pixel to color index
+  // 4. Map every pixel to color index (-1 = BG, -2 = ink)
   progress('Creating color sections...', 60);
   await new Promise(r => setTimeout(r, 20));
 
   const grid = new Int32Array(W * H);
   for (let i = 0; i < W * H; i++) {
+    if (mask[i] === 1) { grid[i] = -1; continue; }
+    if (mask[i] === 2) { grid[i] = -2; continue; }
     const r = sData[i * 4];
     const g = sData[i * 4 + 1];
     const b = sData[i * 4 + 2];
 
     let bestDist = Infinity;
     let bestK = 0;
-    for (let k = 0; k < K; k++) {
+    for (let k = 0; k < centers.length; k++) {
       const dr = r - centers[k][0];
       const dg = g - centers[k][1];
       const db = b - centers[k][2];
@@ -842,12 +984,14 @@ export async function vectorizeImage(sourceImage, options = {}) {
       for (let x = 1; x < W - 1; x++) {
         const idx = y * W + x;
         const cur = grid[idx];
+        if (cur < 0) continue;
         const counts = {};
         let maxCount = 0;
         let dominant = cur;
         for (let dy = -1; dy <= 1; dy++) {
           for (let dx = -1; dx <= 1; dx++) {
             const val = grid[(y + dy) * W + (x + dx)];
+            if (val < 0) continue;
             counts[val] = (counts[val] || 0) + 1;
             if (counts[val] > maxCount) {
               maxCount = counts[val];
@@ -863,12 +1007,40 @@ export async function vectorizeImage(sourceImage, options = {}) {
     grid.set(nextGrid);
   }
 
+  // 5b. Multi-source BFS: propagate adjacent interior colors into thin ink lines (-2)
+  const inkQ = new Int32Array(W * H);
+  let iqHead = 0, iqTail = 0;
+  for (let y = 0; y < H; y++) {
+    for (let x = 0; x < W; x++) {
+      const idx = y * W + x;
+      if (grid[idx] >= 0) {
+        if ((x > 0 && grid[idx - 1] === -2) || (x < W - 1 && grid[idx + 1] === -2) ||
+            (y > 0 && grid[idx - W] === -2) || (y < H - 1 && grid[idx + W] === -2)) {
+          inkQ[iqTail++] = idx;
+        }
+      }
+    }
+  }
+  while (iqHead < iqTail) {
+    const curr = inkQ[iqHead++];
+    const col = grid[curr];
+    const cx = curr % W, cy = Math.floor(curr / W);
+    if (cx > 0 && grid[curr - 1] === -2) { grid[curr - 1] = col; inkQ[iqTail++] = curr - 1; }
+    if (cx < W - 1 && grid[curr + 1] === -2) { grid[curr + 1] = col; inkQ[iqTail++] = curr + 1; }
+    if (cy > 0 && grid[curr - W] === -2) { grid[curr - W] = col; inkQ[iqTail++] = curr - W; }
+    if (cy < H - 1 && grid[curr + W] === -2) { grid[curr + W] = col; inkQ[iqTail++] = curr + W; }
+  }
+  for (let i = 0; i < W * H; i++) {
+    if (grid[i] === -2) grid[i] = -1;
+  }
+
   // Prune 1-pixel spurs/hairs
   for (let pass = 0; pass < 2; pass++) {
     for (let y = 1; y < H - 1; y++) {
       for (let x = 1; x < W - 1; x++) {
         const idx = y * W + x;
         const cur = grid[idx];
+        if (cur < 0) continue;
         const orth = [grid[idx - 1], grid[idx + 1], grid[idx - W], grid[idx + W]];
         let same = 0;
         for (let i = 0; i < 4; i++) {
@@ -876,7 +1048,7 @@ export async function vectorizeImage(sourceImage, options = {}) {
         }
         if (same <= 1) {
           for (let i = 0; i < 4; i++) {
-            if (orth[i] !== cur) {
+            if (orth[i] >= 0 && orth[i] !== cur) {
               grid[idx] = orth[i];
               break;
             }
@@ -894,7 +1066,7 @@ export async function vectorizeImage(sourceImage, options = {}) {
 
   // 7. Final Connected Component Labeling
   const { components } = computeConnectedComponents(grid, W, H);
-  const validComponents = components.filter(c => c.pixels.length >= 4);
+  const validComponents = components.filter(c => c.pixels.length >= 8);
 
   // 8. Build ArtworkData structures (scaled to 800x800)
   progress('Adding numbers to coloring areas...', 90);
@@ -1001,7 +1173,7 @@ export async function generateThumbnailBlob(artwork) {
   canvas.height = 200;
   const ctx = canvas.getContext('2d');
 
-  ctx.fillStyle = '#0f172a';
+  ctx.fillStyle = '#F8FAFC';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
   const margin = 12;
@@ -1037,14 +1209,9 @@ export async function generateThumbnailBlob(artwork) {
       ctx.fillStyle = reg.color_hex;
       ctx.fill();
 
-      // Seam-seal stroke prevents white hairline cracks in thumbnails
-      ctx.strokeStyle = reg.color_hex;
-      ctx.lineWidth = 1.2;
-      ctx.stroke();
-
       if (!isHighRes) {
-        ctx.strokeStyle = 'rgba(0, 0, 0, 0.25)';
-        ctx.lineWidth = 1.0;
+        ctx.strokeStyle = 'rgba(30, 41, 59, 0.78)';
+        ctx.lineWidth = 2.6;
         ctx.stroke();
       }
     }

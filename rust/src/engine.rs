@@ -629,8 +629,8 @@ impl GameEngine {
                     ctx.set_stroke_style_str("rgba(148, 163, 184, 0.35)");
                     ctx.set_line_width((0.7 / s).max(0.5));
                 } else {
-                    ctx.set_stroke_style_str("rgba(30, 41, 59, 0.55)");
-                    ctx.set_line_width((1.3 / s).max(0.7));
+                    ctx.set_stroke_style_str("rgba(30, 41, 59, 0.72)");
+                    ctx.set_line_width((1.8 / s).max(1.0));
                 }
 
                 if is_quad {
@@ -873,8 +873,8 @@ impl GameEngine {
                     ctx.set_stroke_style_str("rgba(148, 163, 184, 0.35)");
                     ctx.set_line_width(0.7 / self.scale.max(0.5));
                 } else {
-                    ctx.set_stroke_style_str("rgba(30, 41, 59, 0.55)");
-                    ctx.set_line_width(1.3 / self.scale.max(0.5));
+                    ctx.set_stroke_style_str("rgba(30, 41, 59, 0.72)");
+                    ctx.set_line_width(1.6 / self.scale.max(0.5));
                 }
 
                 if is_quad {
@@ -976,7 +976,7 @@ impl GameEngine {
                 } else {
                     0.56
                 };
-                let max_font_world = 15.0 / self.scale;
+                let max_font_world = if is_diamond_art { 15.0 / self.scale } else { 20.0 / self.scale };
                 let font_size = if is_diamond_art {
                     if is_hinted {
                         (drill_world_size * font_scale * 1.15).min(drill_world_size * 0.68)
@@ -995,7 +995,7 @@ impl GameEngine {
                 } else if is_active_target {
                     ctx.set_fill_style_str("#3730A3");
                 } else {
-                    ctx.set_fill_style_str("rgba(71, 85, 105, 0.78)");
+                    ctx.set_fill_style_str(if is_diamond_art { "rgba(71, 85, 105, 0.78)" } else { "rgba(30, 41, 59, 0.88)" });
                 }
                 let _ = ctx.fill_text(&num_str, cx, cy);
             }
