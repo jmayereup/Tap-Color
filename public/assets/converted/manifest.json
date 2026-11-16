@@ -626,5 +626,73 @@
       }
     ],
     "pbnVariants": []
+  },
+  {
+    "key": "autumn_fox",
+    "title": "Cozy Autumn Fox",
+    "artist": "Woodland Folk",
+    "desc": "Cozy red fox curled up among autumn leaves, red-capped mushrooms, and meadow wildflowers",
+    "originalAsset": "assets/autumn_fox.jpeg",
+    "diamondVariants": [
+      {
+        "id": "autumn_fox_diamond_80",
+        "resolution": "Cozy (6.4k)",
+        "label": "80\u00d780",
+        "grid": 80,
+        "pieces": 6400,
+        "colors": 18,
+        "jsonFile": "assets/converted/autumn_fox_diamond_80.json",
+        "thumbnailUrl": "assets/converted/autumn_fox_diamond_80_thumb.png"
+      },
+      {
+        "id": "autumn_fox_diamond_120",
+        "resolution": "Standard (14.4k)",
+        "label": "120\u00d7120",
+        "grid": 120,
+        "pieces": 14400,
+        "colors": 26,
+        "jsonFile": "assets/converted/autumn_fox_diamond_120.json",
+        "thumbnailUrl": "assets/converted/autumn_fox_diamond_120_thumb.png"
+      },
+      {
+        "id": "autumn_fox_diamond_160",
+        "resolution": "Masterpiece (25.6k)",
+        "label": "160\u00d7160",
+        "grid": 160,
+        "pieces": 25600,
+        "colors": 36,
+        "jsonFile": "assets/converted/autumn_fox_diamond_160.json",
+        "thumbnailUrl": "assets/converted/autumn_fox_diamond_160_thumb.png"
+      }
+    ],
+    "pbnVariants": [
+      {
+        "id": "autumn_fox_pbn_detailed",
+        "resolution": "Detailed (800+)",
+        "complexity": "detailed",
+        "pieces": 49,
+        "colors": 9,
+        "jsonFile": "assets/converted/autumn_fox_pbn_detailed.json",
+        "thumbnailUrl": "assets/converted/autumn_fox_pbn_detailed_thumb.png"
+      },
+      {
+        "id": "autumn_fox_pbn_intricate",
+        "resolution": "Intricate (2,000+)",
+        "complexity": "intricate",
+        "pieces": 15,
+        "colors": 10,
+        "jsonFile": "assets/converted/autumn_fox_pbn_intricate.json",
+        "thumbnailUrl": "assets/converted/autumn_fox_pbn_intricate_thumb.png"
+      },
+      {
+        "id": "autumn_fox_pbn_masterpiece",
+        "resolution": "Masterpiece (4,000+)",
+        "complexity": "masterpiece",
+        "pieces": 30,
+        "colors": 15,
+        "jsonFile": "assets/converted/autumn_fox_pbn_masterpiece.json",
+        "thumbnailUrl": "assets/converted/autumn_fox_pbn_masterpiece_thumb.png"
+      }
+    ]
   }
 ]

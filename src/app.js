@@ -755,6 +755,23 @@ class TapColorApp {
           { id: 'covered_bridge_diamond_160', label: '160×160', name: 'Masterpiece Ultra', pieces: 25600, colors: 36, grid: 160, jsonFile: 'assets/converted/covered_bridge_diamond_160.json', thumbnailUrl: 'assets/converted/covered_bridge_diamond_160_thumb.png' },
         ],
       },
+      {
+        id: 'autumn_fox_diamond',
+        title: 'Cozy Autumn Fox',
+        artist: 'Woodland Folk',
+        category: 'diamond',
+        pieces: 14400,
+        desc: 'Cozy red fox curled up among autumn leaves, red-capped mushrooms, and meadow wildflowers',
+        defaultVariantId: 'autumn_fox_diamond_120',
+        selectedVariantId: 'autumn_fox_diamond_120',
+        originalAsset: 'assets/autumn_fox.jpeg',
+        thumbnailUrl: 'assets/converted/autumn_fox_diamond_120_thumb.png',
+        variants: [
+          { id: 'autumn_fox_diamond_80', label: '80×80', name: 'Cozy Canvas', pieces: 6400, colors: 18, grid: 80, jsonFile: 'assets/converted/autumn_fox_diamond_80.json', thumbnailUrl: 'assets/converted/autumn_fox_diamond_80_thumb.png' },
+          { id: 'autumn_fox_diamond_120', label: '120×120', name: 'Standard Kit', pieces: 14400, colors: 26, grid: 120, jsonFile: 'assets/converted/autumn_fox_diamond_120.json', thumbnailUrl: 'assets/converted/autumn_fox_diamond_120_thumb.png' },
+          { id: 'autumn_fox_diamond_160', label: '160×160', name: 'Masterpiece Ultra', pieces: 25600, colors: 36, grid: 160, jsonFile: 'assets/converted/autumn_fox_diamond_160.json', thumbnailUrl: 'assets/converted/autumn_fox_diamond_160_thumb.png' },
+        ],
+      },
       // Paint by Number Paintings (Multi-Resolution Vector Masterpieces)
       {
         id: 'fluffy_cow_pbn',
@@ -771,6 +788,23 @@ class TapColorApp {
           { id: 'fluffy_cow_pbn_detailed', label: 'Cozy', name: 'Cozy (Large Print)', pieces: 128, colors: 11, complexity: 'detailed', jsonFile: 'assets/converted/fluffy_cow_pbn_detailed.json', thumbnailUrl: 'assets/converted/fluffy_cow_pbn_detailed_thumb.png' },
           { id: 'fluffy_cow_pbn_intricate', label: 'Classic', name: 'Classic', pieces: 143, colors: 18, complexity: 'intricate', jsonFile: 'assets/converted/fluffy_cow_pbn_intricate.json', thumbnailUrl: 'assets/converted/fluffy_cow_pbn_intricate_thumb.png' },
           { id: 'fluffy_cow_pbn_masterpiece', label: 'Detailed', name: 'Detailed', pieces: 216, colors: 20, complexity: 'masterpiece', jsonFile: 'assets/converted/fluffy_cow_pbn_masterpiece.json', thumbnailUrl: 'assets/converted/fluffy_cow_pbn_masterpiece_thumb.png' },
+        ],
+      },
+      {
+        id: 'autumn_fox_pbn',
+        title: 'Cozy Autumn Fox',
+        artist: 'Woodland Folk',
+        category: 'classic',
+        pieces: 15,
+        desc: 'Cozy red fox curled up among autumn leaves, red-capped mushrooms, and meadow wildflowers',
+        defaultVariantId: 'autumn_fox_pbn_intricate',
+        selectedVariantId: 'autumn_fox_pbn_intricate',
+        originalAsset: 'assets/autumn_fox_pbn.jpeg',
+        thumbnailUrl: 'assets/converted/autumn_fox_pbn_intricate_thumb.png',
+        variants: [
+          { id: 'autumn_fox_pbn_detailed', label: 'Cozy', name: 'Cozy (Large Print)', pieces: 49, colors: 9, complexity: 'detailed', jsonFile: 'assets/converted/autumn_fox_pbn_detailed.json', thumbnailUrl: 'assets/converted/autumn_fox_pbn_detailed_thumb.png' },
+          { id: 'autumn_fox_pbn_intricate', label: 'Classic', name: 'Classic', pieces: 15, colors: 10, complexity: 'intricate', jsonFile: 'assets/converted/autumn_fox_pbn_intricate.json', thumbnailUrl: 'assets/converted/autumn_fox_pbn_intricate_thumb.png' },
+          { id: 'autumn_fox_pbn_masterpiece', label: 'Detailed', name: 'Detailed', pieces: 30, colors: 15, complexity: 'masterpiece', jsonFile: 'assets/converted/autumn_fox_pbn_masterpiece.json', thumbnailUrl: 'assets/converted/autumn_fox_pbn_masterpiece_thumb.png' },
         ],
       },
     ];
@@ -2382,14 +2416,20 @@ class TapColorApp {
     const activeVar = meta.variants
       ? (meta.variants.find(v => v.id === (meta.selectedVariantId || meta.defaultVariantId)) || meta.variants[0])
       : null;
-    const thumbUrl = activeVar ? activeVar.thumbnailUrl : meta.thumbnailUrl;
+    const thumbUrl = meta.originalAsset || (activeVar ? activeVar.thumbnailUrl : meta.thumbnailUrl);
 
     if (thumbUrl) {
       const img = new Image();
       img.onload = () => {
         ctx.fillStyle = '#0f172a';
         ctx.fillRect(0, 0, w, h);
-        ctx.drawImage(img, 0, 0, w, h);
+        const pad = 8;
+        const scale = Math.min((w - pad * 2) / img.naturalWidth, (h - pad * 2) / img.naturalHeight);
+        const dw = img.naturalWidth * scale;
+        const dh = img.naturalHeight * scale;
+        const dx = (w - dw) / 2;
+        const dy = (h - dh) / 2;
+        ctx.drawImage(img, dx, dy, dw, dh);
       };
       img.src = thumbUrl;
       return;

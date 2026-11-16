@@ -784,6 +784,7 @@ def convert_to_paint_by_number(img_path, complexity, title, artist, output_id, o
         ctx = cairo.Context(surf)
         ctx.set_source_rgb(15/255.0, 23/255.0, 42/255.0)
         ctx.paint()
+        ctx.scale(1.0 / ss, 1.0 / ss)
         for r in regions:
             poly_pts = [(tox + pt['x'] * ts, toy + pt['y'] * ts) for pt in r['polygon']]
             if len(poly_pts) >= 3:
@@ -915,6 +916,14 @@ def main():
             "title": "Rustic Covered Bridge",
             "artist": "Valley Stream Folk",
             "desc": "Historic red wooden covered bridge spanning a peaceful babbling stream surrounded by wildflowers"
+        },
+        {
+            "key": "autumn_fox",
+            "file": "autumn_fox.jpeg",
+            "pbn_file": "autumn_fox_pbn.jpeg",
+            "title": "Cozy Autumn Fox",
+            "artist": "Woodland Folk",
+            "desc": "Cozy red fox curled up among autumn leaves, red-capped mushrooms, and meadow wildflowers"
         }
     ]
 
@@ -984,12 +993,16 @@ def main():
                 })
 
         # 2. Paint-by-Number at 3 resolutions
+        pbn_img_path = os.path.join(assets_dir, item["pbn_file"]) if "pbn_file" in item else img_path
+        if not os.path.exists(pbn_img_path):
+            print(f"Skipping PBN {pbn_img_path}: file not found")
+            pbn_img_path = img_path
         pbn_variants = []
         for p_res in pbn_resolutions:
             art_id = f"{item['key']}_pbn_{p_res['suffix']}"
             variant_title = f"{item['title']} ({p_res['name']})"
             art = convert_to_paint_by_number(
-                img_path=img_path,
+                img_path=pbn_img_path,
                 complexity=p_res["complexity"],
                 title=variant_title,
                 artist=item["artist"],

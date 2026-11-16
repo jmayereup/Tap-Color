@@ -33,16 +33,31 @@ This guide outlines the end-to-end workflow for adding new high-quality artworks
 
 ## 1. Artwork Source & Aesthetic Guidelines
 
-For optimal vectorization and gameplay satisfaction, source images should adhere to these standards:
+Diamond Painting and Tap-to-Color (Paint by Number) have different optimal source characteristics, so use **separate source images and prompts** when generating them:
 
-- **Style**: Vector graphic, clean sticker art, or adult coloring book base with bold, clean, closed outlines.
-- **Regions**: Flat or gentle tonal shading rather than noisy photographic grain or heavy stippling.
-- **Background**: Solid clean white (`#FFFFFF`) or transparent background. The converter's `detect_content_bounds()` algorithm automatically trims excess whitespace, preserves the native aspect ratio, and centers the artwork.
-- **Resolution**: Ideally 1024×1024 (or 1024×572 for 16:9 banner subjects).
-- **Naming**: Use lowercase alphanumeric characters and underscores/hyphens (e.g. `country_barn.jpeg`, `fluffy-cow-3.jpeg`).
+- **Background (Both)**: Solid clean white (`#FFFFFF`) or transparent background. The converter's `detect_content_bounds()` algorithm automatically trims excess whitespace, preserves the native aspect ratio, and centers the artwork.
+- **Resolution (Both)**: Ideally 1024×1024 (or 1024×572 for 16:9 banner subjects).
+- **Naming**: Use lowercase alphanumeric characters and underscores/hyphens (e.g. `country_barn.jpeg`, `autumn_fox_pbn.jpeg`).
+
+### Tap-to-Color (Paint by Number) Guidelines
+The PBN vectorizer runs at `380–500px` and removes narrow pixel strips and tiny facets, so thin stems, tiny dots, and fine textures will be lost. Source images must be **simple, bold, and chunky**:
+- **Style**: Minimalist flat vector coloring-page or bold stained-glass art with thick uniform dark outlines and large, simple closed regions.
+- **Regions & Palette**: 10–14 bold solid flat colors, zero shading gradients, no tiny speckles/spots/stems.
 
 > [!TIP]
-> If generating base images using AI or image generators, include: `"clean vector graphics, bold dark outlines, vibrant solid flat colors, white background, sticker style, coloring book art"`.
+> **Tap-to-Color (PBN) Prompt Template:**
+> `"[SUBJECT], minimalist flat vector coloring-page illustration, thick uniform dark outlines, large chunky simple shapes, no small details, no thin stems, no tiny dots or speckles, 10 to 14 bold solid flat colors only, zero shading gradients, clean geometric-organic simplification, centered on pure solid white (#FFFFFF) background, children's wooden puzzle / bold stained-glass simplicity"`
+> **Avoid:** `tiny details, intricate patterns, thin lines, grass blades, small berries, flower stamens, spots, fur strands, hatching, gradients, shadows, photorealistic, texture, noise`
+
+### Diamond Painting Guidelines
+Diamond Painting samples an `80×80` to `160×160` grid (6,400–25,600 drills) with 18–36 colors and rewards depth and contrast:
+- **Style**: Richly detailed digital illustration with luminous jewel-tone lighting, vibrant high-contrast colors, and layered tonal shading.
+- **Palette**: Balanced 24–36 color palette with glowing highlights.
+
+> [!TIP]
+> **Diamond Art Prompt Template:**
+> `"[SUBJECT], richly detailed digital illustration for diamond painting, luminous jewel-tone lighting, vibrant high-contrast colors with rich tonal shading and glowing highlights, intricate layered details, crisp painterly-vector finish, balanced 24 to 36 color palette, centered composition on pure white (#FFFFFF) background, no text, no watermark"`
+> **Avoid:** `washed out, muddy colors, low contrast, flat minimal shapes, monochrome, film grain, blurry, text, watermark`
 
 ---
 
