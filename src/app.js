@@ -761,254 +761,16 @@ class TapColorApp {
         title: 'Sweet Highland Calf',
         artist: 'Country Homestead',
         category: 'classic',
-        pieces: 65,
+        pieces: 128,
         desc: 'Gentle fluffy highland cow calf surrounded by meadow wildflowers and rustic pasture',
         defaultVariantId: 'fluffy_cow_pbn_detailed',
         selectedVariantId: 'fluffy_cow_pbn_detailed',
         originalAsset: 'assets/fluffy-cow-3.jpeg',
         thumbnailUrl: 'assets/converted/fluffy_cow_pbn_detailed_thumb.png',
         variants: [
-          { id: 'fluffy_cow_pbn_detailed', label: 'Cozy', name: 'Cozy (Large Print)', pieces: 65, colors: 11, complexity: 'detailed', jsonFile: 'assets/converted/fluffy_cow_pbn_detailed.json', thumbnailUrl: 'assets/converted/fluffy_cow_pbn_detailed_thumb.png' },
-          { id: 'fluffy_cow_pbn_intricate', label: 'Classic', name: 'Classic', pieces: 96, colors: 13, complexity: 'intricate', jsonFile: 'assets/converted/fluffy_cow_pbn_intricate.json', thumbnailUrl: 'assets/converted/fluffy_cow_pbn_intricate_thumb.png' },
-          { id: 'fluffy_cow_pbn_masterpiece', label: 'Detailed', name: 'Detailed', pieces: 398, colors: 17, complexity: 'masterpiece', jsonFile: 'assets/converted/fluffy_cow_pbn_masterpiece.json', thumbnailUrl: 'assets/converted/fluffy_cow_pbn_masterpiece_thumb.png' },
-        ],
-      },
-      {
-        id: 'hummingbird_pbn',
-        title: 'Garden Hummingbird',
-        artist: 'Sunlit Meadow',
-        category: 'classic',
-        pieces: 58,
-        desc: 'Vibrant hummingbird sipping sweet nectar among blooming country garden flora',
-        defaultVariantId: 'hummingbird_pbn_detailed',
-        selectedVariantId: 'hummingbird_pbn_detailed',
-        originalAsset: 'assets/hummingbird.jpeg',
-        thumbnailUrl: 'assets/converted/hummingbird_pbn_detailed_thumb.png',
-        variants: [
-          { id: 'hummingbird_pbn_detailed', label: 'Cozy', name: 'Cozy (Large Print)', pieces: 58, colors: 11, complexity: 'detailed', jsonFile: 'assets/converted/hummingbird_pbn_detailed.json', thumbnailUrl: 'assets/converted/hummingbird_pbn_detailed_thumb.png' },
-          { id: 'hummingbird_pbn_intricate', label: 'Classic', name: 'Classic', pieces: 85, colors: 16, complexity: 'intricate', jsonFile: 'assets/converted/hummingbird_pbn_intricate.json', thumbnailUrl: 'assets/converted/hummingbird_pbn_intricate_thumb.png' },
-          { id: 'hummingbird_pbn_masterpiece', label: 'Detailed', name: 'Detailed', pieces: 212, colors: 22, complexity: 'masterpiece', jsonFile: 'assets/converted/hummingbird_pbn_masterpiece.json', thumbnailUrl: 'assets/converted/hummingbird_pbn_masterpiece_thumb.png' },
-        ],
-      },
-      {
-        id: 'country_barn_pbn',
-        title: 'Rustic Red Barn',
-        artist: 'Heartland Heritage',
-        category: 'classic',
-        pieces: 50,
-        desc: 'Classic red country barn with silo, split-rail fence, and sunflowers under sunny blue sky',
-        defaultVariantId: 'country_barn_pbn_detailed',
-        selectedVariantId: 'country_barn_pbn_detailed',
-        originalAsset: 'assets/country_barn.jpeg',
-        thumbnailUrl: 'assets/converted/country_barn_pbn_detailed_thumb.png',
-        variants: [
-          { id: 'country_barn_pbn_detailed', label: 'Cozy', name: 'Cozy (Large Print)', pieces: 50, colors: 13, complexity: 'detailed', jsonFile: 'assets/converted/country_barn_pbn_detailed.json', thumbnailUrl: 'assets/converted/country_barn_pbn_detailed_thumb.png' },
-          { id: 'country_barn_pbn_intricate', label: 'Classic', name: 'Classic', pieces: 113, colors: 15, complexity: 'intricate', jsonFile: 'assets/converted/country_barn_pbn_intricate.json', thumbnailUrl: 'assets/converted/country_barn_pbn_intricate_thumb.png' },
-          { id: 'country_barn_pbn_masterpiece', label: 'Detailed', name: 'Detailed', pieces: 278, colors: 21, complexity: 'masterpiece', jsonFile: 'assets/converted/country_barn_pbn_masterpiece.json', thumbnailUrl: 'assets/converted/country_barn_pbn_masterpiece_thumb.png' },
-        ],
-      },
-      {
-        id: 'country_rooster_pbn',
-        title: 'Morning Farm Rooster',
-        artist: 'Sunrise Farmstead',
-        category: 'classic',
-        pieces: 74,
-        desc: 'Colorful country rooster greeting the morning sun from a rustic fence post',
-        defaultVariantId: 'country_rooster_pbn_detailed',
-        selectedVariantId: 'country_rooster_pbn_detailed',
-        originalAsset: 'assets/country_rooster.jpeg',
-        thumbnailUrl: 'assets/converted/country_rooster_pbn_detailed_thumb.png',
-        variants: [
-          { id: 'country_rooster_pbn_detailed', label: 'Cozy', name: 'Cozy (Large Print)', pieces: 74, colors: 13, complexity: 'detailed', jsonFile: 'assets/converted/country_rooster_pbn_detailed.json', thumbnailUrl: 'assets/converted/country_rooster_pbn_detailed_thumb.png' },
-          { id: 'country_rooster_pbn_intricate', label: 'Classic', name: 'Classic', pieces: 121, colors: 18, complexity: 'intricate', jsonFile: 'assets/converted/country_rooster_pbn_intricate.json', thumbnailUrl: 'assets/converted/country_rooster_pbn_intricate_thumb.png' },
-          { id: 'country_rooster_pbn_masterpiece', label: 'Detailed', name: 'Detailed', pieces: 389, colors: 23, complexity: 'masterpiece', jsonFile: 'assets/converted/country_rooster_pbn_masterpiece.json', thumbnailUrl: 'assets/converted/country_rooster_pbn_masterpiece_thumb.png' },
-        ],
-      },
-      {
-        id: 'country_truck_pbn',
-        title: 'Vintage Harvest Truck',
-        artist: 'Country Roads Studio',
-        category: 'classic',
-        pieces: 33,
-        desc: 'Classic turquoise vintage pickup truck filled with harvest pumpkins and sunflowers',
-        defaultVariantId: 'country_truck_pbn_detailed',
-        selectedVariantId: 'country_truck_pbn_detailed',
-        originalAsset: 'assets/country_truck.jpeg',
-        thumbnailUrl: 'assets/converted/country_truck_pbn_detailed_thumb.png',
-        variants: [
-          { id: 'country_truck_pbn_detailed', label: 'Cozy', name: 'Cozy (Large Print)', pieces: 33, colors: 10, complexity: 'detailed', jsonFile: 'assets/converted/country_truck_pbn_detailed.json', thumbnailUrl: 'assets/converted/country_truck_pbn_detailed_thumb.png' },
-          { id: 'country_truck_pbn_intricate', label: 'Classic', name: 'Classic', pieces: 112, colors: 17, complexity: 'intricate', jsonFile: 'assets/converted/country_truck_pbn_intricate.json', thumbnailUrl: 'assets/converted/country_truck_pbn_intricate_thumb.png' },
-          { id: 'country_truck_pbn_masterpiece', label: 'Detailed', name: 'Detailed', pieces: 255, colors: 23, complexity: 'masterpiece', jsonFile: 'assets/converted/country_truck_pbn_masterpiece.json', thumbnailUrl: 'assets/converted/country_truck_pbn_masterpiece_thumb.png' },
-        ],
-      },
-      {
-        id: 'country_puppy_pbn',
-        title: 'Porch Golden Puppy',
-        artist: 'Cottage Companions',
-        category: 'classic',
-        pieces: 46,
-        desc: 'Adorable golden retriever puppy in a red bandana enjoying a sunny farm morning',
-        defaultVariantId: 'country_puppy_pbn_detailed',
-        selectedVariantId: 'country_puppy_pbn_detailed',
-        originalAsset: 'assets/country_puppy.jpeg',
-        thumbnailUrl: 'assets/converted/country_puppy_pbn_detailed_thumb.png',
-        variants: [
-          { id: 'country_puppy_pbn_detailed', label: 'Cozy', name: 'Cozy (Large Print)', pieces: 46, colors: 12, complexity: 'detailed', jsonFile: 'assets/converted/country_puppy_pbn_detailed.json', thumbnailUrl: 'assets/converted/country_puppy_pbn_detailed_thumb.png' },
-          { id: 'country_puppy_pbn_intricate', label: 'Classic', name: 'Classic', pieces: 77, colors: 15, complexity: 'intricate', jsonFile: 'assets/converted/country_puppy_pbn_intricate.json', thumbnailUrl: 'assets/converted/country_puppy_pbn_intricate_thumb.png' },
-          { id: 'country_puppy_pbn_masterpiece', label: 'Detailed', name: 'Detailed', pieces: 249, colors: 24, complexity: 'masterpiece', jsonFile: 'assets/converted/country_puppy_pbn_masterpiece.json', thumbnailUrl: 'assets/converted/country_puppy_pbn_masterpiece_thumb.png' },
-        ],
-      },
-      {
-        id: 'yorky_teacup_pbn',
-        title: 'Teacup Yorkie Ribbon',
-        artist: 'Petite Paws Studio',
-        category: 'classic',
-        pieces: 49,
-        desc: 'Adorable teacup Yorkshire Terrier puppy with pink bow nestled in vintage porcelain',
-        defaultVariantId: 'yorky_teacup_pbn_detailed',
-        selectedVariantId: 'yorky_teacup_pbn_detailed',
-        originalAsset: 'assets/yorky_teacup.jpeg',
-        thumbnailUrl: 'assets/converted/yorky_teacup_pbn_detailed_thumb.png',
-        variants: [
-          { id: 'yorky_teacup_pbn_detailed', label: 'Cozy', name: 'Cozy (Large Print)', pieces: 49, colors: 10, complexity: 'detailed', jsonFile: 'assets/converted/yorky_teacup_pbn_detailed.json', thumbnailUrl: 'assets/converted/yorky_teacup_pbn_detailed_thumb.png' },
-          { id: 'yorky_teacup_pbn_intricate', label: 'Classic', name: 'Classic', pieces: 101, colors: 15, complexity: 'intricate', jsonFile: 'assets/converted/yorky_teacup_pbn_intricate.json', thumbnailUrl: 'assets/converted/yorky_teacup_pbn_intricate_thumb.png' },
-          { id: 'yorky_teacup_pbn_masterpiece', label: 'Detailed', name: 'Detailed', pieces: 295, colors: 19, complexity: 'masterpiece', jsonFile: 'assets/converted/yorky_teacup_pbn_masterpiece.json', thumbnailUrl: 'assets/converted/yorky_teacup_pbn_masterpiece_thumb.png' },
-        ],
-      },
-      {
-        id: 'yorky_garden_pbn',
-        title: 'Garden Blossom Yorkie',
-        artist: 'Cottage Petals',
-        category: 'classic',
-        pieces: 90,
-        desc: 'Cheerful Yorkshire Terrier puppy surrounded by blooming pansies and meadow lavender',
-        defaultVariantId: 'yorky_garden_pbn_detailed',
-        selectedVariantId: 'yorky_garden_pbn_detailed',
-        originalAsset: 'assets/yorky_garden.jpeg',
-        thumbnailUrl: 'assets/converted/yorky_garden_pbn_detailed_thumb.png',
-        variants: [
-          { id: 'yorky_garden_pbn_detailed', label: 'Cozy', name: 'Cozy (Large Print)', pieces: 90, colors: 14, complexity: 'detailed', jsonFile: 'assets/converted/yorky_garden_pbn_detailed.json', thumbnailUrl: 'assets/converted/yorky_garden_pbn_detailed_thumb.png' },
-          { id: 'yorky_garden_pbn_intricate', label: 'Classic', name: 'Classic', pieces: 180, colors: 16, complexity: 'intricate', jsonFile: 'assets/converted/yorky_garden_pbn_intricate.json', thumbnailUrl: 'assets/converted/yorky_garden_pbn_intricate_thumb.png' },
-          { id: 'yorky_garden_pbn_masterpiece', label: 'Detailed', name: 'Detailed', pieces: 365, colors: 23, complexity: 'masterpiece', jsonFile: 'assets/converted/yorky_garden_pbn_masterpiece.json', thumbnailUrl: 'assets/converted/yorky_garden_pbn_masterpiece_thumb.png' },
-        ],
-      },
-      {
-        id: 'yorky_autumn_pbn',
-        title: 'Cozy Autumn Yorkie',
-        artist: 'Harvest Hearth',
-        category: 'classic',
-        pieces: 86,
-        desc: 'Sweet Yorkshire Terrier in a cozy red knit sweater among autumn maple leaves and pumpkins',
-        defaultVariantId: 'yorky_autumn_pbn_detailed',
-        selectedVariantId: 'yorky_autumn_pbn_detailed',
-        originalAsset: 'assets/yorky_autumn.jpeg',
-        thumbnailUrl: 'assets/converted/yorky_autumn_pbn_detailed_thumb.png',
-        variants: [
-          { id: 'yorky_autumn_pbn_detailed', label: 'Cozy', name: 'Cozy (Large Print)', pieces: 86, colors: 9, complexity: 'detailed', jsonFile: 'assets/converted/yorky_autumn_pbn_detailed.json', thumbnailUrl: 'assets/converted/yorky_autumn_pbn_detailed_thumb.png' },
-          { id: 'yorky_autumn_pbn_intricate', label: 'Classic', name: 'Classic', pieces: 100, colors: 12, complexity: 'intricate', jsonFile: 'assets/converted/yorky_autumn_pbn_intricate.json', thumbnailUrl: 'assets/converted/yorky_autumn_pbn_intricate_thumb.png' },
-          { id: 'yorky_autumn_pbn_masterpiece', label: 'Detailed', name: 'Detailed', pieces: 236, colors: 18, complexity: 'masterpiece', jsonFile: 'assets/converted/yorky_autumn_pbn_masterpiece.json', thumbnailUrl: 'assets/converted/yorky_autumn_pbn_masterpiece_thumb.png' },
-        ],
-      },
-      {
-        id: 'yorky_playful_pbn',
-        title: 'Playful Meadow Yorkie',
-        artist: 'Sunny Pastures',
-        category: 'classic',
-        pieces: 97,
-        desc: 'Joyful Yorkshire Terrier puppy in a polka dot bandana playing with a ball in buttercups',
-        defaultVariantId: 'yorky_playful_pbn_detailed',
-        selectedVariantId: 'yorky_playful_pbn_detailed',
-        originalAsset: 'assets/yorky_playful.jpeg',
-        thumbnailUrl: 'assets/converted/yorky_playful_pbn_detailed_thumb.png',
-        variants: [
-          { id: 'yorky_playful_pbn_detailed', label: 'Cozy', name: 'Cozy (Large Print)', pieces: 97, colors: 10, complexity: 'detailed', jsonFile: 'assets/converted/yorky_playful_pbn_detailed.json', thumbnailUrl: 'assets/converted/yorky_playful_pbn_detailed_thumb.png' },
-          { id: 'yorky_playful_pbn_intricate', label: 'Classic', name: 'Classic', pieces: 113, colors: 18, complexity: 'intricate', jsonFile: 'assets/converted/yorky_playful_pbn_intricate.json', thumbnailUrl: 'assets/converted/yorky_playful_pbn_intricate_thumb.png' },
-          { id: 'yorky_playful_pbn_masterpiece', label: 'Detailed', name: 'Detailed', pieces: 313, colors: 25, complexity: 'masterpiece', jsonFile: 'assets/converted/yorky_playful_pbn_masterpiece.json', thumbnailUrl: 'assets/converted/yorky_playful_pbn_masterpiece_thumb.png' },
-        ],
-      },
-      {
-        id: 'rural_windmill_pbn',
-        title: 'Prairie Windmill Sunset',
-        artist: 'Heartland Horizons',
-        category: 'classic',
-        pieces: 70,
-        desc: 'Classic American farm windmill standing tall above golden wheat fields and prairie sunflowers',
-        defaultVariantId: 'rural_windmill_pbn_detailed',
-        selectedVariantId: 'rural_windmill_pbn_detailed',
-        originalAsset: 'assets/rural_windmill.jpeg',
-        thumbnailUrl: 'assets/converted/rural_windmill_pbn_detailed_thumb.png',
-        variants: [
-          { id: 'rural_windmill_pbn_detailed', label: 'Cozy', name: 'Cozy (Large Print)', pieces: 70, colors: 9, complexity: 'detailed', jsonFile: 'assets/converted/rural_windmill_pbn_detailed.json', thumbnailUrl: 'assets/converted/rural_windmill_pbn_detailed_thumb.png' },
-          { id: 'rural_windmill_pbn_intricate', label: 'Classic', name: 'Classic', pieces: 213, colors: 12, complexity: 'intricate', jsonFile: 'assets/converted/rural_windmill_pbn_intricate.json', thumbnailUrl: 'assets/converted/rural_windmill_pbn_intricate_thumb.png' },
-          { id: 'rural_windmill_pbn_masterpiece', label: 'Detailed', name: 'Detailed', pieces: 733, colors: 22, complexity: 'masterpiece', jsonFile: 'assets/converted/rural_windmill_pbn_masterpiece.json', thumbnailUrl: 'assets/converted/rural_windmill_pbn_masterpiece_thumb.png' },
-        ],
-      },
-      {
-        id: 'country_store_pbn',
-        title: 'Old Country Store',
-        artist: 'Heritage Homestead',
-        category: 'classic',
-        pieces: 78,
-        desc: 'Charming general store with wooden porch, rocking chairs, bushel of apples, and hanging lanterns',
-        defaultVariantId: 'country_store_pbn_detailed',
-        selectedVariantId: 'country_store_pbn_detailed',
-        originalAsset: 'assets/country_store.jpeg',
-        thumbnailUrl: 'assets/converted/country_store_pbn_detailed_thumb.png',
-        variants: [
-          { id: 'country_store_pbn_detailed', label: 'Cozy', name: 'Cozy (Large Print)', pieces: 78, colors: 8, complexity: 'detailed', jsonFile: 'assets/converted/country_store_pbn_detailed.json', thumbnailUrl: 'assets/converted/country_store_pbn_detailed_thumb.png' },
-          { id: 'country_store_pbn_intricate', label: 'Classic', name: 'Classic', pieces: 195, colors: 15, complexity: 'intricate', jsonFile: 'assets/converted/country_store_pbn_intricate.json', thumbnailUrl: 'assets/converted/country_store_pbn_intricate_thumb.png' },
-          { id: 'country_store_pbn_masterpiece', label: 'Detailed', name: 'Detailed', pieces: 559, colors: 21, complexity: 'masterpiece', jsonFile: 'assets/converted/country_store_pbn_masterpiece.json', thumbnailUrl: 'assets/converted/country_store_pbn_masterpiece_thumb.png' },
-        ],
-      },
-      {
-        id: 'pasture_horses_pbn',
-        title: 'Pasture Mare & Foal',
-        artist: 'Meadow Run Stables',
-        category: 'classic',
-        pieces: 84,
-        desc: 'Loving chestnut farm mare and playful young foal beside a rustic split-rail pasture fence',
-        defaultVariantId: 'pasture_horses_pbn_detailed',
-        selectedVariantId: 'pasture_horses_pbn_detailed',
-        originalAsset: 'assets/pasture_horses.jpeg',
-        thumbnailUrl: 'assets/converted/pasture_horses_pbn_detailed_thumb.png',
-        variants: [
-          { id: 'pasture_horses_pbn_detailed', label: 'Cozy', name: 'Cozy (Large Print)', pieces: 84, colors: 13, complexity: 'detailed', jsonFile: 'assets/converted/pasture_horses_pbn_detailed.json', thumbnailUrl: 'assets/converted/pasture_horses_pbn_detailed_thumb.png' },
-          { id: 'pasture_horses_pbn_intricate', label: 'Classic', name: 'Classic', pieces: 155, colors: 15, complexity: 'intricate', jsonFile: 'assets/converted/pasture_horses_pbn_intricate.json', thumbnailUrl: 'assets/converted/pasture_horses_pbn_intricate_thumb.png' },
-          { id: 'pasture_horses_pbn_masterpiece', label: 'Detailed', name: 'Detailed', pieces: 330, colors: 22, complexity: 'masterpiece', jsonFile: 'assets/converted/pasture_horses_pbn_masterpiece.json', thumbnailUrl: 'assets/converted/pasture_horses_pbn_masterpiece_thumb.png' },
-        ],
-      },
-      {
-        id: 'vintage_tractor_pbn',
-        title: 'Heartland Antique Tractor',
-        artist: 'Country Roads Studio',
-        category: 'classic',
-        pieces: 73,
-        desc: 'Classic vintage farm tractor in vibrant green and yellow beside summer cornfields and harvest crates',
-        defaultVariantId: 'vintage_tractor_pbn_detailed',
-        selectedVariantId: 'vintage_tractor_pbn_detailed',
-        originalAsset: 'assets/vintage_tractor.jpeg',
-        thumbnailUrl: 'assets/converted/vintage_tractor_pbn_detailed_thumb.png',
-        variants: [
-          { id: 'vintage_tractor_pbn_detailed', label: 'Cozy', name: 'Cozy (Large Print)', pieces: 73, colors: 13, complexity: 'detailed', jsonFile: 'assets/converted/vintage_tractor_pbn_detailed.json', thumbnailUrl: 'assets/converted/vintage_tractor_pbn_detailed_thumb.png' },
-          { id: 'vintage_tractor_pbn_intricate', label: 'Classic', name: 'Classic', pieces: 156, colors: 16, complexity: 'intricate', jsonFile: 'assets/converted/vintage_tractor_pbn_intricate.json', thumbnailUrl: 'assets/converted/vintage_tractor_pbn_intricate_thumb.png' },
-          { id: 'vintage_tractor_pbn_masterpiece', label: 'Detailed', name: 'Detailed', pieces: 420, colors: 25, complexity: 'masterpiece', jsonFile: 'assets/converted/vintage_tractor_pbn_masterpiece.json', thumbnailUrl: 'assets/converted/vintage_tractor_pbn_masterpiece_thumb.png' },
-        ],
-      },
-      {
-        id: 'covered_bridge_pbn',
-        title: 'Rustic Covered Bridge',
-        artist: 'Valley Stream Folk',
-        category: 'classic',
-        pieces: 84,
-        desc: 'Historic red wooden covered bridge spanning a peaceful babbling stream surrounded by wildflowers',
-        defaultVariantId: 'covered_bridge_pbn_detailed',
-        selectedVariantId: 'covered_bridge_pbn_detailed',
-        originalAsset: 'assets/covered_bridge.jpeg',
-        thumbnailUrl: 'assets/converted/covered_bridge_pbn_detailed_thumb.png',
-        variants: [
-          { id: 'covered_bridge_pbn_detailed', label: 'Cozy', name: 'Cozy (Large Print)', pieces: 84, colors: 11, complexity: 'detailed', jsonFile: 'assets/converted/covered_bridge_pbn_detailed.json', thumbnailUrl: 'assets/converted/covered_bridge_pbn_detailed_thumb.png' },
-          { id: 'covered_bridge_pbn_intricate', label: 'Classic', name: 'Classic', pieces: 203, colors: 15, complexity: 'intricate', jsonFile: 'assets/converted/covered_bridge_pbn_intricate.json', thumbnailUrl: 'assets/converted/covered_bridge_pbn_intricate_thumb.png' },
-          { id: 'covered_bridge_pbn_masterpiece', label: 'Detailed', name: 'Detailed', pieces: 485, colors: 25, complexity: 'masterpiece', jsonFile: 'assets/converted/covered_bridge_pbn_masterpiece.json', thumbnailUrl: 'assets/converted/covered_bridge_pbn_masterpiece_thumb.png' },
+          { id: 'fluffy_cow_pbn_detailed', label: 'Cozy', name: 'Cozy (Large Print)', pieces: 128, colors: 11, complexity: 'detailed', jsonFile: 'assets/converted/fluffy_cow_pbn_detailed.json', thumbnailUrl: 'assets/converted/fluffy_cow_pbn_detailed_thumb.png' },
+          { id: 'fluffy_cow_pbn_intricate', label: 'Classic', name: 'Classic', pieces: 143, colors: 18, complexity: 'intricate', jsonFile: 'assets/converted/fluffy_cow_pbn_intricate.json', thumbnailUrl: 'assets/converted/fluffy_cow_pbn_intricate_thumb.png' },
+          { id: 'fluffy_cow_pbn_masterpiece', label: 'Detailed', name: 'Detailed', pieces: 216, colors: 20, complexity: 'masterpiece', jsonFile: 'assets/converted/fluffy_cow_pbn_masterpiece.json', thumbnailUrl: 'assets/converted/fluffy_cow_pbn_masterpiece_thumb.png' },
         ],
       },
     ];
@@ -3451,7 +3213,7 @@ class TapColorApp {
     const dropdownQuick = document.getElementById('quick-style-dropdown');
     const btnResSwitcher = document.getElementById('btn-resolution-switcher');
 
-    // 1. Gallery Artwork: find counterpart
+    // 1. Gallery Artwork: find counterpart or convert originalAsset on the fly
     if (this.currentArtworkMeta) {
       const currentId = this.currentArtworkMeta.id;
       const baseKey = currentId.replace(/_(pbn|diamond)$/, '');
@@ -3464,6 +3226,15 @@ class TapColorApp {
         if (backdropQuick) backdropQuick.classList.add('hidden');
         await this.selectArtwork(counterpartMeta.id);
         return;
+      } else if (this.currentArtworkMeta.originalAsset) {
+        const assetUrl = this.currentArtworkMeta.originalAsset;
+        this.lastCustomTitle = this.currentArtworkMeta.title;
+        this.lastCustomImage = await new Promise((resolve, reject) => {
+          const img = new Image();
+          img.onload = () => resolve(img);
+          img.onerror = reject;
+          img.src = assetUrl;
+        });
       }
     }
 

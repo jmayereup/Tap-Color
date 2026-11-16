@@ -713,307 +713,52 @@ def merge_similar_palette(centers, counts, min_dist):
 
 
 def convert_to_paint_by_number(img_path, complexity, title, artist, output_id, output_dir):
+    import subprocess, tempfile
     json_path = os.path.join(output_dir, f"{output_id}.json")
     thumb_path = os.path.join(output_dir, f"{output_id}_thumb.png")
 
     presets = {
-        'detailed':    {'K': 14, 'W': 360, 'min_pixels': 130, 'min_thickness': 3, 'merge_dist': 26.0, 'epsilon': 0.65},
-        'intricate':   {'K': 20, 'W': 440, 'min_pixels': 70,  'min_thickness': 2, 'merge_dist': 20.0, 'epsilon': 0.50},
-        'masterpiece': {'K': 28, 'W': 540, 'min_pixels': 30,  'min_thickness': 2, 'merge_dist': 14.0, 'epsilon': 0.40},
+        'detailed':    {'W': 380, 'pbn_key': 'cozy'},
+        'intricate':   {'W': 440, 'pbn_key': 'balanced'},
+        'masterpiece': {'W': 500, 'pbn_key': 'detailed'},
     }
     cfg = presets[complexity]
-    K, W, min_pixels, min_thickness, merge_dist, epsilon = (
-        cfg['K'], cfg['W'], cfg['min_pixels'], cfg['min_thickness'], cfg['merge_dist'], cfg['epsilon']
-    )
+    W = cfg['W']
+    pbn_key = cfg['pbn_key']
 
     grid_rgb = load_framed_rgb_grid(img_path, W)
-    # Edge-preserving bilateral smoothing
-    grid_rgb = bilateral_smooth_rgb(grid_rgb, W, W)
+    buf = bytearray(W * W * 4)
+    for i, (r, g, b) in enumerate(grid_rgb):
+        o = i * 4
+        buf[o] = r
+        buf[o + 1] = g
+        buf[o + 2] = b
+        buf[o + 3] = 255
 
-    mask = detect_bg_and_ink_grid(grid_rgb, W)
+    base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    pbn_script = os.path.join(base_dir, "scripts", "convert_pbn.mjs")
 
-    # Sample only clean interior pixels for k-means++
-    samples = []
-    step = max(1, W // 55)
-    for y in range(2, W - 2, step):
-        for x in range(2, W - 2, step):
-            idx = y * W + x
-            if mask[idx] != 0:
-                continue
-            if mask[idx - 1] != 0 or mask[idx + 1] != 0 or mask[idx - W] != 0 or mask[idx + W] != 0:
-                continue
-            samples.append(grid_rgb[idx])
+    with tempfile.NamedTemporaryFile(suffix=".bin", delete=False) as tf:
+        raw_bin_path = tf.name
+        tf.write(buf)
 
-    if len(samples) < K * 4:
-        for y in range(0, W, step):
-            for x in range(0, W, step):
-                idx = y * W + x
-                if mask[idx] == 0:
-                    samples.append(grid_rgb[idx])
-    if not samples:
-        samples = [grid_rgb[(W // 2) * W + (W // 2)]]
+    try:
+        subprocess.run(
+            ["node", pbn_script, raw_bin_path, str(W), pbn_key, output_id, title, artist, json_path],
+            check=True,
+            cwd=base_dir,
+        )
+    finally:
+        if os.path.exists(raw_bin_path):
+            os.remove(raw_bin_path)
 
-    K_eff = min(K, len(samples))
-    centers = kmeans_pp(samples, K_eff, max_iter=12)
+    with open(json_path, 'r', encoding='utf-8') as f:
+        artwork = json.load(f)
 
-    counts = [0] * len(centers)
-    for s in samples:
-        best_k = min(range(len(centers)), key=lambda k: (s[0]-centers[k][0])**2 + (s[1]-centers[k][1])**2 + (s[2]-centers[k][2])**2)
-        counts[best_k] += 1
-    centers = merge_similar_palette(centers, counts, merge_dist)
-    K_eff = len(centers)
-    centers.sort(key=lambda c: get_luminance(*c), reverse=True)
-
-    cR = [c[0] for c in centers]
-    cG = [c[1] for c in centers]
-    cB = [c[2] for c in centers]
-
-    grid = [-1] * (W * W)
-    for idx, (pr, pg, pb) in enumerate(grid_rgb):
-        if mask[idx] == 1:
-            grid[idx] = -1
-        elif mask[idx] == 2:
-            grid[idx] = -2
-        else:
-            best_k = min(range(K_eff), key=lambda k: (pr-cR[k])**2 + (pg-cG[k])**2 + (pb-cB[k])**2)
-            grid[idx] = best_k
-
-    # 2 passes of majority filter (mode >= 5) on playable pixels
-    for _ in range(2):
-        new_grid = list(grid)
-        for y in range(1, W - 1):
-            row = y * W
-            for x in range(1, W - 1):
-                idx = row + x
-                cur = grid[idx]
-                if cur < 0:
-                    continue
-                counts_nbr = Counter()
-                for dy in (-1, 0, 1):
-                    nrow = (y + dy) * W
-                    for dx in (-1, 0, 1):
-                        val = grid[nrow + x + dx]
-                        if val >= 0:
-                            counts_nbr[val] += 1
-                if counts_nbr:
-                    dom, count = counts_nbr.most_common(1)[0]
-                    if count >= 5 and dom != cur:
-                        new_grid[idx] = dom
-        grid = new_grid
-
-    # Multi-source BFS: propagate adjacent interior colors into thin ink lines (-2)
-    ink_q = deque()
-    for y in range(W):
-        for x in range(W):
-            idx = y * W + x
-            if grid[idx] >= 0:
-                if (x > 0 and grid[idx - 1] == -2) or (x < W - 1 and grid[idx + 1] == -2) or \
-                   (y > 0 and grid[idx - W] == -2) or (y < W - 1 and grid[idx + W] == -2):
-                    ink_q.append(idx)
-
-    while ink_q:
-        curr = ink_q.popleft()
-        col = grid[curr]
-        cx = curr % W
-        cy = curr // W
-        if cx > 0 and grid[curr - 1] == -2:
-            grid[curr - 1] = col
-            ink_q.append(curr - 1)
-        if cx < W - 1 and grid[curr + 1] == -2:
-            grid[curr + 1] = col
-            ink_q.append(curr + 1)
-        if cy > 0 and grid[curr - W] == -2:
-            grid[curr - W] = col
-            ink_q.append(curr - W)
-        if cy < W - 1 and grid[curr + W] == -2:
-            grid[curr + W] = col
-            ink_q.append(curr + W)
-
-    for i in range(W * W):
-        if grid[i] == -2:
-            grid[i] = -1
-
-    # Morphological cleanup of 1px spurs/hairs
-    for _ in range(2):
-        for y in range(1, W - 1):
-            row = y * W
-            for x in range(1, W - 1):
-                idx = row + x
-                cur = grid[idx]
-                if cur < 0:
-                    continue
-                orth = [grid[idx - 1], grid[idx + 1], grid[idx - W], grid[idx + W]]
-                same = sum(1 for v in orth if v == cur)
-                if same <= 1:
-                    others = [v for v in orth if v >= 0 and v != cur]
-                    if others:
-                        grid[idx] = Counter(others).most_common(1)[0][0]
-
-    # Watershed neighbor merge: absorb micro-regions (< min_pixels) AND thin outline slivers (< min_thickness)
-    for _ in range(6):
-        labels = [-1] * (W * W)
-        components = []
-        next_label = 0
-        for y in range(W):
-            for x in range(W):
-                idx = y * W + x
-                if grid[idx] < 0 or labels[idx] != -1:
-                    continue
-                color = grid[idx]
-                label = next_label
-                next_label += 1
-                labels[idx] = label
-
-                q = deque([idx])
-                comp_pixels = []
-                while q:
-                    curr = q.popleft()
-                    comp_pixels.append(curr)
-                    cx = curr % W
-                    cy = curr // W
-                    if cx > 0 and labels[curr - 1] == -1 and grid[curr - 1] == color:
-                        labels[curr - 1] = label
-                        q.append(curr - 1)
-                    if cx < W - 1 and labels[curr + 1] == -1 and grid[curr + 1] == color:
-                        labels[curr + 1] = label
-                        q.append(curr + 1)
-                    if cy > 0 and labels[curr - W] == -1 and grid[curr - W] == color:
-                        labels[curr - W] = label
-                        q.append(curr - W)
-                    if cy < W - 1 and labels[curr + W] == -1 and grid[curr + W] == color:
-                        labels[curr + W] = label
-                        q.append(curr + W)
-                components.append({'label': label, 'color': color, 'pixels': comp_pixels})
-
-        small_comps = []
-        for c in components:
-            n_pix = len(c['pixels'])
-            if n_pix < min_pixels:
-                small_comps.append(c)
-            elif n_pix < min_pixels * 5:
-                thick, _, _ = get_component_thickness_and_pole(c['pixels'], W, W)
-                if thick < min_thickness:
-                    small_comps.append(c)
-
-        if not small_comps:
-            break
-        small_comps.sort(key=lambda c: len(c['pixels']))
-        merged_any = False
-        for c in small_comps:
-            contact = Counter()
-            for p in c['pixels']:
-                cx = p % W
-                cy = p // W
-                if cx > 0 and labels[p - 1] != c['label'] and grid[p - 1] >= 0:
-                    contact[grid[p - 1]] += 1
-                if cx < W - 1 and labels[p + 1] != c['label'] and grid[p + 1] >= 0:
-                    contact[grid[p + 1]] += 1
-                if cy > 0 and labels[p - W] != c['label'] and grid[p - W] >= 0:
-                    contact[grid[p - W]] += 1
-                if cy < W - 1 and labels[p + W] != c['label'] and grid[p + W] >= 0:
-                    contact[grid[p + W]] += 1
-            if not contact:
-                continue
-            cur_rgb = centers[c['color']]
-            def score(cand):
-                n_rgb = centers[cand]
-                cdist = math.sqrt(sum((a - b)**2 for a, b in zip(cur_rgb, n_rgb)))
-                return contact[cand] * 1000 - cdist
-            best_col = max(contact.keys(), key=score)
-            for p in c['pixels']:
-                grid[p] = best_col
-            merged_any = True
-        if not merged_any:
-            break
-
-    valid_components = [c for c in components if len(c['pixels']) >= 8]
-
-    width = 800
-    height = 800
-    margin = 20
-    avail_w = width - margin * 2
-    avail_h = height - margin * 2
-    scale_x = avail_w / W
-    scale_y = avail_h / W
-    sq_tol = epsilon * epsilon
-
-    palette = []
-    for idx, c in enumerate(centers):
-        palette.append({
-            "number": idx + 1,
-            "hex": rgb_to_hex(*c),
-            "name": f"Color #{idx + 1}",
-            "total_count": 0,
-            "filled_count": 0,
-            "is_completed": False
-        })
-
-    regions = []
-    reg_id = 0
-
-    for comp in valid_components:
-        raw_poly = trace_boundary(comp['pixels'], W, W)
-        if len(raw_poly) < 3:
-            continue
-        smoothed = smooth_contour(raw_poly, W, W, sq_tol)
-        if len(smoothed) < 3:
-            continue
-
-        world_poly = [
-            {
-                "x": round((margin + pt[0] * scale_x) * 10) / 10,
-                "y": round((margin + pt[1] * scale_y) * 10) / 10
-            }
-            for pt in smoothed
-        ]
-
-        thick, cands, dist_map = get_component_thickness_and_pole(comp['pixels'], W, W)
-        cx, cy, label_rad = refine_pole_in_poly(cands, world_poly, dist_map, W, margin, scale_x)
-        world_centroid = {
-            "x": round(cx * 10) / 10,
-            "y": round(cy * 10) / 10
-        }
-
-        c_num = comp['color'] + 1
-        palette[comp['color']]['total_count'] += 1
-
-        regions.append({
-            "id": reg_id,
-            "number": c_num,
-            "polygon": world_poly,
-            "centroid": world_centroid,
-            "label_radius": round(label_rad * 10) / 10,
-            "color_hex": palette[comp['color']]['hex'],
-            "is_filled": False,
-            "fill_anim": 0.0
-        })
-        reg_id += 1
-
-    # Re-index active palette colors sequentially
-    active_palette = [p for p in palette if p['total_count'] > 0]
-    for new_idx, p in enumerate(active_palette):
-        old_num = p['number']
-        new_num = new_idx + 1
-        p['number'] = new_num
-        p['name'] = f"Color #{new_num}"
-        if old_num != new_num:
-            for r in regions:
-                if r['number'] == old_num:
-                    r['number'] = new_num
-
-    artwork = {
-        "id": output_id,
-        "title": title,
-        "artist": artist,
-        "category": "classic",
-        "width": width,
-        "height": height,
-        "palette": active_palette,
-        "regions": regions
-    }
-
-    with open(json_path, 'w', encoding='utf-8') as f:
-        json.dump(artwork, f, separators=(',', ':'))
+    regions = artwork["regions"]
+    active_palette = artwork["palette"]
+    width = artwork["width"]
+    height = artwork["height"]
 
     # Render Thumbnail (280x200, 2x supersampled with crisp dark ink outlines)
     thumb_w, thumb_h = 280, 200
