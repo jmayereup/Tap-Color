@@ -670,8 +670,8 @@
         "id": "autumn_fox_pbn_detailed",
         "resolution": "Detailed (800+)",
         "complexity": "detailed",
-        "pieces": 49,
-        "colors": 9,
+        "pieces": 76,
+        "colors": 13,
         "jsonFile": "assets/converted/autumn_fox_pbn_detailed.json",
         "thumbnailUrl": "assets/converted/autumn_fox_pbn_detailed_thumb.png"
       },
@@ -679,8 +679,8 @@
         "id": "autumn_fox_pbn_intricate",
         "resolution": "Intricate (2,000+)",
         "complexity": "intricate",
-        "pieces": 15,
-        "colors": 10,
+        "pieces": 231,
+        "colors": 20,
         "jsonFile": "assets/converted/autumn_fox_pbn_intricate.json",
         "thumbnailUrl": "assets/converted/autumn_fox_pbn_intricate_thumb.png"
       },
@@ -688,8 +688,8 @@
         "id": "autumn_fox_pbn_masterpiece",
         "resolution": "Masterpiece (4,000+)",
         "complexity": "masterpiece",
-        "pieces": 30,
-        "colors": 15,
+        "pieces": 248,
+        "colors": 23,
         "jsonFile": "assets/converted/autumn_fox_pbn_masterpiece.json",
         "thumbnailUrl": "assets/converted/autumn_fox_pbn_masterpiece_thumb.png"
       }
