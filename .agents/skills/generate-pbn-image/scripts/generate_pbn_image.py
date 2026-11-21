@@ -36,13 +36,13 @@ DIFFICULTY_MODIFIERS = {
         "thick uniform solid black ink outlines (#000000) completely enclosing every shape"
     ),
     "medium": (
-        "clean storybook vector paint-by-number illustration, balanced composition with broad "
+        "clean storybook vector illustration, balanced composition with broad "
         "easy-to-tap enclosed shapes, 14 to 20 vibrant flat solid colors, layered foreground and "
         "background with simple crisp ink-bordered 2-tone cel-shaded color blocks, simplified "
         "foliage and textures with zero tiny speckles"
     ),
     "hard": (
-        "intricate stained-glass mosaic paint-by-number illustration, full-scene composition with "
+        "intricate stained-glass mosaic vector illustration, full-scene composition with "
         "multi-layered foliage, architectural or natural facets, and crisp ink-bordered cel-shaded "
         "color-blocking in 18 to 26 vibrant flat solid colors, every enclosed shape clearly "
         "separated and large enough to tap"
@@ -83,10 +83,11 @@ def build_prompt(subject: str, tier: str, extra: str = "", raw_prompt: str = "")
     modifier = DIFFICULTY_MODIFIERS[tier]
     parts = [
         subject.strip(),
-        "flat vector paint-by-number illustration",
+        "clean unnumbered flat vector illustration",
         "uniform solid black ink outlines (#000000) with every shape completely closed",
         modifier,
         "strictly flat solid color fills with zero gradients, zero soft shading, and zero texture or noise",
+        "completely unnumbered and text-free illustration with no printed numbers, no labels, and no color legend",
         "unframed floating composition centered with generous pure solid white (#FFFFFF) margin on all four edges and corners",
     ]
     if extra.strip():

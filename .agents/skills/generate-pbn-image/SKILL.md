@@ -51,7 +51,7 @@ Choose a difficulty tier based on the user's request; **default to `medium`** wh
 
 ## 3. Prompt Crafting Guidelines
 
-[generate_pbn_image.py](./scripts/generate_pbn_image.py) is the single source of truth for the base prompt and tier modifiers. It uses **positive framing** (describing what to draw—flat solid fills, unframed pure white margins, closed black outlines—rather than appending long `"Avoid: watercolor, frame, border..."` lists that can trigger pink-elephant artifacts on endpoints without a separate `negative_prompt` field).
+[generate_pbn_image.py](./scripts/generate_pbn_image.py) is the single source of truth for the base prompt and tier modifiers. It uses **positive framing** and deliberately avoids the literal phrase `"paint-by-number"` in the image prompt—asking for a **clean, unnumbered, text-free flat vector illustration** instead—because image models otherwise tend to bake printed numbers (`1, 2, 3...`) and a color legend bar into the artwork (which `convert_pbn.mjs` would extract as permanent ink in `_lines.png`). Tap Color renders region numbers dynamically at runtime.
 
 ### Subject Simplification Tips
 - **Reaching Medium/Hard region counts cleanly**: Describe **structured sub-regions** (e.g., roof shingles, stone blocks, layered flower petals, scalloped tree canopies, terraced hills, stylized clouds, and ink-bordered shadow/highlight blocks) rather than fine textures.
@@ -108,6 +108,7 @@ Inspect the terminal output and open the converted previews in `public/assets/co
 | White bleed into interior shapes | Gap in outer black outline, or unbordered white shape (snow, clouds, white fur) touching the background | Regenerate with `--extra "thick continuous closed black ink outline around the entire outer silhouette and all white shapes"`. |
 | Outer background became a giant paintable region | Background tinted off-white (`RGB ≤ 235`), or an outer frame/border blocked edge flood-fill | Regenerate with `--extra "pure bright white (#FFFFFF) empty background all the way to all four corners, unframed floating vignette"`. |
 | Missing or faint interior lines in `_lines.png` | Colored or thin gray outlines failed ink luminance/chroma thresholds | Regenerate with `--extra "bold uniform pure black (#000000) ink outlines on every detail"`. |
+| Printed numbers, text, or color legend baked into `_lines.png` | Model generated a literal PBN worksheet with numbers/key | Regenerate with `--extra "clean blank unnumbered illustration with zero text, zero printed numbers, and zero color legend"` (and avoid `"paint-by-number"` in `<SUBJECT>`). |
 
 ---
 
