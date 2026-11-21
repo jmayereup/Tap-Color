@@ -1051,14 +1051,21 @@ def main():
     ]
 
     for key in ordered_keys:
+        item = discovered[key]
+        src_paths = [p for p in (item["diamond_path"], item["pbn_path"]) if p and os.path.exists(p)]
+        src_added_at = int(max(os.path.getmtime(p) for p in src_paths) * 1000) if src_paths else 0
+
         if target_key and key != target_key:
             if key in existing_manifest:
-                manifest_entries.append(existing_manifest[key])
+                prev_entry = dict(existing_manifest[key])
+                if not prev_entry.get("addedAt") and src_added_at:
+                    prev_entry["addedAt"] = src_added_at
+                manifest_entries.append(prev_entry)
             continue
 
-        item = discovered[key]
         meta = get_meta(key, item["raw_stem"])
         prev = existing_manifest.get(key, {})
+        added_at = prev.get("addedAt") or src_added_at
 
         # 1. Diamond Art (generated for both diamond_art_only/ and paint_by_number/ images)
         diamond_variants = []
@@ -1131,11 +1138,14 @@ def main():
             "title": meta["title"],
             "artist": meta["artist"],
             "desc": meta["desc"],
+            "addedAt": added_at,
             "originalAsset": item["diamond_rel"] or item["pbn_rel"],
             "pbnAsset": item["pbn_rel"],
             "diamondVariants": diamond_variants,
             "pbnVariants": pbn_variants,
         })
+
+    manifest_entries.sort(key=lambda e: e.get("addedAt", 0), reverse=True)
 
     with open(manifest_path, 'w', encoding='utf-8') as f:
         json.dump(manifest_entries, f, indent=2)

@@ -1,728 +1,199 @@
 [
   {
-    "key": "fluffy_cow",
-    "title": "Sweet Highland Calf",
-    "artist": "Country Homestead",
-    "desc": "Gentle fluffy highland cow calf surrounded by meadow wildflowers and rustic wooden pasture",
-    "originalAsset": "assets/paint_by_number/fluffy-cow-3.jpeg",
-    "pbnAsset": "assets/paint_by_number/fluffy-cow-3.jpeg",
-    "diamondVariants": [
-      {
-        "id": "fluffy_cow_diamond_80",
-        "resolution": "Cozy (6.4k)",
-        "label": "80\u00d780",
-        "grid": 80,
-        "pieces": 6400,
-        "colors": 18,
-        "jsonFile": "assets/converted/fluffy_cow_diamond_80.json",
-        "thumbnailUrl": "assets/converted/fluffy_cow_diamond_80_thumb.png"
-      },
-      {
-        "id": "fluffy_cow_diamond_120",
-        "resolution": "Standard (14.4k)",
-        "label": "120\u00d7120",
-        "grid": 120,
-        "pieces": 14400,
-        "colors": 26,
-        "jsonFile": "assets/converted/fluffy_cow_diamond_120.json",
-        "thumbnailUrl": "assets/converted/fluffy_cow_diamond_120_thumb.png"
-      },
-      {
-        "id": "fluffy_cow_diamond_160",
-        "resolution": "Masterpiece (25.6k)",
-        "label": "160\u00d7160",
-        "grid": 160,
-        "pieces": 25600,
-        "colors": 36,
-        "jsonFile": "assets/converted/fluffy_cow_diamond_160.json",
-        "thumbnailUrl": "assets/converted/fluffy_cow_diamond_160_thumb.png"
-      }
-    ],
-    "pbnVariants": [
-      {
-        "id": "fluffy_cow_pbn",
-        "resolution": "Original",
-        "pieces": 129,
-        "colors": 15,
-        "jsonFile": "assets/converted/fluffy_cow_pbn.json",
-        "lineArtUrl": "assets/converted/fluffy_cow_pbn_lines.png",
-        "thumbnailUrl": "assets/converted/fluffy_cow_pbn_thumb.png"
-      }
-    ]
-  },
-  {
-    "key": "hummingbird",
-    "title": "Garden Hummingbird",
-    "artist": "Sunlit Meadow",
-    "desc": "Vibrant hummingbird sipping sweet nectar among blooming country garden flora",
-    "originalAsset": "assets/diamond_art_only/hummingbird.jpeg",
-    "pbnAsset": null,
-    "diamondVariants": [
-      {
-        "id": "hummingbird_diamond_80",
-        "resolution": "Cozy (6.4k)",
-        "label": "80\u00d780",
-        "grid": 80,
-        "pieces": 6400,
-        "colors": 18,
-        "jsonFile": "assets/converted/hummingbird_diamond_80.json",
-        "thumbnailUrl": "assets/converted/hummingbird_diamond_80_thumb.png"
-      },
-      {
-        "id": "hummingbird_diamond_120",
-        "resolution": "Standard (14.4k)",
-        "label": "120\u00d7120",
-        "grid": 120,
-        "pieces": 14400,
-        "colors": 26,
-        "jsonFile": "assets/converted/hummingbird_diamond_120.json",
-        "thumbnailUrl": "assets/converted/hummingbird_diamond_120_thumb.png"
-      },
-      {
-        "id": "hummingbird_diamond_160",
-        "resolution": "Masterpiece (25.6k)",
-        "label": "160\u00d7160",
-        "grid": 160,
-        "pieces": 25600,
-        "colors": 36,
-        "jsonFile": "assets/converted/hummingbird_diamond_160.json",
-        "thumbnailUrl": "assets/converted/hummingbird_diamond_160_thumb.png"
-      }
-    ],
-    "pbnVariants": []
-  },
-  {
-    "key": "country_barn",
-    "title": "Rustic Red Barn",
-    "artist": "Heartland Heritage",
-    "desc": "Classic red country barn with silo, split-rail fence, and sunflowers under sunny blue sky",
-    "originalAsset": "assets/diamond_art_only/country_barn.jpeg",
-    "pbnAsset": null,
-    "diamondVariants": [
-      {
-        "id": "country_barn_diamond_80",
-        "resolution": "Cozy (6.4k)",
-        "label": "80\u00d780",
-        "grid": 80,
-        "pieces": 6400,
-        "colors": 18,
-        "jsonFile": "assets/converted/country_barn_diamond_80.json",
-        "thumbnailUrl": "assets/converted/country_barn_diamond_80_thumb.png"
-      },
-      {
-        "id": "country_barn_diamond_120",
-        "resolution": "Standard (14.4k)",
-        "label": "120\u00d7120",
-        "grid": 120,
-        "pieces": 14400,
-        "colors": 26,
-        "jsonFile": "assets/converted/country_barn_diamond_120.json",
-        "thumbnailUrl": "assets/converted/country_barn_diamond_120_thumb.png"
-      },
-      {
-        "id": "country_barn_diamond_160",
-        "resolution": "Masterpiece (25.6k)",
-        "label": "160\u00d7160",
-        "grid": 160,
-        "pieces": 25600,
-        "colors": 36,
-        "jsonFile": "assets/converted/country_barn_diamond_160.json",
-        "thumbnailUrl": "assets/converted/country_barn_diamond_160_thumb.png"
-      }
-    ],
-    "pbnVariants": []
-  },
-  {
-    "key": "country_rooster",
-    "title": "Morning Farm Rooster",
-    "artist": "Sunrise Farmstead",
-    "desc": "Colorful country rooster greeting the morning sun from a rustic fence post",
-    "originalAsset": "assets/diamond_art_only/country_rooster.jpeg",
-    "pbnAsset": null,
-    "diamondVariants": [
-      {
-        "id": "country_rooster_diamond_80",
-        "resolution": "Cozy (6.4k)",
-        "label": "80\u00d780",
-        "grid": 80,
-        "pieces": 6400,
-        "colors": 18,
-        "jsonFile": "assets/converted/country_rooster_diamond_80.json",
-        "thumbnailUrl": "assets/converted/country_rooster_diamond_80_thumb.png"
-      },
-      {
-        "id": "country_rooster_diamond_120",
-        "resolution": "Standard (14.4k)",
-        "label": "120\u00d7120",
-        "grid": 120,
-        "pieces": 14400,
-        "colors": 26,
-        "jsonFile": "assets/converted/country_rooster_diamond_120.json",
-        "thumbnailUrl": "assets/converted/country_rooster_diamond_120_thumb.png"
-      },
-      {
-        "id": "country_rooster_diamond_160",
-        "resolution": "Masterpiece (25.6k)",
-        "label": "160\u00d7160",
-        "grid": 160,
-        "pieces": 25600,
-        "colors": 36,
-        "jsonFile": "assets/converted/country_rooster_diamond_160.json",
-        "thumbnailUrl": "assets/converted/country_rooster_diamond_160_thumb.png"
-      }
-    ],
-    "pbnVariants": []
-  },
-  {
-    "key": "country_truck",
-    "title": "Vintage Harvest Truck",
-    "artist": "Country Roads Studio",
-    "desc": "Classic turquoise vintage pickup truck filled with harvest pumpkins and sunflowers",
-    "originalAsset": "assets/diamond_art_only/country_truck.jpeg",
-    "pbnAsset": null,
-    "diamondVariants": [
-      {
-        "id": "country_truck_diamond_80",
-        "resolution": "Cozy (6.4k)",
-        "label": "80\u00d780",
-        "grid": 80,
-        "pieces": 6400,
-        "colors": 18,
-        "jsonFile": "assets/converted/country_truck_diamond_80.json",
-        "thumbnailUrl": "assets/converted/country_truck_diamond_80_thumb.png"
-      },
-      {
-        "id": "country_truck_diamond_120",
-        "resolution": "Standard (14.4k)",
-        "label": "120\u00d7120",
-        "grid": 120,
-        "pieces": 14400,
-        "colors": 26,
-        "jsonFile": "assets/converted/country_truck_diamond_120.json",
-        "thumbnailUrl": "assets/converted/country_truck_diamond_120_thumb.png"
-      },
-      {
-        "id": "country_truck_diamond_160",
-        "resolution": "Masterpiece (25.6k)",
-        "label": "160\u00d7160",
-        "grid": 160,
-        "pieces": 25600,
-        "colors": 36,
-        "jsonFile": "assets/converted/country_truck_diamond_160.json",
-        "thumbnailUrl": "assets/converted/country_truck_diamond_160_thumb.png"
-      }
-    ],
-    "pbnVariants": []
-  },
-  {
-    "key": "country_puppy",
-    "title": "Porch Golden Puppy",
-    "artist": "Cottage Companions",
-    "desc": "Adorable golden retriever puppy in a red bandana enjoying a sunny farm morning",
-    "originalAsset": "assets/diamond_art_only/country_puppy.jpeg",
-    "pbnAsset": null,
-    "diamondVariants": [
-      {
-        "id": "country_puppy_diamond_80",
-        "resolution": "Cozy (6.4k)",
-        "label": "80\u00d780",
-        "grid": 80,
-        "pieces": 6400,
-        "colors": 18,
-        "jsonFile": "assets/converted/country_puppy_diamond_80.json",
-        "thumbnailUrl": "assets/converted/country_puppy_diamond_80_thumb.png"
-      },
-      {
-        "id": "country_puppy_diamond_120",
-        "resolution": "Standard (14.4k)",
-        "label": "120\u00d7120",
-        "grid": 120,
-        "pieces": 14400,
-        "colors": 26,
-        "jsonFile": "assets/converted/country_puppy_diamond_120.json",
-        "thumbnailUrl": "assets/converted/country_puppy_diamond_120_thumb.png"
-      },
-      {
-        "id": "country_puppy_diamond_160",
-        "resolution": "Masterpiece (25.6k)",
-        "label": "160\u00d7160",
-        "grid": 160,
-        "pieces": 25600,
-        "colors": 36,
-        "jsonFile": "assets/converted/country_puppy_diamond_160.json",
-        "thumbnailUrl": "assets/converted/country_puppy_diamond_160_thumb.png"
-      }
-    ],
-    "pbnVariants": []
-  },
-  {
-    "key": "yorky_teacup",
-    "title": "Teacup Yorkie Ribbon",
-    "artist": "Petite Paws Studio",
-    "desc": "Adorable teacup Yorkshire Terrier puppy with pink bow nestled in vintage porcelain",
-    "originalAsset": "assets/diamond_art_only/yorky_teacup.jpeg",
-    "pbnAsset": null,
-    "diamondVariants": [
-      {
-        "id": "yorky_teacup_diamond_80",
-        "resolution": "Cozy (6.4k)",
-        "label": "80\u00d780",
-        "grid": 80,
-        "pieces": 6400,
-        "colors": 18,
-        "jsonFile": "assets/converted/yorky_teacup_diamond_80.json",
-        "thumbnailUrl": "assets/converted/yorky_teacup_diamond_80_thumb.png"
-      },
-      {
-        "id": "yorky_teacup_diamond_120",
-        "resolution": "Standard (14.4k)",
-        "label": "120\u00d7120",
-        "grid": 120,
-        "pieces": 14400,
-        "colors": 26,
-        "jsonFile": "assets/converted/yorky_teacup_diamond_120.json",
-        "thumbnailUrl": "assets/converted/yorky_teacup_diamond_120_thumb.png"
-      },
-      {
-        "id": "yorky_teacup_diamond_160",
-        "resolution": "Masterpiece (25.6k)",
-        "label": "160\u00d7160",
-        "grid": 160,
-        "pieces": 25600,
-        "colors": 36,
-        "jsonFile": "assets/converted/yorky_teacup_diamond_160.json",
-        "thumbnailUrl": "assets/converted/yorky_teacup_diamond_160_thumb.png"
-      }
-    ],
-    "pbnVariants": []
-  },
-  {
-    "key": "yorky_garden",
-    "title": "Garden Blossom Yorkie",
-    "artist": "Cottage Petals",
-    "desc": "Cheerful Yorkshire Terrier puppy surrounded by blooming pansies and meadow lavender",
-    "originalAsset": "assets/diamond_art_only/yorky_garden.jpeg",
-    "pbnAsset": null,
-    "diamondVariants": [
-      {
-        "id": "yorky_garden_diamond_80",
-        "resolution": "Cozy (6.4k)",
-        "label": "80\u00d780",
-        "grid": 80,
-        "pieces": 6400,
-        "colors": 18,
-        "jsonFile": "assets/converted/yorky_garden_diamond_80.json",
-        "thumbnailUrl": "assets/converted/yorky_garden_diamond_80_thumb.png"
-      },
-      {
-        "id": "yorky_garden_diamond_120",
-        "resolution": "Standard (14.4k)",
-        "label": "120\u00d7120",
-        "grid": 120,
-        "pieces": 14400,
-        "colors": 26,
-        "jsonFile": "assets/converted/yorky_garden_diamond_120.json",
-        "thumbnailUrl": "assets/converted/yorky_garden_diamond_120_thumb.png"
-      },
-      {
-        "id": "yorky_garden_diamond_160",
-        "resolution": "Masterpiece (25.6k)",
-        "label": "160\u00d7160",
-        "grid": 160,
-        "pieces": 25600,
-        "colors": 36,
-        "jsonFile": "assets/converted/yorky_garden_diamond_160.json",
-        "thumbnailUrl": "assets/converted/yorky_garden_diamond_160_thumb.png"
-      }
-    ],
-    "pbnVariants": []
-  },
-  {
-    "key": "yorky_autumn",
-    "title": "Cozy Autumn Yorkie",
-    "artist": "Harvest Hearth",
-    "desc": "Sweet Yorkshire Terrier in a cozy red knit sweater among autumn maple leaves and pumpkins",
-    "originalAsset": "assets/diamond_art_only/yorky_autumn.jpeg",
-    "pbnAsset": null,
-    "diamondVariants": [
-      {
-        "id": "yorky_autumn_diamond_80",
-        "resolution": "Cozy (6.4k)",
-        "label": "80\u00d780",
-        "grid": 80,
-        "pieces": 6400,
-        "colors": 18,
-        "jsonFile": "assets/converted/yorky_autumn_diamond_80.json",
-        "thumbnailUrl": "assets/converted/yorky_autumn_diamond_80_thumb.png"
-      },
-      {
-        "id": "yorky_autumn_diamond_120",
-        "resolution": "Standard (14.4k)",
-        "label": "120\u00d7120",
-        "grid": 120,
-        "pieces": 14400,
-        "colors": 26,
-        "jsonFile": "assets/converted/yorky_autumn_diamond_120.json",
-        "thumbnailUrl": "assets/converted/yorky_autumn_diamond_120_thumb.png"
-      },
-      {
-        "id": "yorky_autumn_diamond_160",
-        "resolution": "Masterpiece (25.6k)",
-        "label": "160\u00d7160",
-        "grid": 160,
-        "pieces": 25600,
-        "colors": 36,
-        "jsonFile": "assets/converted/yorky_autumn_diamond_160.json",
-        "thumbnailUrl": "assets/converted/yorky_autumn_diamond_160_thumb.png"
-      }
-    ],
-    "pbnVariants": []
-  },
-  {
-    "key": "yorky_playful",
-    "title": "Playful Meadow Yorkie",
-    "artist": "Sunny Pastures",
-    "desc": "Joyful Yorkshire Terrier puppy in a polka dot bandana playing with a ball in buttercups",
-    "originalAsset": "assets/diamond_art_only/yorky_playful.jpeg",
-    "pbnAsset": null,
-    "diamondVariants": [
-      {
-        "id": "yorky_playful_diamond_80",
-        "resolution": "Cozy (6.4k)",
-        "label": "80\u00d780",
-        "grid": 80,
-        "pieces": 6400,
-        "colors": 18,
-        "jsonFile": "assets/converted/yorky_playful_diamond_80.json",
-        "thumbnailUrl": "assets/converted/yorky_playful_diamond_80_thumb.png"
-      },
-      {
-        "id": "yorky_playful_diamond_120",
-        "resolution": "Standard (14.4k)",
-        "label": "120\u00d7120",
-        "grid": 120,
-        "pieces": 14400,
-        "colors": 26,
-        "jsonFile": "assets/converted/yorky_playful_diamond_120.json",
-        "thumbnailUrl": "assets/converted/yorky_playful_diamond_120_thumb.png"
-      },
-      {
-        "id": "yorky_playful_diamond_160",
-        "resolution": "Masterpiece (25.6k)",
-        "label": "160\u00d7160",
-        "grid": 160,
-        "pieces": 25600,
-        "colors": 36,
-        "jsonFile": "assets/converted/yorky_playful_diamond_160.json",
-        "thumbnailUrl": "assets/converted/yorky_playful_diamond_160_thumb.png"
-      }
-    ],
-    "pbnVariants": []
-  },
-  {
-    "key": "rural_windmill",
-    "title": "Prairie Windmill Sunset",
-    "artist": "Heartland Horizons",
-    "desc": "Classic American farm windmill standing tall above golden wheat fields and prairie sunflowers",
-    "originalAsset": "assets/diamond_art_only/rural_windmill.jpeg",
-    "pbnAsset": null,
-    "diamondVariants": [
-      {
-        "id": "rural_windmill_diamond_80",
-        "resolution": "Cozy (6.4k)",
-        "label": "80\u00d780",
-        "grid": 80,
-        "pieces": 6400,
-        "colors": 18,
-        "jsonFile": "assets/converted/rural_windmill_diamond_80.json",
-        "thumbnailUrl": "assets/converted/rural_windmill_diamond_80_thumb.png"
-      },
-      {
-        "id": "rural_windmill_diamond_120",
-        "resolution": "Standard (14.4k)",
-        "label": "120\u00d7120",
-        "grid": 120,
-        "pieces": 14400,
-        "colors": 26,
-        "jsonFile": "assets/converted/rural_windmill_diamond_120.json",
-        "thumbnailUrl": "assets/converted/rural_windmill_diamond_120_thumb.png"
-      },
-      {
-        "id": "rural_windmill_diamond_160",
-        "resolution": "Masterpiece (25.6k)",
-        "label": "160\u00d7160",
-        "grid": 160,
-        "pieces": 25600,
-        "colors": 36,
-        "jsonFile": "assets/converted/rural_windmill_diamond_160.json",
-        "thumbnailUrl": "assets/converted/rural_windmill_diamond_160_thumb.png"
-      }
-    ],
-    "pbnVariants": []
-  },
-  {
-    "key": "country_store",
-    "title": "Old Country Store",
-    "artist": "Heritage Homestead",
-    "desc": "Charming general store with wooden porch, rocking chairs, bushel of apples, and hanging lanterns",
-    "originalAsset": "assets/diamond_art_only/country_store.jpeg",
-    "pbnAsset": null,
-    "diamondVariants": [
-      {
-        "id": "country_store_diamond_80",
-        "resolution": "Cozy (6.4k)",
-        "label": "80\u00d780",
-        "grid": 80,
-        "pieces": 6400,
-        "colors": 18,
-        "jsonFile": "assets/converted/country_store_diamond_80.json",
-        "thumbnailUrl": "assets/converted/country_store_diamond_80_thumb.png"
-      },
-      {
-        "id": "country_store_diamond_120",
-        "resolution": "Standard (14.4k)",
-        "label": "120\u00d7120",
-        "grid": 120,
-        "pieces": 14400,
-        "colors": 26,
-        "jsonFile": "assets/converted/country_store_diamond_120.json",
-        "thumbnailUrl": "assets/converted/country_store_diamond_120_thumb.png"
-      },
-      {
-        "id": "country_store_diamond_160",
-        "resolution": "Masterpiece (25.6k)",
-        "label": "160\u00d7160",
-        "grid": 160,
-        "pieces": 25600,
-        "colors": 36,
-        "jsonFile": "assets/converted/country_store_diamond_160.json",
-        "thumbnailUrl": "assets/converted/country_store_diamond_160_thumb.png"
-      }
-    ],
-    "pbnVariants": []
-  },
-  {
-    "key": "pasture_horses",
-    "title": "Pasture Mare & Foal",
-    "artist": "Meadow Run Stables",
-    "desc": "Loving chestnut farm mare and playful young foal beside a rustic split-rail pasture fence",
-    "originalAsset": "assets/diamond_art_only/pasture_horses.jpeg",
-    "pbnAsset": null,
-    "diamondVariants": [
-      {
-        "id": "pasture_horses_diamond_80",
-        "resolution": "Cozy (6.4k)",
-        "label": "80\u00d780",
-        "grid": 80,
-        "pieces": 6400,
-        "colors": 18,
-        "jsonFile": "assets/converted/pasture_horses_diamond_80.json",
-        "thumbnailUrl": "assets/converted/pasture_horses_diamond_80_thumb.png"
-      },
-      {
-        "id": "pasture_horses_diamond_120",
-        "resolution": "Standard (14.4k)",
-        "label": "120\u00d7120",
-        "grid": 120,
-        "pieces": 14400,
-        "colors": 26,
-        "jsonFile": "assets/converted/pasture_horses_diamond_120.json",
-        "thumbnailUrl": "assets/converted/pasture_horses_diamond_120_thumb.png"
-      },
-      {
-        "id": "pasture_horses_diamond_160",
-        "resolution": "Masterpiece (25.6k)",
-        "label": "160\u00d7160",
-        "grid": 160,
-        "pieces": 25600,
-        "colors": 36,
-        "jsonFile": "assets/converted/pasture_horses_diamond_160.json",
-        "thumbnailUrl": "assets/converted/pasture_horses_diamond_160_thumb.png"
-      }
-    ],
-    "pbnVariants": []
-  },
-  {
-    "key": "vintage_tractor",
-    "title": "Heartland Antique Tractor",
-    "artist": "Country Roads Studio",
-    "desc": "Classic vintage farm tractor in vibrant green and yellow beside summer cornfields and harvest crates",
-    "originalAsset": "assets/diamond_art_only/vintage_tractor.jpeg",
-    "pbnAsset": null,
-    "diamondVariants": [
-      {
-        "id": "vintage_tractor_diamond_80",
-        "resolution": "Cozy (6.4k)",
-        "label": "80\u00d780",
-        "grid": 80,
-        "pieces": 6400,
-        "colors": 18,
-        "jsonFile": "assets/converted/vintage_tractor_diamond_80.json",
-        "thumbnailUrl": "assets/converted/vintage_tractor_diamond_80_thumb.png"
-      },
-      {
-        "id": "vintage_tractor_diamond_120",
-        "resolution": "Standard (14.4k)",
-        "label": "120\u00d7120",
-        "grid": 120,
-        "pieces": 14400,
-        "colors": 26,
-        "jsonFile": "assets/converted/vintage_tractor_diamond_120.json",
-        "thumbnailUrl": "assets/converted/vintage_tractor_diamond_120_thumb.png"
-      },
-      {
-        "id": "vintage_tractor_diamond_160",
-        "resolution": "Masterpiece (25.6k)",
-        "label": "160\u00d7160",
-        "grid": 160,
-        "pieces": 25600,
-        "colors": 36,
-        "jsonFile": "assets/converted/vintage_tractor_diamond_160.json",
-        "thumbnailUrl": "assets/converted/vintage_tractor_diamond_160_thumb.png"
-      }
-    ],
-    "pbnVariants": []
-  },
-  {
-    "key": "covered_bridge",
-    "title": "Rustic Covered Bridge",
-    "artist": "Valley Stream Folk",
-    "desc": "Historic red wooden covered bridge spanning a peaceful babbling stream surrounded by wildflowers",
-    "originalAsset": "assets/diamond_art_only/covered_bridge.jpeg",
-    "pbnAsset": null,
-    "diamondVariants": [
-      {
-        "id": "covered_bridge_diamond_80",
-        "resolution": "Cozy (6.4k)",
-        "label": "80\u00d780",
-        "grid": 80,
-        "pieces": 6400,
-        "colors": 18,
-        "jsonFile": "assets/converted/covered_bridge_diamond_80.json",
-        "thumbnailUrl": "assets/converted/covered_bridge_diamond_80_thumb.png"
-      },
-      {
-        "id": "covered_bridge_diamond_120",
-        "resolution": "Standard (14.4k)",
-        "label": "120\u00d7120",
-        "grid": 120,
-        "pieces": 14400,
-        "colors": 26,
-        "jsonFile": "assets/converted/covered_bridge_diamond_120.json",
-        "thumbnailUrl": "assets/converted/covered_bridge_diamond_120_thumb.png"
-      },
-      {
-        "id": "covered_bridge_diamond_160",
-        "resolution": "Masterpiece (25.6k)",
-        "label": "160\u00d7160",
-        "grid": 160,
-        "pieces": 25600,
-        "colors": 36,
-        "jsonFile": "assets/converted/covered_bridge_diamond_160.json",
-        "thumbnailUrl": "assets/converted/covered_bridge_diamond_160_thumb.png"
-      }
-    ],
-    "pbnVariants": []
-  },
-  {
-    "key": "autumn_fox",
-    "title": "Cozy Autumn Fox",
-    "artist": "Woodland Folk",
-    "desc": "Cozy red fox curled up among autumn leaves, red-capped mushrooms, and meadow wildflowers",
-    "originalAsset": "assets/diamond_art_only/autumn_fox.jpeg",
-    "pbnAsset": "assets/paint_by_number/autumn_fox_pbn.jpeg",
-    "diamondVariants": [
-      {
-        "id": "autumn_fox_diamond_80",
-        "resolution": "Cozy (6.4k)",
-        "label": "80\u00d780",
-        "grid": 80,
-        "pieces": 6400,
-        "colors": 18,
-        "jsonFile": "assets/converted/autumn_fox_diamond_80.json",
-        "thumbnailUrl": "assets/converted/autumn_fox_diamond_80_thumb.png"
-      },
-      {
-        "id": "autumn_fox_diamond_120",
-        "resolution": "Standard (14.4k)",
-        "label": "120\u00d7120",
-        "grid": 120,
-        "pieces": 14400,
-        "colors": 26,
-        "jsonFile": "assets/converted/autumn_fox_diamond_120.json",
-        "thumbnailUrl": "assets/converted/autumn_fox_diamond_120_thumb.png"
-      },
-      {
-        "id": "autumn_fox_diamond_160",
-        "resolution": "Masterpiece (25.6k)",
-        "label": "160\u00d7160",
-        "grid": 160,
-        "pieces": 25600,
-        "colors": 36,
-        "jsonFile": "assets/converted/autumn_fox_diamond_160.json",
-        "thumbnailUrl": "assets/converted/autumn_fox_diamond_160_thumb.png"
-      }
-    ],
-    "pbnVariants": [
-      {
-        "id": "autumn_fox_pbn",
-        "resolution": "Original",
-        "pieces": 49,
-        "colors": 15,
-        "jsonFile": "assets/converted/autumn_fox_pbn.json",
-        "lineArtUrl": "assets/converted/autumn_fox_pbn_lines.png",
-        "thumbnailUrl": "assets/converted/autumn_fox_pbn_thumb.png"
-      }
-    ]
-  },
-  {
-    "key": "christmas_scene",
-    "title": "Christmas Scene",
+    "key": "santa_1",
+    "title": "Santa 1",
     "artist": "Tap Color Studio",
-    "desc": "Christmas Scene artwork",
-    "originalAsset": "assets/paint_by_number/christmas-scene.webp",
-    "pbnAsset": "assets/paint_by_number/christmas-scene.webp",
+    "desc": "Santa 1 artwork",
+    "addedAt": 1795249942919,
+    "originalAsset": "assets/diamond_art_only/santa-1.webp",
+    "pbnAsset": null,
     "diamondVariants": [
       {
-        "id": "christmas_scene_diamond_80",
+        "id": "santa_1_diamond_80",
         "resolution": "Cozy (6.4k)",
         "label": "80\u00d780",
         "grid": 80,
         "pieces": 6400,
         "colors": 18,
-        "jsonFile": "assets/converted/christmas_scene_diamond_80.json",
-        "thumbnailUrl": "assets/converted/christmas_scene_diamond_80_thumb.png"
+        "jsonFile": "assets/converted/santa_1_diamond_80.json",
+        "thumbnailUrl": "assets/converted/santa_1_diamond_80_thumb.png"
       },
       {
-        "id": "christmas_scene_diamond_120",
+        "id": "santa_1_diamond_120",
         "resolution": "Standard (14.4k)",
         "label": "120\u00d7120",
         "grid": 120,
         "pieces": 14400,
         "colors": 26,
-        "jsonFile": "assets/converted/christmas_scene_diamond_120.json",
-        "thumbnailUrl": "assets/converted/christmas_scene_diamond_120_thumb.png"
+        "jsonFile": "assets/converted/santa_1_diamond_120.json",
+        "thumbnailUrl": "assets/converted/santa_1_diamond_120_thumb.png"
       },
       {
-        "id": "christmas_scene_diamond_160",
+        "id": "santa_1_diamond_160",
         "resolution": "Masterpiece (25.6k)",
         "label": "160\u00d7160",
         "grid": 160,
         "pieces": 25600,
         "colors": 36,
-        "jsonFile": "assets/converted/christmas_scene_diamond_160.json",
-        "thumbnailUrl": "assets/converted/christmas_scene_diamond_160_thumb.png"
+        "jsonFile": "assets/converted/santa_1_diamond_160.json",
+        "thumbnailUrl": "assets/converted/santa_1_diamond_160_thumb.png"
+      }
+    ],
+    "pbnVariants": []
+  },
+  {
+    "key": "nativity_3",
+    "title": "Nativity 3",
+    "artist": "Tap Color Studio",
+    "desc": "Nativity 3 artwork",
+    "addedAt": 1795248913167,
+    "originalAsset": "assets/paint_by_number/nativity-3.webp",
+    "pbnAsset": "assets/paint_by_number/nativity-3.webp",
+    "diamondVariants": [
+      {
+        "id": "nativity_3_diamond_80",
+        "resolution": "Cozy (6.4k)",
+        "label": "80\u00d780",
+        "grid": 80,
+        "pieces": 6400,
+        "colors": 18,
+        "jsonFile": "assets/converted/nativity_3_diamond_80.json",
+        "thumbnailUrl": "assets/converted/nativity_3_diamond_80_thumb.png"
+      },
+      {
+        "id": "nativity_3_diamond_120",
+        "resolution": "Standard (14.4k)",
+        "label": "120\u00d7120",
+        "grid": 120,
+        "pieces": 14400,
+        "colors": 26,
+        "jsonFile": "assets/converted/nativity_3_diamond_120.json",
+        "thumbnailUrl": "assets/converted/nativity_3_diamond_120_thumb.png"
+      },
+      {
+        "id": "nativity_3_diamond_160",
+        "resolution": "Masterpiece (25.6k)",
+        "label": "160\u00d7160",
+        "grid": 160,
+        "pieces": 25600,
+        "colors": 36,
+        "jsonFile": "assets/converted/nativity_3_diamond_160.json",
+        "thumbnailUrl": "assets/converted/nativity_3_diamond_160_thumb.png"
       }
     ],
     "pbnVariants": [
       {
-        "id": "christmas_scene_pbn",
+        "id": "nativity_3_pbn",
         "resolution": "Original",
-        "pieces": 107,
-        "colors": 15,
-        "jsonFile": "assets/converted/christmas_scene_pbn.json",
-        "lineArtUrl": "assets/converted/christmas_scene_pbn_lines.png",
-        "thumbnailUrl": "assets/converted/christmas_scene_pbn_thumb.png"
+        "pieces": 128,
+        "colors": 18,
+        "jsonFile": "assets/converted/nativity_3_pbn.json",
+        "lineArtUrl": "assets/converted/nativity_3_pbn_lines.png",
+        "thumbnailUrl": "assets/converted/nativity_3_pbn_thumb.png"
+      }
+    ]
+  },
+  {
+    "key": "nativity_1",
+    "title": "Nativity 1",
+    "artist": "Tap Color Studio",
+    "desc": "Nativity 1 artwork",
+    "addedAt": 1795248842403,
+    "originalAsset": "assets/paint_by_number/nativity-1.webp",
+    "pbnAsset": "assets/paint_by_number/nativity-1.webp",
+    "diamondVariants": [
+      {
+        "id": "nativity_1_diamond_80",
+        "resolution": "Cozy (6.4k)",
+        "label": "80\u00d780",
+        "grid": 80,
+        "pieces": 6400,
+        "colors": 18,
+        "jsonFile": "assets/converted/nativity_1_diamond_80.json",
+        "thumbnailUrl": "assets/converted/nativity_1_diamond_80_thumb.png"
+      },
+      {
+        "id": "nativity_1_diamond_120",
+        "resolution": "Standard (14.4k)",
+        "label": "120\u00d7120",
+        "grid": 120,
+        "pieces": 14400,
+        "colors": 26,
+        "jsonFile": "assets/converted/nativity_1_diamond_120.json",
+        "thumbnailUrl": "assets/converted/nativity_1_diamond_120_thumb.png"
+      },
+      {
+        "id": "nativity_1_diamond_160",
+        "resolution": "Masterpiece (25.6k)",
+        "label": "160\u00d7160",
+        "grid": 160,
+        "pieces": 25600,
+        "colors": 36,
+        "jsonFile": "assets/converted/nativity_1_diamond_160.json",
+        "thumbnailUrl": "assets/converted/nativity_1_diamond_160_thumb.png"
+      }
+    ],
+    "pbnVariants": [
+      {
+        "id": "nativity_1_pbn",
+        "resolution": "Original",
+        "pieces": 101,
+        "colors": 19,
+        "jsonFile": "assets/converted/nativity_1_pbn.json",
+        "lineArtUrl": "assets/converted/nativity_1_pbn_lines.png",
+        "thumbnailUrl": "assets/converted/nativity_1_pbn_thumb.png"
+      }
+    ]
+  },
+  {
+    "key": "cozy_fireplace",
+    "title": "Cozy Fireplace",
+    "artist": "Tap Color Studio",
+    "desc": "Cozy Fireplace artwork",
+    "addedAt": 1795248477867,
+    "originalAsset": "assets/paint_by_number/cozy_fireplace.jpg",
+    "pbnAsset": "assets/paint_by_number/cozy_fireplace.jpg",
+    "diamondVariants": [
+      {
+        "id": "cozy_fireplace_diamond_80",
+        "resolution": "Cozy (6.4k)",
+        "label": "80\u00d780",
+        "grid": 80,
+        "pieces": 6400,
+        "colors": 18,
+        "jsonFile": "assets/converted/cozy_fireplace_diamond_80.json",
+        "thumbnailUrl": "assets/converted/cozy_fireplace_diamond_80_thumb.png"
+      },
+      {
+        "id": "cozy_fireplace_diamond_120",
+        "resolution": "Standard (14.4k)",
+        "label": "120\u00d7120",
+        "grid": 120,
+        "pieces": 14400,
+        "colors": 26,
+        "jsonFile": "assets/converted/cozy_fireplace_diamond_120.json",
+        "thumbnailUrl": "assets/converted/cozy_fireplace_diamond_120_thumb.png"
+      },
+      {
+        "id": "cozy_fireplace_diamond_160",
+        "resolution": "Masterpiece (25.6k)",
+        "label": "160\u00d7160",
+        "grid": 160,
+        "pieces": 25600,
+        "colors": 36,
+        "jsonFile": "assets/converted/cozy_fireplace_diamond_160.json",
+        "thumbnailUrl": "assets/converted/cozy_fireplace_diamond_160_thumb.png"
+      }
+    ],
+    "pbnVariants": [
+      {
+        "id": "cozy_fireplace_pbn",
+        "resolution": "Original",
+        "pieces": 352,
+        "colors": 20,
+        "jsonFile": "assets/converted/cozy_fireplace_pbn.json",
+        "lineArtUrl": "assets/converted/cozy_fireplace_pbn_lines.png",
+        "thumbnailUrl": "assets/converted/cozy_fireplace_pbn_thumb.png"
       }
     ]
   },
@@ -731,6 +202,7 @@
     "title": "Christmas Tree",
     "artist": "Tap Color Studio",
     "desc": "Christmas Tree artwork",
+    "addedAt": 1795248477847,
     "originalAsset": "assets/paint_by_number/christmas-tree.webp",
     "pbnAsset": "assets/paint_by_number/christmas_tree.jpg",
     "diamondVariants": [
@@ -782,6 +254,7 @@
     "title": "Christmas Wreath",
     "artist": "Tap Color Studio",
     "desc": "Christmas Wreath artwork",
+    "addedAt": 1795248477819,
     "originalAsset": "assets/paint_by_number/christmas_wreath.jpg",
     "pbnAsset": "assets/paint_by_number/christmas_wreath.jpg",
     "diamondVariants": [
@@ -829,316 +302,11 @@
     ]
   },
   {
-    "key": "country_birdhouse",
-    "title": "Country Birdhouse",
-    "artist": "Tap Color Studio",
-    "desc": "Country Birdhouse artwork",
-    "originalAsset": "assets/paint_by_number/country_birdhouse.jpg",
-    "pbnAsset": "assets/paint_by_number/country_birdhouse.jpg",
-    "diamondVariants": [
-      {
-        "id": "country_birdhouse_diamond_80",
-        "resolution": "Cozy (6.4k)",
-        "label": "80\u00d780",
-        "grid": 80,
-        "pieces": 6400,
-        "colors": 18,
-        "jsonFile": "assets/converted/country_birdhouse_diamond_80.json",
-        "thumbnailUrl": "assets/converted/country_birdhouse_diamond_80_thumb.png"
-      },
-      {
-        "id": "country_birdhouse_diamond_120",
-        "resolution": "Standard (14.4k)",
-        "label": "120\u00d7120",
-        "grid": 120,
-        "pieces": 14400,
-        "colors": 26,
-        "jsonFile": "assets/converted/country_birdhouse_diamond_120.json",
-        "thumbnailUrl": "assets/converted/country_birdhouse_diamond_120_thumb.png"
-      },
-      {
-        "id": "country_birdhouse_diamond_160",
-        "resolution": "Masterpiece (25.6k)",
-        "label": "160\u00d7160",
-        "grid": 160,
-        "pieces": 25600,
-        "colors": 36,
-        "jsonFile": "assets/converted/country_birdhouse_diamond_160.json",
-        "thumbnailUrl": "assets/converted/country_birdhouse_diamond_160_thumb.png"
-      }
-    ],
-    "pbnVariants": [
-      {
-        "id": "country_birdhouse_pbn",
-        "resolution": "Original",
-        "pieces": 53,
-        "colors": 12,
-        "jsonFile": "assets/converted/country_birdhouse_pbn.json",
-        "lineArtUrl": "assets/converted/country_birdhouse_pbn_lines.png",
-        "thumbnailUrl": "assets/converted/country_birdhouse_pbn_thumb.png"
-      }
-    ]
-  },
-  {
-    "key": "cozy_fireplace",
-    "title": "Cozy Fireplace",
-    "artist": "Tap Color Studio",
-    "desc": "Cozy Fireplace artwork",
-    "originalAsset": "assets/paint_by_number/cozy_fireplace.jpg",
-    "pbnAsset": "assets/paint_by_number/cozy_fireplace.jpg",
-    "diamondVariants": [
-      {
-        "id": "cozy_fireplace_diamond_80",
-        "resolution": "Cozy (6.4k)",
-        "label": "80\u00d780",
-        "grid": 80,
-        "pieces": 6400,
-        "colors": 18,
-        "jsonFile": "assets/converted/cozy_fireplace_diamond_80.json",
-        "thumbnailUrl": "assets/converted/cozy_fireplace_diamond_80_thumb.png"
-      },
-      {
-        "id": "cozy_fireplace_diamond_120",
-        "resolution": "Standard (14.4k)",
-        "label": "120\u00d7120",
-        "grid": 120,
-        "pieces": 14400,
-        "colors": 26,
-        "jsonFile": "assets/converted/cozy_fireplace_diamond_120.json",
-        "thumbnailUrl": "assets/converted/cozy_fireplace_diamond_120_thumb.png"
-      },
-      {
-        "id": "cozy_fireplace_diamond_160",
-        "resolution": "Masterpiece (25.6k)",
-        "label": "160\u00d7160",
-        "grid": 160,
-        "pieces": 25600,
-        "colors": 36,
-        "jsonFile": "assets/converted/cozy_fireplace_diamond_160.json",
-        "thumbnailUrl": "assets/converted/cozy_fireplace_diamond_160_thumb.png"
-      }
-    ],
-    "pbnVariants": [
-      {
-        "id": "cozy_fireplace_pbn",
-        "resolution": "Original",
-        "pieces": 352,
-        "colors": 20,
-        "jsonFile": "assets/converted/cozy_fireplace_pbn.json",
-        "lineArtUrl": "assets/converted/cozy_fireplace_pbn_lines.png",
-        "thumbnailUrl": "assets/converted/cozy_fireplace_pbn_thumb.png"
-      }
-    ]
-  },
-  {
-    "key": "jolly_snowman",
-    "title": "Jolly Snowman",
-    "artist": "Tap Color Studio",
-    "desc": "Jolly Snowman artwork",
-    "originalAsset": "assets/paint_by_number/jolly_snowman.jpg",
-    "pbnAsset": "assets/paint_by_number/jolly_snowman.jpg",
-    "diamondVariants": [
-      {
-        "id": "jolly_snowman_diamond_80",
-        "resolution": "Cozy (6.4k)",
-        "label": "80\u00d780",
-        "grid": 80,
-        "pieces": 6400,
-        "colors": 18,
-        "jsonFile": "assets/converted/jolly_snowman_diamond_80.json",
-        "thumbnailUrl": "assets/converted/jolly_snowman_diamond_80_thumb.png"
-      },
-      {
-        "id": "jolly_snowman_diamond_120",
-        "resolution": "Standard (14.4k)",
-        "label": "120\u00d7120",
-        "grid": 120,
-        "pieces": 14400,
-        "colors": 26,
-        "jsonFile": "assets/converted/jolly_snowman_diamond_120.json",
-        "thumbnailUrl": "assets/converted/jolly_snowman_diamond_120_thumb.png"
-      },
-      {
-        "id": "jolly_snowman_diamond_160",
-        "resolution": "Masterpiece (25.6k)",
-        "label": "160\u00d7160",
-        "grid": 160,
-        "pieces": 25600,
-        "colors": 36,
-        "jsonFile": "assets/converted/jolly_snowman_diamond_160.json",
-        "thumbnailUrl": "assets/converted/jolly_snowman_diamond_160_thumb.png"
-      }
-    ],
-    "pbnVariants": [
-      {
-        "id": "jolly_snowman_pbn",
-        "resolution": "Original",
-        "pieces": 305,
-        "colors": 25,
-        "jsonFile": "assets/converted/jolly_snowman_pbn.json",
-        "lineArtUrl": "assets/converted/jolly_snowman_pbn_lines.png",
-        "thumbnailUrl": "assets/converted/jolly_snowman_pbn_thumb.png"
-      }
-    ]
-  },
-  {
-    "key": "nativity_1",
-    "title": "Nativity 1",
-    "artist": "Tap Color Studio",
-    "desc": "Nativity 1 artwork",
-    "originalAsset": "assets/paint_by_number/nativity-1.webp",
-    "pbnAsset": "assets/paint_by_number/nativity-1.webp",
-    "diamondVariants": [
-      {
-        "id": "nativity_1_diamond_80",
-        "resolution": "Cozy (6.4k)",
-        "label": "80\u00d780",
-        "grid": 80,
-        "pieces": 6400,
-        "colors": 18,
-        "jsonFile": "assets/converted/nativity_1_diamond_80.json",
-        "thumbnailUrl": "assets/converted/nativity_1_diamond_80_thumb.png"
-      },
-      {
-        "id": "nativity_1_diamond_120",
-        "resolution": "Standard (14.4k)",
-        "label": "120\u00d7120",
-        "grid": 120,
-        "pieces": 14400,
-        "colors": 26,
-        "jsonFile": "assets/converted/nativity_1_diamond_120.json",
-        "thumbnailUrl": "assets/converted/nativity_1_diamond_120_thumb.png"
-      },
-      {
-        "id": "nativity_1_diamond_160",
-        "resolution": "Masterpiece (25.6k)",
-        "label": "160\u00d7160",
-        "grid": 160,
-        "pieces": 25600,
-        "colors": 36,
-        "jsonFile": "assets/converted/nativity_1_diamond_160.json",
-        "thumbnailUrl": "assets/converted/nativity_1_diamond_160_thumb.png"
-      }
-    ],
-    "pbnVariants": [
-      {
-        "id": "nativity_1_pbn",
-        "resolution": "Original",
-        "pieces": 101,
-        "colors": 19,
-        "jsonFile": "assets/converted/nativity_1_pbn.json",
-        "lineArtUrl": "assets/converted/nativity_1_pbn_lines.png",
-        "thumbnailUrl": "assets/converted/nativity_1_pbn_thumb.png"
-      }
-    ]
-  },
-  {
-    "key": "nativity_2",
-    "title": "Nativity 2",
-    "artist": "Tap Color Studio",
-    "desc": "Nativity 2 artwork",
-    "originalAsset": "assets/paint_by_number/nativity-2.webp",
-    "pbnAsset": "assets/paint_by_number/nativity-2.webp",
-    "diamondVariants": [
-      {
-        "id": "nativity_2_diamond_80",
-        "resolution": "Cozy (6.4k)",
-        "label": "80\u00d780",
-        "grid": 80,
-        "pieces": 6400,
-        "colors": 18,
-        "jsonFile": "assets/converted/nativity_2_diamond_80.json",
-        "thumbnailUrl": "assets/converted/nativity_2_diamond_80_thumb.png"
-      },
-      {
-        "id": "nativity_2_diamond_120",
-        "resolution": "Standard (14.4k)",
-        "label": "120\u00d7120",
-        "grid": 120,
-        "pieces": 14400,
-        "colors": 26,
-        "jsonFile": "assets/converted/nativity_2_diamond_120.json",
-        "thumbnailUrl": "assets/converted/nativity_2_diamond_120_thumb.png"
-      },
-      {
-        "id": "nativity_2_diamond_160",
-        "resolution": "Masterpiece (25.6k)",
-        "label": "160\u00d7160",
-        "grid": 160,
-        "pieces": 25600,
-        "colors": 36,
-        "jsonFile": "assets/converted/nativity_2_diamond_160.json",
-        "thumbnailUrl": "assets/converted/nativity_2_diamond_160_thumb.png"
-      }
-    ],
-    "pbnVariants": [
-      {
-        "id": "nativity_2_pbn",
-        "resolution": "Original",
-        "pieces": 84,
-        "colors": 16,
-        "jsonFile": "assets/converted/nativity_2_pbn.json",
-        "lineArtUrl": "assets/converted/nativity_2_pbn_lines.png",
-        "thumbnailUrl": "assets/converted/nativity_2_pbn_thumb.png"
-      }
-    ]
-  },
-  {
-    "key": "nativity_3",
-    "title": "Nativity 3",
-    "artist": "Tap Color Studio",
-    "desc": "Nativity 3 artwork",
-    "originalAsset": "assets/paint_by_number/nativity-3.webp",
-    "pbnAsset": "assets/paint_by_number/nativity-3.webp",
-    "diamondVariants": [
-      {
-        "id": "nativity_3_diamond_80",
-        "resolution": "Cozy (6.4k)",
-        "label": "80\u00d780",
-        "grid": 80,
-        "pieces": 6400,
-        "colors": 18,
-        "jsonFile": "assets/converted/nativity_3_diamond_80.json",
-        "thumbnailUrl": "assets/converted/nativity_3_diamond_80_thumb.png"
-      },
-      {
-        "id": "nativity_3_diamond_120",
-        "resolution": "Standard (14.4k)",
-        "label": "120\u00d7120",
-        "grid": 120,
-        "pieces": 14400,
-        "colors": 26,
-        "jsonFile": "assets/converted/nativity_3_diamond_120.json",
-        "thumbnailUrl": "assets/converted/nativity_3_diamond_120_thumb.png"
-      },
-      {
-        "id": "nativity_3_diamond_160",
-        "resolution": "Masterpiece (25.6k)",
-        "label": "160\u00d7160",
-        "grid": 160,
-        "pieces": 25600,
-        "colors": 36,
-        "jsonFile": "assets/converted/nativity_3_diamond_160.json",
-        "thumbnailUrl": "assets/converted/nativity_3_diamond_160_thumb.png"
-      }
-    ],
-    "pbnVariants": [
-      {
-        "id": "nativity_3_pbn",
-        "resolution": "Original",
-        "pieces": 128,
-        "colors": 18,
-        "jsonFile": "assets/converted/nativity_3_pbn.json",
-        "lineArtUrl": "assets/converted/nativity_3_pbn_lines.png",
-        "thumbnailUrl": "assets/converted/nativity_3_pbn_thumb.png"
-      }
-    ]
-  },
-  {
     "key": "santa_sleigh",
     "title": "Santa Sleigh",
     "artist": "Tap Color Studio",
     "desc": "Santa Sleigh artwork",
+    "addedAt": 1795248436719,
     "originalAsset": "assets/paint_by_number/santa_sleigh.jpg",
     "pbnAsset": "assets/paint_by_number/santa_sleigh.jpg",
     "diamondVariants": [
@@ -1186,53 +354,54 @@
     ]
   },
   {
-    "key": "sermon_on_the_mount",
-    "title": "Sermon On The Mount",
+    "key": "jolly_snowman",
+    "title": "Jolly Snowman",
     "artist": "Tap Color Studio",
-    "desc": "Sermon On The Mount artwork",
-    "originalAsset": "assets/paint_by_number/sermon_on_the_mount.jpg",
-    "pbnAsset": "assets/paint_by_number/sermon_on_the_mount.jpg",
+    "desc": "Jolly Snowman artwork",
+    "addedAt": 1795248436703,
+    "originalAsset": "assets/paint_by_number/jolly_snowman.jpg",
+    "pbnAsset": "assets/paint_by_number/jolly_snowman.jpg",
     "diamondVariants": [
       {
-        "id": "sermon_on_the_mount_diamond_80",
+        "id": "jolly_snowman_diamond_80",
         "resolution": "Cozy (6.4k)",
         "label": "80\u00d780",
         "grid": 80,
         "pieces": 6400,
         "colors": 18,
-        "jsonFile": "assets/converted/sermon_on_the_mount_diamond_80.json",
-        "thumbnailUrl": "assets/converted/sermon_on_the_mount_diamond_80_thumb.png"
+        "jsonFile": "assets/converted/jolly_snowman_diamond_80.json",
+        "thumbnailUrl": "assets/converted/jolly_snowman_diamond_80_thumb.png"
       },
       {
-        "id": "sermon_on_the_mount_diamond_120",
+        "id": "jolly_snowman_diamond_120",
         "resolution": "Standard (14.4k)",
         "label": "120\u00d7120",
         "grid": 120,
         "pieces": 14400,
         "colors": 26,
-        "jsonFile": "assets/converted/sermon_on_the_mount_diamond_120.json",
-        "thumbnailUrl": "assets/converted/sermon_on_the_mount_diamond_120_thumb.png"
+        "jsonFile": "assets/converted/jolly_snowman_diamond_120.json",
+        "thumbnailUrl": "assets/converted/jolly_snowman_diamond_120_thumb.png"
       },
       {
-        "id": "sermon_on_the_mount_diamond_160",
+        "id": "jolly_snowman_diamond_160",
         "resolution": "Masterpiece (25.6k)",
         "label": "160\u00d7160",
         "grid": 160,
         "pieces": 25600,
         "colors": 36,
-        "jsonFile": "assets/converted/sermon_on_the_mount_diamond_160.json",
-        "thumbnailUrl": "assets/converted/sermon_on_the_mount_diamond_160_thumb.png"
+        "jsonFile": "assets/converted/jolly_snowman_diamond_160.json",
+        "thumbnailUrl": "assets/converted/jolly_snowman_diamond_160_thumb.png"
       }
     ],
     "pbnVariants": [
       {
-        "id": "sermon_on_the_mount_pbn",
+        "id": "jolly_snowman_pbn",
         "resolution": "Original",
-        "pieces": 515,
-        "colors": 26,
-        "jsonFile": "assets/converted/sermon_on_the_mount_pbn.json",
-        "lineArtUrl": "assets/converted/sermon_on_the_mount_pbn_lines.png",
-        "thumbnailUrl": "assets/converted/sermon_on_the_mount_pbn_thumb.png"
+        "pieces": 305,
+        "colors": 25,
+        "jsonFile": "assets/converted/jolly_snowman_pbn.json",
+        "lineArtUrl": "assets/converted/jolly_snowman_pbn_lines.png",
+        "thumbnailUrl": "assets/converted/jolly_snowman_pbn_thumb.png"
       }
     ]
   },
@@ -1241,6 +410,7 @@
     "title": "Snowy Cottage",
     "artist": "Tap Color Studio",
     "desc": "Snowy Cottage artwork",
+    "addedAt": 1795248436679,
     "originalAsset": "assets/paint_by_number/snowy_cottage.jpg",
     "pbnAsset": "assets/paint_by_number/snowy_cottage.jpg",
     "diamondVariants": [
@@ -1288,10 +458,63 @@
     ]
   },
   {
+    "key": "christmas_scene",
+    "title": "Christmas Scene",
+    "artist": "Tap Color Studio",
+    "desc": "Christmas Scene artwork",
+    "addedAt": 1795248287199,
+    "originalAsset": "assets/paint_by_number/christmas-scene.webp",
+    "pbnAsset": "assets/paint_by_number/christmas-scene.webp",
+    "diamondVariants": [
+      {
+        "id": "christmas_scene_diamond_80",
+        "resolution": "Cozy (6.4k)",
+        "label": "80\u00d780",
+        "grid": 80,
+        "pieces": 6400,
+        "colors": 18,
+        "jsonFile": "assets/converted/christmas_scene_diamond_80.json",
+        "thumbnailUrl": "assets/converted/christmas_scene_diamond_80_thumb.png"
+      },
+      {
+        "id": "christmas_scene_diamond_120",
+        "resolution": "Standard (14.4k)",
+        "label": "120\u00d7120",
+        "grid": 120,
+        "pieces": 14400,
+        "colors": 26,
+        "jsonFile": "assets/converted/christmas_scene_diamond_120.json",
+        "thumbnailUrl": "assets/converted/christmas_scene_diamond_120_thumb.png"
+      },
+      {
+        "id": "christmas_scene_diamond_160",
+        "resolution": "Masterpiece (25.6k)",
+        "label": "160\u00d7160",
+        "grid": 160,
+        "pieces": 25600,
+        "colors": 36,
+        "jsonFile": "assets/converted/christmas_scene_diamond_160.json",
+        "thumbnailUrl": "assets/converted/christmas_scene_diamond_160_thumb.png"
+      }
+    ],
+    "pbnVariants": [
+      {
+        "id": "christmas_scene_pbn",
+        "resolution": "Original",
+        "pieces": 107,
+        "colors": 15,
+        "jsonFile": "assets/converted/christmas_scene_pbn.json",
+        "lineArtUrl": "assets/converted/christmas_scene_pbn_lines.png",
+        "thumbnailUrl": "assets/converted/christmas_scene_pbn_thumb.png"
+      }
+    ]
+  },
+  {
     "key": "washing_of_the_feet",
     "title": "Washing Of The Feet",
     "artist": "Tap Color Studio",
     "desc": "Washing Of The Feet artwork",
+    "addedAt": 1795248020191,
     "originalAsset": "assets/paint_by_number/washing_of_the_feet.jpg",
     "pbnAsset": "assets/paint_by_number/washing_of_the_feet.jpg",
     "diamondVariants": [
@@ -1337,5 +560,801 @@
         "thumbnailUrl": "assets/converted/washing_of_the_feet_pbn_thumb.png"
       }
     ]
+  },
+  {
+    "key": "sermon_on_the_mount",
+    "title": "Sermon On The Mount",
+    "artist": "Tap Color Studio",
+    "desc": "Sermon On The Mount artwork",
+    "addedAt": 1795247993307,
+    "originalAsset": "assets/paint_by_number/sermon_on_the_mount.jpg",
+    "pbnAsset": "assets/paint_by_number/sermon_on_the_mount.jpg",
+    "diamondVariants": [
+      {
+        "id": "sermon_on_the_mount_diamond_80",
+        "resolution": "Cozy (6.4k)",
+        "label": "80\u00d780",
+        "grid": 80,
+        "pieces": 6400,
+        "colors": 18,
+        "jsonFile": "assets/converted/sermon_on_the_mount_diamond_80.json",
+        "thumbnailUrl": "assets/converted/sermon_on_the_mount_diamond_80_thumb.png"
+      },
+      {
+        "id": "sermon_on_the_mount_diamond_120",
+        "resolution": "Standard (14.4k)",
+        "label": "120\u00d7120",
+        "grid": 120,
+        "pieces": 14400,
+        "colors": 26,
+        "jsonFile": "assets/converted/sermon_on_the_mount_diamond_120.json",
+        "thumbnailUrl": "assets/converted/sermon_on_the_mount_diamond_120_thumb.png"
+      },
+      {
+        "id": "sermon_on_the_mount_diamond_160",
+        "resolution": "Masterpiece (25.6k)",
+        "label": "160\u00d7160",
+        "grid": 160,
+        "pieces": 25600,
+        "colors": 36,
+        "jsonFile": "assets/converted/sermon_on_the_mount_diamond_160.json",
+        "thumbnailUrl": "assets/converted/sermon_on_the_mount_diamond_160_thumb.png"
+      }
+    ],
+    "pbnVariants": [
+      {
+        "id": "sermon_on_the_mount_pbn",
+        "resolution": "Original",
+        "pieces": 515,
+        "colors": 26,
+        "jsonFile": "assets/converted/sermon_on_the_mount_pbn.json",
+        "lineArtUrl": "assets/converted/sermon_on_the_mount_pbn_lines.png",
+        "thumbnailUrl": "assets/converted/sermon_on_the_mount_pbn_thumb.png"
+      }
+    ]
+  },
+  {
+    "key": "country_birdhouse",
+    "title": "Country Birdhouse",
+    "artist": "Tap Color Studio",
+    "desc": "Country Birdhouse artwork",
+    "addedAt": 1795247291495,
+    "originalAsset": "assets/paint_by_number/country_birdhouse.jpg",
+    "pbnAsset": "assets/paint_by_number/country_birdhouse.jpg",
+    "diamondVariants": [
+      {
+        "id": "country_birdhouse_diamond_80",
+        "resolution": "Cozy (6.4k)",
+        "label": "80\u00d780",
+        "grid": 80,
+        "pieces": 6400,
+        "colors": 18,
+        "jsonFile": "assets/converted/country_birdhouse_diamond_80.json",
+        "thumbnailUrl": "assets/converted/country_birdhouse_diamond_80_thumb.png"
+      },
+      {
+        "id": "country_birdhouse_diamond_120",
+        "resolution": "Standard (14.4k)",
+        "label": "120\u00d7120",
+        "grid": 120,
+        "pieces": 14400,
+        "colors": 26,
+        "jsonFile": "assets/converted/country_birdhouse_diamond_120.json",
+        "thumbnailUrl": "assets/converted/country_birdhouse_diamond_120_thumb.png"
+      },
+      {
+        "id": "country_birdhouse_diamond_160",
+        "resolution": "Masterpiece (25.6k)",
+        "label": "160\u00d7160",
+        "grid": 160,
+        "pieces": 25600,
+        "colors": 36,
+        "jsonFile": "assets/converted/country_birdhouse_diamond_160.json",
+        "thumbnailUrl": "assets/converted/country_birdhouse_diamond_160_thumb.png"
+      }
+    ],
+    "pbnVariants": [
+      {
+        "id": "country_birdhouse_pbn",
+        "resolution": "Original",
+        "pieces": 53,
+        "colors": 12,
+        "jsonFile": "assets/converted/country_birdhouse_pbn.json",
+        "lineArtUrl": "assets/converted/country_birdhouse_pbn_lines.png",
+        "thumbnailUrl": "assets/converted/country_birdhouse_pbn_thumb.png"
+      }
+    ]
+  },
+  {
+    "key": "autumn_fox",
+    "title": "Cozy Autumn Fox",
+    "artist": "Woodland Folk",
+    "desc": "Cozy red fox curled up among autumn leaves, red-capped mushrooms, and meadow wildflowers",
+    "addedAt": 1794835676890,
+    "originalAsset": "assets/diamond_art_only/autumn_fox.jpeg",
+    "pbnAsset": "assets/paint_by_number/autumn_fox_pbn.jpeg",
+    "diamondVariants": [
+      {
+        "id": "autumn_fox_diamond_80",
+        "resolution": "Cozy (6.4k)",
+        "label": "80\u00d780",
+        "grid": 80,
+        "pieces": 6400,
+        "colors": 18,
+        "jsonFile": "assets/converted/autumn_fox_diamond_80.json",
+        "thumbnailUrl": "assets/converted/autumn_fox_diamond_80_thumb.png"
+      },
+      {
+        "id": "autumn_fox_diamond_120",
+        "resolution": "Standard (14.4k)",
+        "label": "120\u00d7120",
+        "grid": 120,
+        "pieces": 14400,
+        "colors": 26,
+        "jsonFile": "assets/converted/autumn_fox_diamond_120.json",
+        "thumbnailUrl": "assets/converted/autumn_fox_diamond_120_thumb.png"
+      },
+      {
+        "id": "autumn_fox_diamond_160",
+        "resolution": "Masterpiece (25.6k)",
+        "label": "160\u00d7160",
+        "grid": 160,
+        "pieces": 25600,
+        "colors": 36,
+        "jsonFile": "assets/converted/autumn_fox_diamond_160.json",
+        "thumbnailUrl": "assets/converted/autumn_fox_diamond_160_thumb.png"
+      }
+    ],
+    "pbnVariants": [
+      {
+        "id": "autumn_fox_pbn",
+        "resolution": "Original",
+        "pieces": 49,
+        "colors": 15,
+        "jsonFile": "assets/converted/autumn_fox_pbn.json",
+        "lineArtUrl": "assets/converted/autumn_fox_pbn_lines.png",
+        "thumbnailUrl": "assets/converted/autumn_fox_pbn_thumb.png"
+      }
+    ]
+  },
+  {
+    "key": "covered_bridge",
+    "title": "Rustic Covered Bridge",
+    "artist": "Valley Stream Folk",
+    "desc": "Historic red wooden covered bridge spanning a peaceful babbling stream surrounded by wildflowers",
+    "addedAt": 1793450733297,
+    "originalAsset": "assets/diamond_art_only/covered_bridge.jpeg",
+    "pbnAsset": null,
+    "diamondVariants": [
+      {
+        "id": "covered_bridge_diamond_80",
+        "resolution": "Cozy (6.4k)",
+        "label": "80\u00d780",
+        "grid": 80,
+        "pieces": 6400,
+        "colors": 18,
+        "jsonFile": "assets/converted/covered_bridge_diamond_80.json",
+        "thumbnailUrl": "assets/converted/covered_bridge_diamond_80_thumb.png"
+      },
+      {
+        "id": "covered_bridge_diamond_120",
+        "resolution": "Standard (14.4k)",
+        "label": "120\u00d7120",
+        "grid": 120,
+        "pieces": 14400,
+        "colors": 26,
+        "jsonFile": "assets/converted/covered_bridge_diamond_120.json",
+        "thumbnailUrl": "assets/converted/covered_bridge_diamond_120_thumb.png"
+      },
+      {
+        "id": "covered_bridge_diamond_160",
+        "resolution": "Masterpiece (25.6k)",
+        "label": "160\u00d7160",
+        "grid": 160,
+        "pieces": 25600,
+        "colors": 36,
+        "jsonFile": "assets/converted/covered_bridge_diamond_160.json",
+        "thumbnailUrl": "assets/converted/covered_bridge_diamond_160_thumb.png"
+      }
+    ],
+    "pbnVariants": []
+  },
+  {
+    "key": "vintage_tractor",
+    "title": "Heartland Antique Tractor",
+    "artist": "Country Roads Studio",
+    "desc": "Classic vintage farm tractor in vibrant green and yellow beside summer cornfields and harvest crates",
+    "addedAt": 1793450733293,
+    "originalAsset": "assets/diamond_art_only/vintage_tractor.jpeg",
+    "pbnAsset": null,
+    "diamondVariants": [
+      {
+        "id": "vintage_tractor_diamond_80",
+        "resolution": "Cozy (6.4k)",
+        "label": "80\u00d780",
+        "grid": 80,
+        "pieces": 6400,
+        "colors": 18,
+        "jsonFile": "assets/converted/vintage_tractor_diamond_80.json",
+        "thumbnailUrl": "assets/converted/vintage_tractor_diamond_80_thumb.png"
+      },
+      {
+        "id": "vintage_tractor_diamond_120",
+        "resolution": "Standard (14.4k)",
+        "label": "120\u00d7120",
+        "grid": 120,
+        "pieces": 14400,
+        "colors": 26,
+        "jsonFile": "assets/converted/vintage_tractor_diamond_120.json",
+        "thumbnailUrl": "assets/converted/vintage_tractor_diamond_120_thumb.png"
+      },
+      {
+        "id": "vintage_tractor_diamond_160",
+        "resolution": "Masterpiece (25.6k)",
+        "label": "160\u00d7160",
+        "grid": 160,
+        "pieces": 25600,
+        "colors": 36,
+        "jsonFile": "assets/converted/vintage_tractor_diamond_160.json",
+        "thumbnailUrl": "assets/converted/vintage_tractor_diamond_160_thumb.png"
+      }
+    ],
+    "pbnVariants": []
+  },
+  {
+    "key": "pasture_horses",
+    "title": "Pasture Mare & Foal",
+    "artist": "Meadow Run Stables",
+    "desc": "Loving chestnut farm mare and playful young foal beside a rustic split-rail pasture fence",
+    "addedAt": 1793450733289,
+    "originalAsset": "assets/diamond_art_only/pasture_horses.jpeg",
+    "pbnAsset": null,
+    "diamondVariants": [
+      {
+        "id": "pasture_horses_diamond_80",
+        "resolution": "Cozy (6.4k)",
+        "label": "80\u00d780",
+        "grid": 80,
+        "pieces": 6400,
+        "colors": 18,
+        "jsonFile": "assets/converted/pasture_horses_diamond_80.json",
+        "thumbnailUrl": "assets/converted/pasture_horses_diamond_80_thumb.png"
+      },
+      {
+        "id": "pasture_horses_diamond_120",
+        "resolution": "Standard (14.4k)",
+        "label": "120\u00d7120",
+        "grid": 120,
+        "pieces": 14400,
+        "colors": 26,
+        "jsonFile": "assets/converted/pasture_horses_diamond_120.json",
+        "thumbnailUrl": "assets/converted/pasture_horses_diamond_120_thumb.png"
+      },
+      {
+        "id": "pasture_horses_diamond_160",
+        "resolution": "Masterpiece (25.6k)",
+        "label": "160\u00d7160",
+        "grid": 160,
+        "pieces": 25600,
+        "colors": 36,
+        "jsonFile": "assets/converted/pasture_horses_diamond_160.json",
+        "thumbnailUrl": "assets/converted/pasture_horses_diamond_160_thumb.png"
+      }
+    ],
+    "pbnVariants": []
+  },
+  {
+    "key": "rural_windmill",
+    "title": "Prairie Windmill Sunset",
+    "artist": "Heartland Horizons",
+    "desc": "Classic American farm windmill standing tall above golden wheat fields and prairie sunflowers",
+    "addedAt": 1793450733285,
+    "originalAsset": "assets/diamond_art_only/rural_windmill.jpeg",
+    "pbnAsset": null,
+    "diamondVariants": [
+      {
+        "id": "rural_windmill_diamond_80",
+        "resolution": "Cozy (6.4k)",
+        "label": "80\u00d780",
+        "grid": 80,
+        "pieces": 6400,
+        "colors": 18,
+        "jsonFile": "assets/converted/rural_windmill_diamond_80.json",
+        "thumbnailUrl": "assets/converted/rural_windmill_diamond_80_thumb.png"
+      },
+      {
+        "id": "rural_windmill_diamond_120",
+        "resolution": "Standard (14.4k)",
+        "label": "120\u00d7120",
+        "grid": 120,
+        "pieces": 14400,
+        "colors": 26,
+        "jsonFile": "assets/converted/rural_windmill_diamond_120.json",
+        "thumbnailUrl": "assets/converted/rural_windmill_diamond_120_thumb.png"
+      },
+      {
+        "id": "rural_windmill_diamond_160",
+        "resolution": "Masterpiece (25.6k)",
+        "label": "160\u00d7160",
+        "grid": 160,
+        "pieces": 25600,
+        "colors": 36,
+        "jsonFile": "assets/converted/rural_windmill_diamond_160.json",
+        "thumbnailUrl": "assets/converted/rural_windmill_diamond_160_thumb.png"
+      }
+    ],
+    "pbnVariants": []
+  },
+  {
+    "key": "country_store",
+    "title": "Old Country Store",
+    "artist": "Heritage Homestead",
+    "desc": "Charming general store with wooden porch, rocking chairs, bushel of apples, and hanging lanterns",
+    "addedAt": 1793450733285,
+    "originalAsset": "assets/diamond_art_only/country_store.jpeg",
+    "pbnAsset": null,
+    "diamondVariants": [
+      {
+        "id": "country_store_diamond_80",
+        "resolution": "Cozy (6.4k)",
+        "label": "80\u00d780",
+        "grid": 80,
+        "pieces": 6400,
+        "colors": 18,
+        "jsonFile": "assets/converted/country_store_diamond_80.json",
+        "thumbnailUrl": "assets/converted/country_store_diamond_80_thumb.png"
+      },
+      {
+        "id": "country_store_diamond_120",
+        "resolution": "Standard (14.4k)",
+        "label": "120\u00d7120",
+        "grid": 120,
+        "pieces": 14400,
+        "colors": 26,
+        "jsonFile": "assets/converted/country_store_diamond_120.json",
+        "thumbnailUrl": "assets/converted/country_store_diamond_120_thumb.png"
+      },
+      {
+        "id": "country_store_diamond_160",
+        "resolution": "Masterpiece (25.6k)",
+        "label": "160\u00d7160",
+        "grid": 160,
+        "pieces": 25600,
+        "colors": 36,
+        "jsonFile": "assets/converted/country_store_diamond_160.json",
+        "thumbnailUrl": "assets/converted/country_store_diamond_160_thumb.png"
+      }
+    ],
+    "pbnVariants": []
+  },
+  {
+    "key": "yorky_teacup",
+    "title": "Teacup Yorkie Ribbon",
+    "artist": "Petite Paws Studio",
+    "desc": "Adorable teacup Yorkshire Terrier puppy with pink bow nestled in vintage porcelain",
+    "addedAt": 1793445788346,
+    "originalAsset": "assets/diamond_art_only/yorky_teacup.jpeg",
+    "pbnAsset": null,
+    "diamondVariants": [
+      {
+        "id": "yorky_teacup_diamond_80",
+        "resolution": "Cozy (6.4k)",
+        "label": "80\u00d780",
+        "grid": 80,
+        "pieces": 6400,
+        "colors": 18,
+        "jsonFile": "assets/converted/yorky_teacup_diamond_80.json",
+        "thumbnailUrl": "assets/converted/yorky_teacup_diamond_80_thumb.png"
+      },
+      {
+        "id": "yorky_teacup_diamond_120",
+        "resolution": "Standard (14.4k)",
+        "label": "120\u00d7120",
+        "grid": 120,
+        "pieces": 14400,
+        "colors": 26,
+        "jsonFile": "assets/converted/yorky_teacup_diamond_120.json",
+        "thumbnailUrl": "assets/converted/yorky_teacup_diamond_120_thumb.png"
+      },
+      {
+        "id": "yorky_teacup_diamond_160",
+        "resolution": "Masterpiece (25.6k)",
+        "label": "160\u00d7160",
+        "grid": 160,
+        "pieces": 25600,
+        "colors": 36,
+        "jsonFile": "assets/converted/yorky_teacup_diamond_160.json",
+        "thumbnailUrl": "assets/converted/yorky_teacup_diamond_160_thumb.png"
+      }
+    ],
+    "pbnVariants": []
+  },
+  {
+    "key": "yorky_playful",
+    "title": "Playful Meadow Yorkie",
+    "artist": "Sunny Pastures",
+    "desc": "Joyful Yorkshire Terrier puppy in a polka dot bandana playing with a ball in buttercups",
+    "addedAt": 1793445788342,
+    "originalAsset": "assets/diamond_art_only/yorky_playful.jpeg",
+    "pbnAsset": null,
+    "diamondVariants": [
+      {
+        "id": "yorky_playful_diamond_80",
+        "resolution": "Cozy (6.4k)",
+        "label": "80\u00d780",
+        "grid": 80,
+        "pieces": 6400,
+        "colors": 18,
+        "jsonFile": "assets/converted/yorky_playful_diamond_80.json",
+        "thumbnailUrl": "assets/converted/yorky_playful_diamond_80_thumb.png"
+      },
+      {
+        "id": "yorky_playful_diamond_120",
+        "resolution": "Standard (14.4k)",
+        "label": "120\u00d7120",
+        "grid": 120,
+        "pieces": 14400,
+        "colors": 26,
+        "jsonFile": "assets/converted/yorky_playful_diamond_120.json",
+        "thumbnailUrl": "assets/converted/yorky_playful_diamond_120_thumb.png"
+      },
+      {
+        "id": "yorky_playful_diamond_160",
+        "resolution": "Masterpiece (25.6k)",
+        "label": "160\u00d7160",
+        "grid": 160,
+        "pieces": 25600,
+        "colors": 36,
+        "jsonFile": "assets/converted/yorky_playful_diamond_160.json",
+        "thumbnailUrl": "assets/converted/yorky_playful_diamond_160_thumb.png"
+      }
+    ],
+    "pbnVariants": []
+  },
+  {
+    "key": "yorky_garden",
+    "title": "Garden Blossom Yorkie",
+    "artist": "Cottage Petals",
+    "desc": "Cheerful Yorkshire Terrier puppy surrounded by blooming pansies and meadow lavender",
+    "addedAt": 1793445788338,
+    "originalAsset": "assets/diamond_art_only/yorky_garden.jpeg",
+    "pbnAsset": null,
+    "diamondVariants": [
+      {
+        "id": "yorky_garden_diamond_80",
+        "resolution": "Cozy (6.4k)",
+        "label": "80\u00d780",
+        "grid": 80,
+        "pieces": 6400,
+        "colors": 18,
+        "jsonFile": "assets/converted/yorky_garden_diamond_80.json",
+        "thumbnailUrl": "assets/converted/yorky_garden_diamond_80_thumb.png"
+      },
+      {
+        "id": "yorky_garden_diamond_120",
+        "resolution": "Standard (14.4k)",
+        "label": "120\u00d7120",
+        "grid": 120,
+        "pieces": 14400,
+        "colors": 26,
+        "jsonFile": "assets/converted/yorky_garden_diamond_120.json",
+        "thumbnailUrl": "assets/converted/yorky_garden_diamond_120_thumb.png"
+      },
+      {
+        "id": "yorky_garden_diamond_160",
+        "resolution": "Masterpiece (25.6k)",
+        "label": "160\u00d7160",
+        "grid": 160,
+        "pieces": 25600,
+        "colors": 36,
+        "jsonFile": "assets/converted/yorky_garden_diamond_160.json",
+        "thumbnailUrl": "assets/converted/yorky_garden_diamond_160_thumb.png"
+      }
+    ],
+    "pbnVariants": []
+  },
+  {
+    "key": "yorky_autumn",
+    "title": "Cozy Autumn Yorkie",
+    "artist": "Harvest Hearth",
+    "desc": "Sweet Yorkshire Terrier in a cozy red knit sweater among autumn maple leaves and pumpkins",
+    "addedAt": 1793445788338,
+    "originalAsset": "assets/diamond_art_only/yorky_autumn.jpeg",
+    "pbnAsset": null,
+    "diamondVariants": [
+      {
+        "id": "yorky_autumn_diamond_80",
+        "resolution": "Cozy (6.4k)",
+        "label": "80\u00d780",
+        "grid": 80,
+        "pieces": 6400,
+        "colors": 18,
+        "jsonFile": "assets/converted/yorky_autumn_diamond_80.json",
+        "thumbnailUrl": "assets/converted/yorky_autumn_diamond_80_thumb.png"
+      },
+      {
+        "id": "yorky_autumn_diamond_120",
+        "resolution": "Standard (14.4k)",
+        "label": "120\u00d7120",
+        "grid": 120,
+        "pieces": 14400,
+        "colors": 26,
+        "jsonFile": "assets/converted/yorky_autumn_diamond_120.json",
+        "thumbnailUrl": "assets/converted/yorky_autumn_diamond_120_thumb.png"
+      },
+      {
+        "id": "yorky_autumn_diamond_160",
+        "resolution": "Masterpiece (25.6k)",
+        "label": "160\u00d7160",
+        "grid": 160,
+        "pieces": 25600,
+        "colors": 36,
+        "jsonFile": "assets/converted/yorky_autumn_diamond_160.json",
+        "thumbnailUrl": "assets/converted/yorky_autumn_diamond_160_thumb.png"
+      }
+    ],
+    "pbnVariants": []
+  },
+  {
+    "key": "fluffy_cow",
+    "title": "Sweet Highland Calf",
+    "artist": "Country Homestead",
+    "desc": "Gentle fluffy highland cow calf surrounded by meadow wildflowers and rustic wooden pasture",
+    "addedAt": 1793445788334,
+    "originalAsset": "assets/paint_by_number/fluffy-cow-3.jpeg",
+    "pbnAsset": "assets/paint_by_number/fluffy-cow-3.jpeg",
+    "diamondVariants": [
+      {
+        "id": "fluffy_cow_diamond_80",
+        "resolution": "Cozy (6.4k)",
+        "label": "80\u00d780",
+        "grid": 80,
+        "pieces": 6400,
+        "colors": 18,
+        "jsonFile": "assets/converted/fluffy_cow_diamond_80.json",
+        "thumbnailUrl": "assets/converted/fluffy_cow_diamond_80_thumb.png"
+      },
+      {
+        "id": "fluffy_cow_diamond_120",
+        "resolution": "Standard (14.4k)",
+        "label": "120\u00d7120",
+        "grid": 120,
+        "pieces": 14400,
+        "colors": 26,
+        "jsonFile": "assets/converted/fluffy_cow_diamond_120.json",
+        "thumbnailUrl": "assets/converted/fluffy_cow_diamond_120_thumb.png"
+      },
+      {
+        "id": "fluffy_cow_diamond_160",
+        "resolution": "Masterpiece (25.6k)",
+        "label": "160\u00d7160",
+        "grid": 160,
+        "pieces": 25600,
+        "colors": 36,
+        "jsonFile": "assets/converted/fluffy_cow_diamond_160.json",
+        "thumbnailUrl": "assets/converted/fluffy_cow_diamond_160_thumb.png"
+      }
+    ],
+    "pbnVariants": [
+      {
+        "id": "fluffy_cow_pbn",
+        "resolution": "Original",
+        "pieces": 129,
+        "colors": 15,
+        "jsonFile": "assets/converted/fluffy_cow_pbn.json",
+        "lineArtUrl": "assets/converted/fluffy_cow_pbn_lines.png",
+        "thumbnailUrl": "assets/converted/fluffy_cow_pbn_thumb.png"
+      }
+    ]
+  },
+  {
+    "key": "hummingbird",
+    "title": "Garden Hummingbird",
+    "artist": "Sunlit Meadow",
+    "desc": "Vibrant hummingbird sipping sweet nectar among blooming country garden flora",
+    "addedAt": 1793445788334,
+    "originalAsset": "assets/diamond_art_only/hummingbird.jpeg",
+    "pbnAsset": null,
+    "diamondVariants": [
+      {
+        "id": "hummingbird_diamond_80",
+        "resolution": "Cozy (6.4k)",
+        "label": "80\u00d780",
+        "grid": 80,
+        "pieces": 6400,
+        "colors": 18,
+        "jsonFile": "assets/converted/hummingbird_diamond_80.json",
+        "thumbnailUrl": "assets/converted/hummingbird_diamond_80_thumb.png"
+      },
+      {
+        "id": "hummingbird_diamond_120",
+        "resolution": "Standard (14.4k)",
+        "label": "120\u00d7120",
+        "grid": 120,
+        "pieces": 14400,
+        "colors": 26,
+        "jsonFile": "assets/converted/hummingbird_diamond_120.json",
+        "thumbnailUrl": "assets/converted/hummingbird_diamond_120_thumb.png"
+      },
+      {
+        "id": "hummingbird_diamond_160",
+        "resolution": "Masterpiece (25.6k)",
+        "label": "160\u00d7160",
+        "grid": 160,
+        "pieces": 25600,
+        "colors": 36,
+        "jsonFile": "assets/converted/hummingbird_diamond_160.json",
+        "thumbnailUrl": "assets/converted/hummingbird_diamond_160_thumb.png"
+      }
+    ],
+    "pbnVariants": []
+  },
+  {
+    "key": "country_truck",
+    "title": "Vintage Harvest Truck",
+    "artist": "Country Roads Studio",
+    "desc": "Classic turquoise vintage pickup truck filled with harvest pumpkins and sunflowers",
+    "addedAt": 1793445788334,
+    "originalAsset": "assets/diamond_art_only/country_truck.jpeg",
+    "pbnAsset": null,
+    "diamondVariants": [
+      {
+        "id": "country_truck_diamond_80",
+        "resolution": "Cozy (6.4k)",
+        "label": "80\u00d780",
+        "grid": 80,
+        "pieces": 6400,
+        "colors": 18,
+        "jsonFile": "assets/converted/country_truck_diamond_80.json",
+        "thumbnailUrl": "assets/converted/country_truck_diamond_80_thumb.png"
+      },
+      {
+        "id": "country_truck_diamond_120",
+        "resolution": "Standard (14.4k)",
+        "label": "120\u00d7120",
+        "grid": 120,
+        "pieces": 14400,
+        "colors": 26,
+        "jsonFile": "assets/converted/country_truck_diamond_120.json",
+        "thumbnailUrl": "assets/converted/country_truck_diamond_120_thumb.png"
+      },
+      {
+        "id": "country_truck_diamond_160",
+        "resolution": "Masterpiece (25.6k)",
+        "label": "160\u00d7160",
+        "grid": 160,
+        "pieces": 25600,
+        "colors": 36,
+        "jsonFile": "assets/converted/country_truck_diamond_160.json",
+        "thumbnailUrl": "assets/converted/country_truck_diamond_160_thumb.png"
+      }
+    ],
+    "pbnVariants": []
+  },
+  {
+    "key": "country_rooster",
+    "title": "Morning Farm Rooster",
+    "artist": "Sunrise Farmstead",
+    "desc": "Colorful country rooster greeting the morning sun from a rustic fence post",
+    "addedAt": 1793445788330,
+    "originalAsset": "assets/diamond_art_only/country_rooster.jpeg",
+    "pbnAsset": null,
+    "diamondVariants": [
+      {
+        "id": "country_rooster_diamond_80",
+        "resolution": "Cozy (6.4k)",
+        "label": "80\u00d780",
+        "grid": 80,
+        "pieces": 6400,
+        "colors": 18,
+        "jsonFile": "assets/converted/country_rooster_diamond_80.json",
+        "thumbnailUrl": "assets/converted/country_rooster_diamond_80_thumb.png"
+      },
+      {
+        "id": "country_rooster_diamond_120",
+        "resolution": "Standard (14.4k)",
+        "label": "120\u00d7120",
+        "grid": 120,
+        "pieces": 14400,
+        "colors": 26,
+        "jsonFile": "assets/converted/country_rooster_diamond_120.json",
+        "thumbnailUrl": "assets/converted/country_rooster_diamond_120_thumb.png"
+      },
+      {
+        "id": "country_rooster_diamond_160",
+        "resolution": "Masterpiece (25.6k)",
+        "label": "160\u00d7160",
+        "grid": 160,
+        "pieces": 25600,
+        "colors": 36,
+        "jsonFile": "assets/converted/country_rooster_diamond_160.json",
+        "thumbnailUrl": "assets/converted/country_rooster_diamond_160_thumb.png"
+      }
+    ],
+    "pbnVariants": []
+  },
+  {
+    "key": "country_puppy",
+    "title": "Porch Golden Puppy",
+    "artist": "Cottage Companions",
+    "desc": "Adorable golden retriever puppy in a red bandana enjoying a sunny farm morning",
+    "addedAt": 1793445788330,
+    "originalAsset": "assets/diamond_art_only/country_puppy.jpeg",
+    "pbnAsset": null,
+    "diamondVariants": [
+      {
+        "id": "country_puppy_diamond_80",
+        "resolution": "Cozy (6.4k)",
+        "label": "80\u00d780",
+        "grid": 80,
+        "pieces": 6400,
+        "colors": 18,
+        "jsonFile": "assets/converted/country_puppy_diamond_80.json",
+        "thumbnailUrl": "assets/converted/country_puppy_diamond_80_thumb.png"
+      },
+      {
+        "id": "country_puppy_diamond_120",
+        "resolution": "Standard (14.4k)",
+        "label": "120\u00d7120",
+        "grid": 120,
+        "pieces": 14400,
+        "colors": 26,
+        "jsonFile": "assets/converted/country_puppy_diamond_120.json",
+        "thumbnailUrl": "assets/converted/country_puppy_diamond_120_thumb.png"
+      },
+      {
+        "id": "country_puppy_diamond_160",
+        "resolution": "Masterpiece (25.6k)",
+        "label": "160\u00d7160",
+        "grid": 160,
+        "pieces": 25600,
+        "colors": 36,
+        "jsonFile": "assets/converted/country_puppy_diamond_160.json",
+        "thumbnailUrl": "assets/converted/country_puppy_diamond_160_thumb.png"
+      }
+    ],
+    "pbnVariants": []
+  },
+  {
+    "key": "country_barn",
+    "title": "Rustic Red Barn",
+    "artist": "Heartland Heritage",
+    "desc": "Classic red country barn with silo, split-rail fence, and sunflowers under sunny blue sky",
+    "addedAt": 1793445788326,
+    "originalAsset": "assets/diamond_art_only/country_barn.jpeg",
+    "pbnAsset": null,
+    "diamondVariants": [
+      {
+        "id": "country_barn_diamond_80",
+        "resolution": "Cozy (6.4k)",
+        "label": "80\u00d780",
+        "grid": 80,
+        "pieces": 6400,
+        "colors": 18,
+        "jsonFile": "assets/converted/country_barn_diamond_80.json",
+        "thumbnailUrl": "assets/converted/country_barn_diamond_80_thumb.png"
+      },
+      {
+        "id": "country_barn_diamond_120",
+        "resolution": "Standard (14.4k)",
+        "label": "120\u00d7120",
+        "grid": 120,
+        "pieces": 14400,
+        "colors": 26,
+        "jsonFile": "assets/converted/country_barn_diamond_120.json",
+        "thumbnailUrl": "assets/converted/country_barn_diamond_120_thumb.png"
+      },
+      {
+        "id": "country_barn_diamond_160",
+        "resolution": "Masterpiece (25.6k)",
+        "label": "160\u00d7160",
+        "grid": 160,
+        "pieces": 25600,
+        "colors": 36,
+        "jsonFile": "assets/converted/country_barn_diamond_160.json",
+        "thumbnailUrl": "assets/converted/country_barn_diamond_160_thumb.png"
+      }
+    ],
+    "pbnVariants": []
   }
 ]

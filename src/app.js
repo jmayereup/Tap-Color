@@ -814,10 +814,11 @@ class TapColorApp {
       const entries = await res.json();
       if (!Array.isArray(entries) || entries.length === 0) return;
 
+      const sortedEntries = [...entries].sort((a, b) => (b.addedAt || 0) - (a.addedAt || 0));
       const dynamicMeta = [];
 
       // 1. Diamond Art entries (from both diamond_art_only/ and paint_by_number/)
-      for (const entry of entries) {
+      for (const entry of sortedEntries) {
         if (entry.diamondVariants && entry.diamondVariants.length > 0) {
           const defVar = entry.diamondVariants.find(v => v.id.endsWith('_120')) || entry.diamondVariants[0];
           const variants = entry.diamondVariants.map(v => ({
@@ -841,7 +842,7 @@ class TapColorApp {
       }
 
       // 2. Paint by Number entries (ONLY from paint_by_number/)
-      for (const entry of entries) {
+      for (const entry of sortedEntries) {
         if (entry.pbnVariants && entry.pbnVariants.length > 0) {
           const pbnVar = entry.pbnVariants[0];
           dynamicMeta.push({
