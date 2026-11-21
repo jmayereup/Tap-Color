@@ -305,39 +305,18 @@
             </p>
           </div>
 
-          <!-- Step 1: Studio Mode Switcher -->
+          <!-- Step 1: Studio Mode Header (Diamond Painting Only) -->
           <div class="studio-step-section">
-            <div class="studio-step-header">
-              <span class="step-num">1</span>
-              <span class="step-title">Choose Your Art Style</span>
-            </div>
-            <div class="studio-mode-toggle">
-              <button class="btn-studio-mode active" data-mode="diamond" id="btn-mode-diamond">
-                <span class="mode-icon">💎</span>
-                <span class="mode-text">
-                  <span class="mode-name">Diamond Painting</span>
-                  <span class="mode-desc">Sparkling gemstone mosaic grid</span>
-                </span>
-              </button>
-              <button class="btn-studio-mode" data-mode="vector" id="btn-mode-vector">
-                <span class="mode-icon">🎨</span>
-                <span class="mode-text">
-                  <span class="mode-name">Paint by Number</span>
-                  <span class="mode-desc">Smooth outlines & numbered regions</span>
-                </span>
-              </button>
-            </div>
             <div class="studio-mode-banner" id="studio-mode-banner">
-              <span class="mode-banner-badge" id="mode-banner-badge">💎 Diamond Painting Active</span>
-              <span class="mode-banner-text" id="mode-banner-text">Diamond mode active: Sparkly gemstone drills mapped
-                onto a precision mosaic grid.</span>
+              <span class="mode-banner-badge" id="mode-banner-badge">💎 Custom Diamond Painting Studio</span>
+              <span class="mode-banner-text" id="mode-banner-text">Turn any photo or picture into a sparkling gemstone mosaic grid. (Paint by Number uses our curated line-art gallery!)</span>
             </div>
           </div>
 
-          <!-- Step 2: Picture Selection -->
+          <!-- Step 1: Picture Selection -->
           <div class="studio-step-section">
             <div class="studio-step-header">
-              <span class="step-num">2</span>
+              <span class="step-num">1</span>
               <span class="step-title">Pick a Picture</span>
             </div>
             <div class="custom-studio-grid">
@@ -406,53 +385,10 @@
                 </div>
               </div>
 
-              <!-- Step 3: Difficulty & Settings for Paint by Number -->
-              <div class="custom-settings hidden" id="settings-vector-panel">
-                <div class="studio-step-header">
-                  <span class="step-num">3</span>
-                  <span class="step-title">Paint by Number Options</span>
-                </div>
-                <div class="settings-feature-badge">
-                  <span>🎨 Vector Outlines</span> • <span>Smooth Curves</span> • <span>Seamless Fills</span>
-                </div>
-                <div class="difficulty-picker" id="difficulty-chips-vector">
-                  <button type="button" class="btn-diff-chip" data-complexity="cozy" data-colors="18">
-                    <span class="diff-icon">🟢</span>
-                    <span class="diff-name">Detailed</span>
-                    <span class="diff-desc">Smooth spaces • 18 colors</span>
-                  </button>
-                  <button type="button" class="btn-diff-chip active" data-complexity="balanced" data-colors="26">
-                    <span class="diff-icon">🟡</span>
-                    <span class="diff-name">Intricate</span>
-                    <span class="diff-desc">Adult Coloring Book • 26 colors</span>
-                  </button>
-                  <button type="button" class="btn-diff-chip" data-complexity="detailed" data-colors="34">
-                    <span class="diff-icon">🟣</span>
-                    <span class="diff-name">Masterpiece</span>
-                    <span class="diff-desc">Ultra-fine detail • 34 colors</span>
-                  </button>
-                </div>
-
-                <select id="select-vector-complexity" class="styled-select" style="display:none">
-                  <option value="cozy">Cozy</option>
-                  <option value="balanced" selected>Balanced</option>
-                  <option value="detailed">Detailed</option>
-                </select>
-                <select id="select-vector-colors" class="styled-select" style="display:none">
-                  <option value="18">18</option>
-                  <option value="26" selected>26</option>
-                  <option value="34">34</option>
-                </select>
-
-                <button id="btn-convert-vector" class="btn-primary btn-sparkle btn-large-action">
-                  ✨ Create Paint by Number & Start Coloring
-                </button>
-              </div>
-
-              <!-- Step 3: Difficulty & Settings for Diamond Painting -->
+              <!-- Step 2: Difficulty & Settings for Diamond Painting -->
               <div class="custom-settings" id="settings-diamond-panel">
                 <div class="studio-step-header">
-                  <span class="step-num">3</span>
+                  <span class="step-num">2</span>
                   <span class="step-title">Diamond Painting Options</span>
                 </div>
                 <div class="settings-feature-badge diamond-badge">

@@ -4,7 +4,7 @@ mod models;
 
 use engine::GameEngine;
 use wasm_bindgen::prelude::*;
-use web_sys::{CanvasRenderingContext2d, HtmlCanvasElement};
+use web_sys::{CanvasRenderingContext2d, HtmlCanvasElement, HtmlImageElement};
 
 #[wasm_bindgen(start)]
 pub fn main_js() -> Result<(), JsValue> {
@@ -133,6 +133,10 @@ impl GameController {
         let w = self.canvas.width() as f64;
         let h = self.canvas.height() as f64;
         self.engine.fit_to_screen(w, h);
+    }
+
+    pub fn set_line_art_image(&mut self, img: Option<HtmlImageElement>) {
+        self.engine.set_line_art_image(img);
     }
 
     pub fn load_artwork_json(&mut self, json_str: &str) -> bool {

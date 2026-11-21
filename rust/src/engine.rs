@@ -1,8 +1,9 @@
 use std::f64::consts::PI;
-use web_sys::CanvasRenderingContext2d;
+use wasm_bindgen::JsCast;
+use web_sys::{CanvasPattern, CanvasRenderingContext2d, CanvasWindingRule, HtmlCanvasElement, HtmlImageElement};
 
 use crate::artworks::{generate_procedural_mosaic, load_artwork};
-use crate::models::{ArtworkData, Particle, Point, TapFeedback};
+use crate::models::{ArtworkData, Particle, Point, Region, TapFeedback};
 
 pub struct GameEngine {
     pub artwork: ArtworkData,
@@ -20,6 +21,8 @@ pub struct GameEngine {
     pub last_time: f64,
     pub pulse_phase: f64,
     pub highlight_matching_tiles: bool,
+    pub line_art_image: Option<HtmlImageElement>,
+    pub hatch_pattern: Option<CanvasPattern>,
 }
 
 impl GameEngine {
@@ -43,6 +46,65 @@ impl GameEngine {
             hint_timer: 0.0,
             last_time: 0.0,
             pulse_phase: 0.0,
+            line_art_image: None,
+            hatch_pattern: None,
+        }
+    }
+
+    pub fn set_line_art_image(&mut self, img: Option<HtmlImageElement>) {
+        self.line_art_image = img;
+    }
+
+    fn ensure_hatch_pattern(&mut self, ctx: &CanvasRenderingContext2d) {
+        if self.hatch_pattern.is_some() {
+            return;
+        }
+        if let Some(window) = web_sys::window() {
+            if let Some(document) = window.document() {
+                if let Ok(el) = document.create_element("canvas") {
+                    if let Ok(tile) = el.dyn_into::<HtmlCanvasElement>() {
+                        tile.set_width(10);
+                        tile.set_height(10);
+                        if let Ok(Some(tctx_obj)) = tile.get_context("2d") {
+                            if let Ok(tctx) = tctx_obj.dyn_into::<CanvasRenderingContext2d>() {
+                                tctx.set_fill_style_str("#E8EEF5");
+                                tctx.fill_rect(0.0, 0.0, 10.0, 10.0);
+                                tctx.set_stroke_style_str("rgba(100, 116, 139, 0.32)");
+                                tctx.set_line_width(1.6);
+                                tctx.begin_path();
+                                tctx.move_to(-2.0, 12.0);
+                                tctx.line_to(12.0, -2.0);
+                                tctx.move_to(-2.0, 2.0);
+                                tctx.line_to(2.0, -2.0);
+                                tctx.move_to(8.0, 12.0);
+                                tctx.line_to(12.0, 8.0);
+                                tctx.stroke();
+                                if let Ok(pat) = ctx.create_pattern_with_html_canvas_element(&tile, "repeat") {
+                                    self.hatch_pattern = pat;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    fn trace_region_path(ctx: &CanvasRenderingContext2d, region: &Region) {
+        ctx.begin_path();
+        ctx.move_to(region.polygon[0].x, region.polygon[0].y);
+        for pt in region.polygon.iter().skip(1) {
+            ctx.line_to(pt.x, pt.y);
+        }
+        ctx.close_path();
+        for hole in &region.holes {
+            if hole.len() >= 3 {
+                ctx.move_to(hole[0].x, hole[0].y);
+                for pt in hole.iter().skip(1) {
+                    ctx.line_to(pt.x, pt.y);
+                }
+                ctx.close_path();
+            }
         }
     }
 
@@ -514,7 +576,10 @@ impl GameEngine {
         let _ = ctx.translate(ox, oy);
         let _ = ctx.scale(s, s);
 
-        let is_diamond_art = self.artwork.id.contains("diamond") || self.artwork.regions.len() > 200;
+        let is_diamond_art = self.artwork.id.contains("diamond")
+            || (self.artwork.regions.len() > 300
+                && self.artwork.regions.get(0).map_or(false, |r| r.polygon.len() == 4));
+        let has_line_art = self.line_art_image.is_some();
         let drill_screen_size = if is_diamond_art && !self.artwork.regions.is_empty() {
             let p0 = self.artwork.regions[0].polygon.first();
             let p1 = self.artwork.regions[0].polygon.get(1);
@@ -551,17 +616,12 @@ impl GameEngine {
                 if is_quad {
                     ctx.fill_rect(p0.x, p0.y, cell_w, cell_h);
                 } else {
-                    ctx.begin_path();
-                    ctx.move_to(region.polygon[0].x, region.polygon[0].y);
-                    for pt in region.polygon.iter().skip(1) {
-                        ctx.line_to(pt.x, pt.y);
-                    }
-                    ctx.close_path();
-                    ctx.fill();
+                    Self::trace_region_path(ctx, region);
+                    ctx.fill_with_canvas_winding_rule(CanvasWindingRule::Evenodd);
 
                     // Seam-seal stroke: prevents anti-aliasing white cracks between adjacent polygons
                     ctx.set_stroke_style_str(&region.color_hex);
-                    ctx.set_line_width((1.5 / s).max(0.8));
+                    ctx.set_line_width(if has_line_art { 0.8 } else { (1.5 / s).max(0.8) });
                     ctx.stroke();
                 }
 
@@ -608,42 +668,46 @@ impl GameEngine {
                 if is_quad {
                     ctx.fill_rect(p0.x, p0.y, cell_w, cell_h);
                 } else {
-                    ctx.begin_path();
-                    ctx.move_to(region.polygon[0].x, region.polygon[0].y);
-                    for pt in region.polygon.iter().skip(1) {
-                        ctx.line_to(pt.x, pt.y);
-                    }
-                    ctx.close_path();
-                    ctx.fill();
-
-                    // Seam-seal stroke for unfilled background
-                    ctx.set_stroke_style_str("#F8FAFC");
-                    ctx.set_line_width((1.5 / s).max(0.8));
-                    ctx.stroke();
+                    Self::trace_region_path(ctx, region);
+                    ctx.fill_with_canvas_winding_rule(CanvasWindingRule::Evenodd);
                 }
             }
 
-            // Outline strokes
+            // Outline strokes (when line_art_image is present, only draw faint hairline guides on unfilled regions)
             if self.show_outlines {
                 if is_diamond_art {
                     ctx.set_stroke_style_str("rgba(148, 163, 184, 0.35)");
                     ctx.set_line_width((0.7 / s).max(0.5));
-                } else {
+                    if is_quad {
+                        ctx.stroke_rect(p0.x, p0.y, cell_w, cell_h);
+                    } else {
+                        Self::trace_region_path(ctx, region);
+                        ctx.stroke();
+                    }
+                } else if !has_line_art {
                     ctx.set_stroke_style_str("rgba(30, 41, 59, 0.72)");
                     ctx.set_line_width((1.8 / s).max(1.0));
-                }
-
-                if is_quad {
-                    ctx.stroke_rect(p0.x, p0.y, cell_w, cell_h);
-                } else {
-                    ctx.begin_path();
-                    ctx.move_to(region.polygon[0].x, region.polygon[0].y);
-                    for pt in region.polygon.iter().skip(1) {
-                        ctx.line_to(pt.x, pt.y);
-                    }
-                    ctx.close_path();
+                    Self::trace_region_path(ctx, region);
+                    ctx.stroke();
+                } else if !is_filled {
+                    ctx.set_stroke_style_str("rgba(148, 163, 184, 0.35)");
+                    ctx.set_line_width((0.7 / s).max(0.4));
+                    Self::trace_region_path(ctx, region);
                     ctx.stroke();
                 }
+            }
+        }
+
+        // Composite crisp ink line-art overlay on top
+        if let Some(ref img) = self.line_art_image {
+            if img.complete() && img.natural_width() > 0 {
+                let _ = ctx.draw_image_with_html_image_element_and_dw_and_dh(
+                    img,
+                    0.0,
+                    0.0,
+                    self.artwork.width,
+                    self.artwork.height,
+                );
             }
         }
 
@@ -738,6 +802,11 @@ impl GameEngine {
         let drill_screen_size = drill_world_size * self.scale;
         let can_draw_facets = is_diamond_art && drill_screen_size >= 10.0;
         let can_draw_outlines = self.show_outlines && (!is_diamond_art || drill_screen_size >= 3.5);
+        let has_line_art = self.line_art_image.is_some();
+
+        if !is_diamond_art {
+            self.ensure_hatch_pattern(ctx);
+        }
 
         // 2. Render all regions (fills and animations)
         for region in &mut self.artwork.regions {
@@ -748,18 +817,38 @@ impl GameEngine {
 
             let cx = region.centroid.x;
             let cy = region.centroid.y;
-            // Viewport frustum culling: skip regions completely outside current screen view
-            if cx < view_min_x || cx > view_max_x || cy < view_min_y || cy > view_max_y {
-                continue;
+
+            // Viewport frustum culling:
+            // - Diamond drills are tiny squares, so centroid check is exact & O(1).
+            // - Paint-by-Number regions can span half the canvas, so cull against bounding box!
+            if is_diamond_art {
+                if cx < view_min_x || cx > view_max_x || cy < view_min_y || cy > view_max_y {
+                    continue;
+                }
+            } else {
+                let mut r_min_x = f64::INFINITY;
+                let mut r_max_x = f64::NEG_INFINITY;
+                let mut r_min_y = f64::INFINITY;
+                let mut r_max_y = f64::NEG_INFINITY;
+                for pt in &region.polygon {
+                    if pt.x < r_min_x { r_min_x = pt.x; }
+                    if pt.x > r_max_x { r_max_x = pt.x; }
+                    if pt.y < r_min_y { r_min_y = pt.y; }
+                    if pt.y > r_max_y { r_max_y = pt.y; }
+                }
+                if r_max_x < view_min_x || r_min_x > view_max_x || r_max_y < view_min_y || r_min_y > view_max_y {
+                    continue;
+                }
             }
 
             // Animate fill transition
             if region.is_filled && region.fill_anim < 1.0 {
-                region.fill_anim = (region.fill_anim + dt * 4.0).min(1.0);
+                region.fill_anim = (region.fill_anim + dt * 4.5).min(1.0);
             }
 
             let is_hinted = Some(region.id) == self.hint_region_id;
-            let is_active_target = self.highlight_matching_tiles && (region.number == self.active_number);
+            let is_active_number = region.number == self.active_number;
+            let is_active_target = self.highlight_matching_tiles && is_active_number;
 
             let is_quad = is_diamond_art && n == 4;
             let (p0, p1, p2, p3) = if is_quad {
@@ -775,17 +864,12 @@ impl GameEngine {
                 if is_quad {
                     ctx.fill_rect(p0.x, p0.y, cell_w, cell_h);
                 } else {
-                    ctx.begin_path();
-                    ctx.move_to(region.polygon[0].x, region.polygon[0].y);
-                    for pt in region.polygon.iter().skip(1) {
-                        ctx.line_to(pt.x, pt.y);
-                    }
-                    ctx.close_path();
-                    ctx.fill();
+                    Self::trace_region_path(ctx, region);
+                    ctx.fill_with_canvas_winding_rule(CanvasWindingRule::Evenodd);
 
                     // Seam-seal stroke: prevents anti-aliasing white cracks between adjacent polygons
                     ctx.set_stroke_style_str(&region.color_hex);
-                    ctx.set_line_width((1.5 / self.scale).max(0.8));
+                    ctx.set_line_width(if has_line_art { 0.8 } else { (1.5 / self.scale).max(0.8) });
                     ctx.stroke();
                 }
 
@@ -831,63 +915,96 @@ impl GameEngine {
                 }
             } else {
                 // Unfilled region
-                let unfill_color = if is_hinted {
-                    let alpha = 0.45 + active_pulse * 0.35;
-                    format!("rgba(255, 215, 0, {:.2})", alpha)
-                } else if is_active_target {
-                    let alpha = 0.16 + active_pulse * 0.12;
-                    format!("rgba(99, 102, 241, {:.2})", alpha)
-                } else {
-                    "#F8FAFC".to_string()
-                };
-
-                ctx.set_fill_style_str(&unfill_color);
-
                 if is_quad {
+                    let unfill_color = if is_hinted {
+                        let alpha = 0.45 + active_pulse * 0.35;
+                        format!("rgba(255, 215, 0, {:.2})", alpha)
+                    } else if is_active_target {
+                        let alpha = 0.16 + active_pulse * 0.12;
+                        format!("rgba(99, 102, 241, {:.2})", alpha)
+                    } else {
+                        "#F8FAFC".to_string()
+                    };
+                    ctx.set_fill_style_str(&unfill_color);
                     ctx.fill_rect(p0.x, p0.y, cell_w, cell_h);
                 } else {
-                    ctx.begin_path();
-                    ctx.move_to(region.polygon[0].x, region.polygon[0].y);
-                    for pt in region.polygon.iter().skip(1) {
-                        ctx.line_to(pt.x, pt.y);
+                    Self::trace_region_path(ctx, region);
+                    if is_hinted {
+                        let alpha = 0.45 + active_pulse * 0.35;
+                        let c = format!("rgba(255, 215, 0, {:.2})", alpha);
+                        ctx.set_fill_style_str(&c);
+                        ctx.fill_with_canvas_winding_rule(CanvasWindingRule::Evenodd);
+                    } else if is_active_number {
+                        // Classic Paint-by-Number diagonal hatch pattern for the active color
+                        if let Some(ref pat) = self.hatch_pattern {
+                            ctx.set_fill_style_canvas_pattern(pat);
+                            ctx.fill_with_canvas_winding_rule(CanvasWindingRule::Evenodd);
+                        } else {
+                            ctx.set_fill_style_str("#E2E8F0");
+                            ctx.fill_with_canvas_winding_rule(CanvasWindingRule::Evenodd);
+                        }
+                        if is_active_target {
+                            let alpha = 0.14 + active_pulse * 0.12;
+                            let c = format!("rgba(99, 102, 241, {:.2})", alpha);
+                            ctx.set_fill_style_str(&c);
+                            ctx.fill_with_canvas_winding_rule(CanvasWindingRule::Evenodd);
+                        }
+                    } else {
+                        ctx.set_fill_style_str("#F8FAFC");
+                        ctx.fill_with_canvas_winding_rule(CanvasWindingRule::Evenodd);
                     }
-                    ctx.close_path();
-                    ctx.fill();
-
-                    // Seam-seal stroke for unfilled tiles
-                    ctx.set_stroke_style_str(&unfill_color);
-                    ctx.set_line_width((1.5 / self.scale).max(0.8));
-                    ctx.stroke();
                 }
             }
 
             // Outline strokes
             if can_draw_outlines {
-                if is_hinted {
+                if is_quad {
+                    if is_hinted {
+                        ctx.set_stroke_style_str("#F59E0B");
+                        ctx.set_line_width(2.5 / self.scale.max(0.5));
+                    } else if is_active_target {
+                        ctx.set_stroke_style_str("rgba(99, 102, 241, 0.6)");
+                        ctx.set_line_width(1.3 / self.scale.max(0.5));
+                    } else {
+                        ctx.set_stroke_style_str("rgba(148, 163, 184, 0.35)");
+                        ctx.set_line_width(0.7 / self.scale.max(0.5));
+                    }
+                    ctx.stroke_rect(p0.x, p0.y, cell_w, cell_h);
+                } else if is_hinted {
+                    Self::trace_region_path(ctx, region);
                     ctx.set_stroke_style_str("#F59E0B");
                     ctx.set_line_width(2.5 / self.scale.max(0.5));
-                } else if is_active_target {
-                    ctx.set_stroke_style_str("rgba(99, 102, 241, 0.6)");
-                    ctx.set_line_width(1.3 / self.scale.max(0.5));
-                } else if is_diamond_art {
-                    ctx.set_stroke_style_str("rgba(148, 163, 184, 0.35)");
-                    ctx.set_line_width(0.7 / self.scale.max(0.5));
-                } else {
-                    ctx.set_stroke_style_str("rgba(30, 41, 59, 0.72)");
-                    ctx.set_line_width(1.6 / self.scale.max(0.5));
-                }
-
-                if is_quad {
-                    ctx.stroke_rect(p0.x, p0.y, cell_w, cell_h);
-                } else {
-                    ctx.begin_path();
-                    ctx.move_to(region.polygon[0].x, region.polygon[0].y);
-                    for pt in region.polygon.iter().skip(1) {
-                        ctx.line_to(pt.x, pt.y);
+                    ctx.stroke();
+                } else if !has_line_art {
+                    Self::trace_region_path(ctx, region);
+                    if is_active_target {
+                        ctx.set_stroke_style_str("rgba(99, 102, 241, 0.6)");
+                        ctx.set_line_width(1.3 / self.scale.max(0.5));
+                    } else {
+                        ctx.set_stroke_style_str("rgba(30, 41, 59, 0.72)");
+                        ctx.set_line_width(1.6 / self.scale.max(0.5));
                     }
-                    ctx.close_path();
+                    ctx.stroke();
+                } else if !region.is_filled {
+                    // Subtle guide border for unfilled regions so lineless boundaries stay clear
+                    Self::trace_region_path(ctx, region);
+                    ctx.set_stroke_style_str("rgba(148, 163, 184, 0.42)");
+                    ctx.set_line_width(0.8 / self.scale.max(0.5));
                     ctx.stroke();
                 }
+            }
+        }
+
+        // 2.5 Composite crisp ink line-art overlay directly above fills and below numbers
+        if let Some(ref img) = self.line_art_image {
+            if img.complete() && img.natural_width() > 0 {
+                let _ = ctx.draw_image_with_html_image_element_and_dw_and_dh(
+                    img,
+                    0.0,
+                    0.0,
+                    self.artwork.width,
+                    self.artwork.height,
+                );
             }
         }
 

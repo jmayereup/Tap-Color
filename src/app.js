@@ -772,22 +772,20 @@ class TapColorApp {
           { id: 'autumn_fox_diamond_160', label: '160×160', name: 'Masterpiece Ultra', pieces: 25600, colors: 36, grid: 160, jsonFile: 'assets/converted/autumn_fox_diamond_160.json', thumbnailUrl: 'assets/converted/autumn_fox_diamond_160_thumb.png' },
         ],
       },
-      // Paint by Number Paintings (Multi-Resolution Vector Masterpieces)
+      // Paint by Number Paintings (Curated Line-Preserving Editions)
       {
         id: 'fluffy_cow_pbn',
         title: 'Sweet Highland Calf',
         artist: 'Country Homestead',
         category: 'classic',
-        pieces: 128,
+        pieces: 129,
         desc: 'Gentle fluffy highland cow calf surrounded by meadow wildflowers and rustic pasture',
-        defaultVariantId: 'fluffy_cow_pbn_detailed',
-        selectedVariantId: 'fluffy_cow_pbn_detailed',
+        defaultVariantId: 'fluffy_cow_pbn',
+        selectedVariantId: 'fluffy_cow_pbn',
         originalAsset: 'assets/fluffy-cow-3.jpeg',
-        thumbnailUrl: 'assets/converted/fluffy_cow_pbn_detailed_thumb.png',
+        thumbnailUrl: 'assets/converted/fluffy_cow_pbn_thumb.png',
         variants: [
-          { id: 'fluffy_cow_pbn_detailed', label: 'Cozy', name: 'Cozy (Large Print)', pieces: 128, colors: 11, complexity: 'detailed', jsonFile: 'assets/converted/fluffy_cow_pbn_detailed.json', thumbnailUrl: 'assets/converted/fluffy_cow_pbn_detailed_thumb.png' },
-          { id: 'fluffy_cow_pbn_intricate', label: 'Classic', name: 'Classic', pieces: 143, colors: 18, complexity: 'intricate', jsonFile: 'assets/converted/fluffy_cow_pbn_intricate.json', thumbnailUrl: 'assets/converted/fluffy_cow_pbn_intricate_thumb.png' },
-          { id: 'fluffy_cow_pbn_masterpiece', label: 'Detailed', name: 'Detailed', pieces: 216, colors: 20, complexity: 'masterpiece', jsonFile: 'assets/converted/fluffy_cow_pbn_masterpiece.json', thumbnailUrl: 'assets/converted/fluffy_cow_pbn_masterpiece_thumb.png' },
+          { id: 'fluffy_cow_pbn', label: 'Original', name: 'Original Lines', pieces: 129, colors: 15, jsonFile: 'assets/converted/fluffy_cow_pbn.json', lineArtUrl: 'assets/converted/fluffy_cow_pbn_lines.png', thumbnailUrl: 'assets/converted/fluffy_cow_pbn_thumb.png' },
         ],
       },
       {
@@ -795,16 +793,14 @@ class TapColorApp {
         title: 'Cozy Autumn Fox',
         artist: 'Woodland Folk',
         category: 'classic',
-        pieces: 231,
+        pieces: 49,
         desc: 'Cozy red fox curled up among autumn leaves, red-capped mushrooms, and meadow wildflowers',
-        defaultVariantId: 'autumn_fox_pbn_intricate',
-        selectedVariantId: 'autumn_fox_pbn_intricate',
+        defaultVariantId: 'autumn_fox_pbn',
+        selectedVariantId: 'autumn_fox_pbn',
         originalAsset: 'assets/autumn_fox_pbn.jpeg',
-        thumbnailUrl: 'assets/converted/autumn_fox_pbn_intricate_thumb.png',
+        thumbnailUrl: 'assets/converted/autumn_fox_pbn_thumb.png',
         variants: [
-          { id: 'autumn_fox_pbn_detailed', label: 'Cozy', name: 'Cozy (Large Print)', pieces: 76, colors: 13, complexity: 'detailed', jsonFile: 'assets/converted/autumn_fox_pbn_detailed.json', thumbnailUrl: 'assets/converted/autumn_fox_pbn_detailed_thumb.png' },
-          { id: 'autumn_fox_pbn_intricate', label: 'Classic', name: 'Classic', pieces: 231, colors: 20, complexity: 'intricate', jsonFile: 'assets/converted/autumn_fox_pbn_intricate.json', thumbnailUrl: 'assets/converted/autumn_fox_pbn_intricate_thumb.png' },
-          { id: 'autumn_fox_pbn_masterpiece', label: 'Detailed', name: 'Detailed', pieces: 248, colors: 23, complexity: 'masterpiece', jsonFile: 'assets/converted/autumn_fox_pbn_masterpiece.json', thumbnailUrl: 'assets/converted/autumn_fox_pbn_masterpiece_thumb.png' },
+          { id: 'autumn_fox_pbn', label: 'Original', name: 'Original Lines', pieces: 49, colors: 15, jsonFile: 'assets/converted/autumn_fox_pbn.json', lineArtUrl: 'assets/converted/autumn_fox_pbn_lines.png', thumbnailUrl: 'assets/converted/autumn_fox_pbn_thumb.png' },
         ],
       },
     ];
@@ -1185,7 +1181,7 @@ class TapColorApp {
             } else if (this.controller && this.controller.artwork) {
               totalPieces = this.controller.artwork.regions?.length || 0;
             }
-          } catch (e) { }
+          } catch (e) {}
           this.showVictoryModal(totalPieces);
         }
       });
@@ -1317,7 +1313,7 @@ class TapColorApp {
         this.pendingStylusAction = null;
         this.canvas.style.cursor = 'grabbing';
         if (navigator.vibrate) {
-          try { navigator.vibrate(12); } catch (_) { }
+          try { navigator.vibrate(12); } catch (_) {}
         }
         this.showStylusPanFeedback(e.clientX, e.clientY);
       }, 260);
@@ -1874,7 +1870,7 @@ class TapColorApp {
       const piecesCount = activeVariant ? activeVariant.pieces : meta.pieces;
 
       let resolutionSelectorHtml = '';
-      if (meta.variants && meta.variants.length > 0) {
+      if (meta.variants && meta.variants.length > 1) {
         resolutionSelectorHtml = `
           <div class="artwork-resolution-selector">
             <span class="resolution-title">Resolution / Difficulty:</span>
@@ -2392,6 +2388,7 @@ class TapColorApp {
       this.controller.artwork = artwork;
       this.controller.fit_to_screen();
     }
+    this.syncLineArtOverlay(artwork);
 
     this.startTime = Date.now();
     this.totalTaps = 0;
@@ -2931,6 +2928,7 @@ class TapColorApp {
       this.controller.artwork = artwork;
       this.controller.fit_to_screen();
     }
+    this.syncLineArtOverlay(null);
 
     this.startTime = Date.now();
     this.totalTaps = 0;
@@ -2938,6 +2936,23 @@ class TapColorApp {
     this.updateArtworkUI();
     this.refreshPaletteUI();
     this.updateResolutionBarUI();
+  }
+
+  syncLineArtOverlay(artworkData) {
+    if (!this.controller || typeof this.controller.set_line_art_image !== 'function') return;
+    const url = artworkData && artworkData.line_art_url;
+    if (!url) {
+      this.controller.set_line_art_image(null);
+      return;
+    }
+    this.controller.set_line_art_image(null);
+    const img = new Image();
+    img.onload = () => {
+      if (this.controller && typeof this.controller.set_line_art_image === 'function') {
+        this.controller.set_line_art_image(img);
+      }
+    };
+    img.src = url;
   }
 
   async selectArtwork(id, variantId = null) {
@@ -3004,16 +3019,19 @@ class TapColorApp {
           this.controller.artwork = artworkData;
           this.controller.fit_to_screen();
         }
+        this.syncLineArtOverlay(artworkData);
       } catch (err) {
         console.error('Failed to load artwork JSON from ' + jsonPath, err);
         if (this.controller) {
           this.controller.load_artwork(id);
         }
+        this.syncLineArtOverlay(null);
       }
     } else {
       if (this.controller) {
         this.controller.load_artwork(id);
       }
+      this.syncLineArtOverlay(null);
     }
 
     this.startTime = Date.now();
@@ -3060,7 +3078,7 @@ class TapColorApp {
         try {
           const info = JSON.parse(this.controller.get_artwork_info_json());
           count = info.total_regions || 0;
-        } catch (_) { }
+        } catch (_) {}
       }
       labelRes.textContent = isDiamond ? `Diamond (${count.toLocaleString()} drills)` : `Paint (${count.toLocaleString()} pcs)`;
       btnRes.classList.remove('hidden');
@@ -3076,11 +3094,20 @@ class TapColorApp {
     const optionsContainer = document.getElementById('quick-dropdown-options');
     const artTitleEl = document.getElementById('quick-dropdown-art-title');
 
-    if (togglePbn) togglePbn.classList.toggle('active', !isDiamond);
+    if (togglePbn) {
+      // Only show Paint by Number switch if the current gallery artwork has a curated PBN counterpart (or is already PBN)
+      let hasPbnCounterpart = !isDiamond;
+      if (isDiamond && this.currentArtworkMeta) {
+        const baseKey = this.currentArtworkMeta.id.replace(/_(pbn|diamond)$/, '');
+        hasPbnCounterpart = this.artworksMeta.some(a => a.id === `${baseKey}_pbn`);
+      }
+      togglePbn.style.display = hasPbnCounterpart ? '' : 'none';
+      togglePbn.classList.toggle('active', !isDiamond);
+    }
     if (toggleDiamond) toggleDiamond.classList.toggle('active', isDiamond);
 
     const title = this.currentArtworkMeta ? this.currentArtworkMeta.title : (this.lastCustomTitle || 'Current Artwork');
-    if (artTitleEl) artTitleEl.textContent = `${title} • Detail Level`;
+    if (artTitleEl) artTitleEl.textContent = isDiamond ? `${title} • Detail Level` : `${title} • Paint by Number`;
 
     if (!optionsContainer) return;
     optionsContainer.innerHTML = '';
@@ -3103,17 +3130,17 @@ class TapColorApp {
         const isActive = this.currentArtworkVariant && this.currentArtworkVariant.id === v.id;
         const item = document.createElement('div');
         item.className = `quick-dropdown-item ${isMetaDiamond ? 'diamond-item' : ''} ${isActive ? 'active' : ''}`;
-
+        
         let icon = '🟡';
         if (v.id.includes('80') || v.id.includes('detailed')) icon = '🟢';
         if (v.id.includes('160') || v.id.includes('masterpiece')) icon = '🟣';
 
         item.innerHTML = `
           <div class="quick-item-left">
-            <span class="quick-item-icon">${icon}</span>
+            <span class="quick-item-icon">${isMetaDiamond ? icon : '🎨'}</span>
             <div class="quick-item-info">
               <span class="quick-item-title">${v.name || v.label} ${isActive ? '✓' : ''}</span>
-              <span class="quick-item-subtitle">${isMetaDiamond ? `${v.grid}×${v.grid} grid` : 'Clean vector contours'} • ${v.colors} colors</span>
+              <span class="quick-item-subtitle">${isMetaDiamond ? `${v.grid}×${v.grid} grid` : 'Preserved crisp line art'} • ${v.colors} colors</span>
             </div>
           </div>
           <span class="quick-item-badge">${v.pieces.toLocaleString()} pcs</span>
@@ -3417,7 +3444,7 @@ class TapColorApp {
     if (!artwork && this.controller && typeof this.controller.get_artwork_json === 'function') {
       try {
         artwork = JSON.parse(this.controller.get_artwork_json());
-      } catch (e) { }
+      } catch (e) {}
     }
     if (!artwork || !artwork.regions) return;
 
@@ -3734,7 +3761,7 @@ class TapColorApp {
     if (this.dialogPreviousFocus && typeof this.dialogPreviousFocus.focus === 'function') {
       try {
         this.dialogPreviousFocus.focus();
-      } catch (_) { }
+      } catch (_) {}
       this.dialogPreviousFocus = null;
     }
   }
@@ -3839,24 +3866,24 @@ class FallbackJsController {
           { number: 10, hex: '#F72585', name: 'Sakura Pink', total_count: 4, filled_count: 0, is_completed: false },
         ],
         regions: [
-          { id: 0, number: 9, color_hex: '#577590', is_filled: false, polygon: [{ x: 180, y: 310 }, { x: 330, y: 335 }, { x: 325, y: 342 }], centroid: { x: 278, y: 329 } },
-          { id: 1, number: 9, color_hex: '#577590', is_filled: false, polygon: [{ x: 180, y: 310 }, { x: 325, y: 342 }, { x: 310, y: 350 }], centroid: { x: 271, y: 334 } },
-          { id: 2, number: 4, color_hex: '#2A9D8F', is_filled: false, polygon: [{ x: 330, y: 335 }, { x: 380, y: 300 }, { x: 395, y: 330 }, { x: 335, y: 345 }], centroid: { x: 360, y: 327 } },
-          { id: 3, number: 4, color_hex: '#2A9D8F', is_filled: false, polygon: [{ x: 380, y: 300 }, { x: 430, y: 315 }, { x: 420, y: 345 }, { x: 395, y: 330 }], centroid: { x: 406, y: 322 } },
-          { id: 4, number: 5, color_hex: '#48CAE4', is_filled: false, polygon: [{ x: 335, y: 345 }, { x: 395, y: 330 }, { x: 385, y: 370 }], centroid: { x: 371, y: 348 } },
-          { id: 5, number: 9, color_hex: '#577590', is_filled: false, polygon: [{ x: 365, y: 330 }, { x: 375, y: 325 }, { x: 380, y: 335 }, { x: 370, y: 340 }], centroid: { x: 372, y: 332 } },
-          { id: 6, number: 1, color_hex: '#E63946', is_filled: false, polygon: [{ x: 335, y: 345 }, { x: 385, y: 370 }, { x: 355, y: 400 }], centroid: { x: 358, y: 371 } },
-          { id: 7, number: 1, color_hex: '#E63946', is_filled: false, polygon: [{ x: 385, y: 370 }, { x: 415, y: 390 }, { x: 375, y: 420 }, { x: 355, y: 400 }], centroid: { x: 382, y: 395 } },
-          { id: 8, number: 2, color_hex: '#F4A261', is_filled: false, polygon: [{ x: 415, y: 390 }, { x: 455, y: 400 }, { x: 420, y: 435 }, { x: 375, y: 420 }], centroid: { x: 416, y: 411 } },
-          { id: 9, number: 3, color_hex: '#E76F51', is_filled: false, polygon: [{ x: 355, y: 400 }, { x: 375, y: 420 }, { x: 350, y: 460 }], centroid: { x: 360, y: 426 } },
-          { id: 10, number: 6, color_hex: '#0077B6', is_filled: false, polygon: [{ x: 420, y: 345 }, { x: 490, y: 240 }, { x: 460, y: 340 }], centroid: { x: 456, y: 308 } },
-          { id: 11, number: 5, color_hex: '#48CAE4', is_filled: false, polygon: [{ x: 490, y: 240 }, { x: 560, y: 160 }, { x: 515, y: 255 }, { x: 460, y: 340 }], centroid: { x: 506, y: 248 } },
-          { id: 12, number: 6, color_hex: '#0077B6', is_filled: false, polygon: [{ x: 560, y: 160 }, { x: 630, y: 100 }, { x: 585, y: 185 }, { x: 515, y: 255 }], centroid: { x: 572, y: 175 } },
-          { id: 13, number: 4, color_hex: '#2A9D8F', is_filled: false, polygon: [{ x: 630, y: 100 }, { x: 700, y: 50 }, { x: 650, y: 130 }, { x: 585, y: 185 }], centroid: { x: 641, y: 116 } },
-          { id: 14, number: 7, color_hex: '#90BE6D', is_filled: false, polygon: [{ x: 700, y: 50 }, { x: 720, y: 40 }, { x: 675, y: 120 }, { x: 650, y: 130 }], centroid: { x: 686, y: 85 } },
-          { id: 15, number: 4, color_hex: '#2A9D8F', is_filled: false, polygon: [{ x: 460, y: 340 }, { x: 515, y: 255 }, { x: 550, y: 290 }, { x: 485, y: 375 }], centroid: { x: 502, y: 315 } },
-          { id: 16, number: 8, color_hex: '#43AA8B', is_filled: false, polygon: [{ x: 515, y: 255 }, { x: 585, y: 185 }, { x: 615, y: 230 }, { x: 550, y: 290 }], centroid: { x: 566, y: 240 } },
-          { id: 17, number: 7, color_hex: '#90BE6D', is_filled: false, polygon: [{ x: 585, y: 185 }, { x: 650, y: 130 }, { x: 670, y: 180 }, { x: 615, y: 230 }], centroid: { x: 630, y: 181 } },
+          { id: 0, number: 9, color_hex: '#577590', is_filled: false, polygon: [{x:180,y:310},{x:330,y:335},{x:325,y:342}], centroid: {x:278,y:329} },
+          { id: 1, number: 9, color_hex: '#577590', is_filled: false, polygon: [{x:180,y:310},{x:325,y:342},{x:310,y:350}], centroid: {x:271,y:334} },
+          { id: 2, number: 4, color_hex: '#2A9D8F', is_filled: false, polygon: [{x:330,y:335},{x:380,y:300},{x:395,y:330},{x:335,y:345}], centroid: {x:360,y:327} },
+          { id: 3, number: 4, color_hex: '#2A9D8F', is_filled: false, polygon: [{x:380,y:300},{x:430,y:315},{x:420,y:345},{x:395,y:330}], centroid: {x:406,y:322} },
+          { id: 4, number: 5, color_hex: '#48CAE4', is_filled: false, polygon: [{x:335,y:345},{x:395,y:330},{x:385,y:370}], centroid: {x:371,y:348} },
+          { id: 5, number: 9, color_hex: '#577590', is_filled: false, polygon: [{x:365,y:330},{x:375,y:325},{x:380,y:335},{x:370,y:340}], centroid: {x:372,y:332} },
+          { id: 6, number: 1, color_hex: '#E63946', is_filled: false, polygon: [{x:335,y:345},{x:385,y:370},{x:355,y:400}], centroid: {x:358,y:371} },
+          { id: 7, number: 1, color_hex: '#E63946', is_filled: false, polygon: [{x:385,y:370},{x:415,y:390},{x:375,y:420},{x:355,y:400}], centroid: {x:382,y:395} },
+          { id: 8, number: 2, color_hex: '#F4A261', is_filled: false, polygon: [{x:415,y:390},{x:455,y:400},{x:420,y:435},{x:375,y:420}], centroid: {x:416,y:411} },
+          { id: 9, number: 3, color_hex: '#E76F51', is_filled: false, polygon: [{x:355,y:400},{x:375,y:420},{x:350,y:460}], centroid: {x:360,y:426} },
+          { id: 10, number: 6, color_hex: '#0077B6', is_filled: false, polygon: [{x:420,y:345},{x:490,y:240},{x:460,y:340}], centroid: {x:456,y:308} },
+          { id: 11, number: 5, color_hex: '#48CAE4', is_filled: false, polygon: [{x:490,y:240},{x:560,y:160},{x:515,y:255},{x:460,y:340}], centroid: {x:506,y:248} },
+          { id: 12, number: 6, color_hex: '#0077B6', is_filled: false, polygon: [{x:560,y:160},{x:630,y:100},{x:585,y:185},{x:515,y:255}], centroid: {x:572,y:175} },
+          { id: 13, number: 4, color_hex: '#2A9D8F', is_filled: false, polygon: [{x:630,y:100},{x:700,y:50},{x:650,y:130},{x:585,y:185}], centroid: {x:641,y:116} },
+          { id: 14, number: 7, color_hex: '#90BE6D', is_filled: false, polygon: [{x:700,y:50},{x:720,y:40},{x:675,y:120},{x:650,y:130}], centroid: {x:686,y:85} },
+          { id: 15, number: 4, color_hex: '#2A9D8F', is_filled: false, polygon: [{x:460,y:340},{x:515,y:255},{x:550,y:290},{x:485,y:375}], centroid: {x:502,y:315} },
+          { id: 16, number: 8, color_hex: '#43AA8B', is_filled: false, polygon: [{x:515,y:255},{x:585,y:185},{x:615,y:230},{x:550,y:290}], centroid: {x:566,y:240} },
+          { id: 17, number: 7, color_hex: '#90BE6D', is_filled: false, polygon: [{x:585,y:185},{x:650,y:130},{x:670,y:180},{x:615,y:230}], centroid: {x:630,y:181} },
         ]
       };
     }
@@ -3866,6 +3893,52 @@ class FallbackJsController {
 
   load_procedural_mosaic(seed, paletteType) {
     this.load_artwork('starry_night_diamond');
+  }
+
+  set_line_art_image(img) {
+    this.lineArtImage = img || null;
+  }
+
+  ensureHatchPattern() {
+    if (this.hatchPattern) return this.hatchPattern;
+    const tile = document.createElement('canvas');
+    tile.width = 10;
+    tile.height = 10;
+    const tctx = tile.getContext('2d');
+    tctx.fillStyle = '#E8EEF5';
+    tctx.fillRect(0, 0, 10, 10);
+    tctx.strokeStyle = 'rgba(100, 116, 139, 0.32)';
+    tctx.lineWidth = 1.6;
+    tctx.beginPath();
+    tctx.moveTo(-2, 12);
+    tctx.lineTo(12, -2);
+    tctx.moveTo(-2, 2);
+    tctx.lineTo(2, -2);
+    tctx.moveTo(8, 12);
+    tctx.lineTo(12, 8);
+    tctx.stroke();
+    this.hatchPattern = this.ctx.createPattern(tile, 'repeat');
+    return this.hatchPattern;
+  }
+
+  traceRegionPath(ctx, region) {
+    ctx.beginPath();
+    ctx.moveTo(region.polygon[0].x, region.polygon[0].y);
+    for (let i = 1; i < region.polygon.length; i++) {
+      ctx.lineTo(region.polygon[i].x, region.polygon[i].y);
+    }
+    ctx.closePath();
+    if (region.holes) {
+      for (const hole of region.holes) {
+        if (hole.length >= 3) {
+          ctx.moveTo(hole[0].x, hole[0].y);
+          for (let i = 1; i < hole.length; i++) {
+            ctx.lineTo(hole[i].x, hole[i].y);
+          }
+          ctx.closePath();
+        }
+      }
+    }
   }
 
   load_artwork_json(jsonStr) {
@@ -4087,7 +4160,13 @@ class FallbackJsController {
           if (pt.y > maxY) maxY = pt.y;
         }
         if (wx < minX - 1 || wx > maxX + 1 || wy < minY - 1 || wy > maxY + 1) return false;
-        return this.pointInPoly(wx, wy, r.polygon);
+        if (!this.pointInPoly(wx, wy, r.polygon)) return false;
+        if (r.holes) {
+          for (const hole of r.holes) {
+            if (this.pointInPoly(wx, wy, hole)) return false;
+          }
+        }
+        return true;
       });
     }
 
@@ -4201,25 +4280,24 @@ class FallbackJsController {
     }
     const drillScreenSize = drillWorldSize * this.scale;
 
+    const hasLineArt = !!(this.lineArtImage && this.lineArtImage.complete && this.lineArtImage.naturalWidth > 0);
+    const hatchPat = !isDiamond ? this.ensureHatchPattern() : null;
+
     // Render regions
     this.artwork.regions.forEach(region => {
-      this.ctx.beginPath();
-      this.ctx.moveTo(region.polygon[0].x, region.polygon[0].y);
-      for (let i = 1; i < region.polygon.length; i++) {
-        this.ctx.lineTo(region.polygon[i].x, region.polygon[i].y);
-      }
-      this.ctx.closePath();
+      this.traceRegionPath(this.ctx, region);
 
       const isHinted = region.id === this.hintRegionId;
-      const isActiveTarget = this.highlightMatchingTiles && (region.number === this.activeNumber);
+      const isActiveNumber = region.number === this.activeNumber;
+      const isActiveTarget = this.highlightMatchingTiles && isActiveNumber;
 
       if (region.is_filled) {
         this.ctx.fillStyle = region.color_hex;
-        this.ctx.fill();
+        this.ctx.fill('evenodd');
 
         // Seam-seal stroke prevents white hairline cracks between adjacent pieces
         this.ctx.strokeStyle = region.color_hex;
-        this.ctx.lineWidth = 1.4 / Math.max(0.5, this.scale);
+        this.ctx.lineWidth = hasLineArt ? 0.8 : (1.4 / Math.max(0.5, this.scale));
         this.ctx.stroke();
 
         // 3D diamond facet luster when zoomed in
@@ -4248,36 +4326,48 @@ class FallbackJsController {
           this.ctx.fill();
         }
       } else {
-        const unfillColor = isHinted
-          ? `rgba(255, 215, 0, ${0.45 + pulse * 0.35})`
-          : (isActiveTarget ? `rgba(99, 102, 241, ${0.16 + pulse * 0.12})` : '#F8FAFC');
-
-        this.ctx.fillStyle = unfillColor;
-        this.ctx.fill();
-
-        // Seam-seal stroke for unfilled tiles
-        this.ctx.strokeStyle = unfillColor;
-        this.ctx.lineWidth = 1.4 / Math.max(0.5, this.scale);
-        this.ctx.stroke();
+        if (isHinted) {
+          this.ctx.fillStyle = `rgba(255, 215, 0, ${0.45 + pulse * 0.35})`;
+          this.ctx.fill('evenodd');
+        } else if (!isDiamond && isActiveNumber) {
+          this.ctx.fillStyle = hatchPat || '#E2E8F0';
+          this.ctx.fill('evenodd');
+          if (isActiveTarget) {
+            this.ctx.fillStyle = `rgba(99, 102, 241, ${0.14 + pulse * 0.12})`;
+            this.ctx.fill('evenodd');
+          }
+        } else {
+          const unfillColor = isActiveTarget ? `rgba(99, 102, 241, ${0.16 + pulse * 0.12})` : '#F8FAFC';
+          this.ctx.fillStyle = unfillColor;
+          this.ctx.fill('evenodd');
+        }
       }
 
       if (this.showOutlines) {
         if (isHinted) {
           this.ctx.strokeStyle = '#F59E0B';
           this.ctx.lineWidth = 2.5 / Math.max(0.5, this.scale);
-        } else if (isActiveTarget) {
-          this.ctx.strokeStyle = 'rgba(99, 102, 241, 0.6)';
-          this.ctx.lineWidth = 1.2 / Math.max(0.5, this.scale);
+          this.ctx.stroke();
         } else if (isDiamond) {
-          this.ctx.strokeStyle = 'rgba(148, 163, 184, 0.35)';
-          this.ctx.lineWidth = 0.7 / Math.max(0.5, this.scale);
-        } else {
-          this.ctx.strokeStyle = 'rgba(30, 41, 59, 0.72)';
-          this.ctx.lineWidth = 1.6 / Math.max(0.5, this.scale);
+          this.ctx.strokeStyle = isActiveTarget ? 'rgba(99, 102, 241, 0.6)' : 'rgba(148, 163, 184, 0.35)';
+          this.ctx.lineWidth = (isActiveTarget ? 1.2 : 0.7) / Math.max(0.5, this.scale);
+          this.ctx.stroke();
+        } else if (!hasLineArt) {
+          this.ctx.strokeStyle = isActiveTarget ? 'rgba(99, 102, 241, 0.6)' : 'rgba(30, 41, 59, 0.72)';
+          this.ctx.lineWidth = (isActiveTarget ? 1.2 : 1.6) / Math.max(0.5, this.scale);
+          this.ctx.stroke();
+        } else if (!region.is_filled) {
+          this.ctx.strokeStyle = 'rgba(148, 163, 184, 0.42)';
+          this.ctx.lineWidth = 0.8 / Math.max(0.5, this.scale);
+          this.ctx.stroke();
         }
-        this.ctx.stroke();
       }
     });
+
+    // Composite crisp ink line-art overlay directly above fills and below numbers
+    if (hasLineArt) {
+      this.ctx.drawImage(this.lineArtImage, 0, 0, this.artwork.width, this.artwork.height);
+    }
 
     // Render numbers
     const fontBaseSize = Math.max(8, Math.min(24, 14 / this.scale));
@@ -4477,17 +4567,21 @@ class FallbackJsController {
         if (isDiamond) {
           ctx.strokeStyle = 'rgba(148, 163, 184, 0.35)';
           ctx.lineWidth = Math.max(0.5, 0.7 / s);
-        } else {
+          if (isQuad) {
+            ctx.strokeRect(p0.x, p0.y, cellW, cellH);
+          } else {
+            ctx.stroke();
+          }
+        } else if (!this.lineArtImage) {
           ctx.strokeStyle = 'rgba(30, 41, 59, 0.35)';
           ctx.lineWidth = Math.max(0.6, 1.0 / s);
-        }
-
-        if (isQuad) {
-          ctx.strokeRect(p0.x, p0.y, cellW, cellH);
-        } else {
           ctx.stroke();
         }
       }
+    }
+
+    if (this.lineArtImage && this.lineArtImage.complete && this.lineArtImage.naturalWidth > 0) {
+      ctx.drawImage(this.lineArtImage, 0, 0, artW, artH);
     }
 
     ctx.restore();

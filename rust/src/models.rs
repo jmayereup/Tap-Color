@@ -17,6 +17,8 @@ pub struct Region {
     pub id: usize,
     pub number: usize,
     pub polygon: Vec<Point>,
+    #[serde(default)]
+    pub holes: Vec<Vec<Point>>,
     pub centroid: Point,
     #[serde(default)]
     pub label_radius: f64,
@@ -62,9 +64,8 @@ impl Region {
         }
     }
 
-    /// Point-in-polygon raycasting algorithm
-    pub fn contains_point(&self, p: Point) -> bool {
-        let n = self.polygon.len();
+    fn point_in_ring(p: Point, ring: &[Point]) -> bool {
+        let n = ring.len();
         if n < 3 {
             return false;
         }
@@ -72,8 +73,8 @@ impl Region {
         let mut j = n - 1;
 
         for i in 0..n {
-            let pi = &self.polygon[i];
-            let pj = &self.polygon[j];
+            let pi = &ring[i];
+            let pj = &ring[j];
 
             if ((pi.y > p.y) != (pj.y > p.y))
                 && (p.x < (pj.x - pi.x) * (p.y - pi.y) / (pj.y - pi.y) + pi.x)
@@ -83,6 +84,19 @@ impl Region {
             j = i;
         }
         inside
+    }
+
+    /// Point-in-polygon raycasting algorithm (respects interior holes)
+    pub fn contains_point(&self, p: Point) -> bool {
+        if !Self::point_in_ring(p, &self.polygon) {
+            return false;
+        }
+        for hole in &self.holes {
+            if Self::point_in_ring(p, hole) {
+                return false;
+            }
+        }
+        true
     }
 }
 
@@ -103,6 +117,8 @@ pub struct ArtworkData {
     pub artist: String,
     pub width: f64,
     pub height: f64,
+    #[serde(default)]
+    pub line_art_url: Option<String>,
     pub palette: Vec<PaletteItem>,
     pub regions: Vec<Region>,
 }

@@ -712,28 +712,54 @@ def merge_similar_palette(centers, counts, min_dist):
     return [a[0] for a in active]
 
 
-def convert_to_paint_by_number(img_path, complexity, title, artist, output_id, output_dir):
+def save_rgba_to_png(rgba_bytes, W, H, png_path):
+    """Saves straight-alpha RGBA bytes (W*H*4) to a PNG file using PIL or Cairo."""
+    if HAS_PIL:
+        im = Image.frombytes('RGBA', (W, H), bytes(rgba_bytes))
+        im.save(png_path, 'PNG')
+    else:
+        # Cairo FORMAT_ARGB32 on little-endian expects premultiplied BGRA bytes
+        bgra = bytearray(W * H * 4)
+        for i in range(0, W * H * 4, 4):
+            a = rgba_bytes[i + 3]
+            if a == 255:
+                bgra[i] = rgba_bytes[i + 2]
+                bgra[i + 1] = rgba_bytes[i + 1]
+                bgra[i + 2] = rgba_bytes[i]
+                bgra[i + 3] = 255
+            elif a > 0:
+                bgra[i] = (rgba_bytes[i + 2] * a + 127) // 255
+                bgra[i + 1] = (rgba_bytes[i + 1] * a + 127) // 255
+                bgra[i + 2] = (rgba_bytes[i] * a + 127) // 255
+                bgra[i + 3] = a
+        surf = cairo.ImageSurface.create_for_data(bgra, cairo.FORMAT_ARGB32, W, H, W * 4)
+        surf.write_to_png(png_path)
+
+
+def convert_to_paint_by_number(img_path, title, artist, output_id, output_dir):
     import subprocess, tempfile
     json_path = os.path.join(output_dir, f"{output_id}.json")
+    lines_png_path = os.path.join(output_dir, f"{output_id}_lines.png")
     thumb_path = os.path.join(output_dir, f"{output_id}_thumb.png")
+    line_art_url = f"assets/converted/{output_id}_lines.png"
 
-    presets = {
-        'detailed':    {'W': 380, 'pbn_key': 'cozy'},
-        'intricate':   {'W': 440, 'pbn_key': 'balanced'},
-        'masterpiece': {'W': 500, 'pbn_key': 'detailed'},
-    }
-    cfg = presets[complexity]
-    W = cfg['W']
-    pbn_key = cfg['pbn_key']
+    W = 800
+    pad = 24
+    inner_w = W - pad * 2
+    inner_rgb = load_framed_rgb_grid(img_path, inner_w)
 
-    grid_rgb = load_framed_rgb_grid(img_path, W)
-    buf = bytearray(W * W * 4)
-    for i, (r, g, b) in enumerate(grid_rgb):
-        o = i * 4
-        buf[o] = r
-        buf[o + 1] = g
-        buf[o + 2] = b
-        buf[o + 3] = 255
+    # Place framed artwork inside 800x800 white canvas with 24px margin for 1:1 world alignment
+    buf = bytearray([255] * (W * W * 4))
+    for y in range(inner_w):
+        src_row = y * inner_w
+        dst_row = (y + pad) * W + pad
+        for x in range(inner_w):
+            r, g, b = inner_rgb[src_row + x]
+            o = (dst_row + x) * 4
+            buf[o] = r
+            buf[o + 1] = g
+            buf[o + 2] = b
+            buf[o + 3] = 255
 
     base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     pbn_script = os.path.join(base_dir, "scripts", "convert_pbn.mjs")
@@ -741,16 +767,23 @@ def convert_to_paint_by_number(img_path, complexity, title, artist, output_id, o
     with tempfile.NamedTemporaryFile(suffix=".bin", delete=False) as tf:
         raw_bin_path = tf.name
         tf.write(buf)
+    with tempfile.NamedTemporaryFile(suffix=".rgba", delete=False) as lf:
+        lines_bin_path = lf.name
 
     try:
         subprocess.run(
-            ["node", pbn_script, raw_bin_path, str(W), pbn_key, output_id, title, artist, json_path],
+            ["node", pbn_script, raw_bin_path, str(W), output_id, title, artist, json_path, lines_bin_path, line_art_url],
             check=True,
             cwd=base_dir,
         )
+        with open(lines_bin_path, 'rb') as lf:
+            lines_rgba = lf.read()
+        save_rgba_to_png(lines_rgba, W, W, lines_png_path)
     finally:
         if os.path.exists(raw_bin_path):
             os.remove(raw_bin_path)
+        if os.path.exists(lines_bin_path):
+            os.remove(lines_bin_path)
 
     with open(json_path, 'r', encoding='utf-8') as f:
         artwork = json.load(f)
@@ -760,49 +793,63 @@ def convert_to_paint_by_number(img_path, complexity, title, artist, output_id, o
     width = artwork["width"]
     height = artwork["height"]
 
-    # Render Thumbnail (280x200, 2x supersampled with crisp dark ink outlines)
+    # Render Thumbnail (280x200 on clean paper background with crisp ink overlay)
     thumb_w, thumb_h = 280, 200
-    ss = 2
-    ts = 0.23 * ss
-    tox = (thumb_w * ss - width * ts) / 2
-    toy = (thumb_h * ss - height * ts) / 2
+    ts = min((thumb_w - 16) / width, (thumb_h - 16) / height)
+    tox = (thumb_w - width * ts) / 2
+    toy = (thumb_h - height * ts) / 2
 
     if HAS_PIL:
-        thumb_hi = Image.new('RGB', (thumb_w * ss, thumb_h * ss), (248, 250, 252))
+        ss = 2
+        thumb_hi = Image.new('RGBA', (thumb_w * ss, thumb_h * ss), (248, 250, 252, 255))
         draw = ImageDraw.Draw(thumb_hi)
         for r in regions:
-            poly_pts = [(tox + pt['x'] * ts, toy + pt['y'] * ts) for pt in r['polygon']]
+            poly_pts = [(tox * ss + pt['x'] * ts * ss, toy * ss + pt['y'] * ts * ss) for pt in r['polygon']]
             if len(poly_pts) >= 3:
                 hex_c = r['color_hex'].lstrip('#')
-                rgb_c = tuple(int(hex_c[i:i+2], 16) for i in (0, 2, 4))
+                rgb_c = tuple(int(hex_c[i:i+2], 16) for i in (0, 2, 4)) + (255,)
                 draw.polygon(poly_pts, fill=rgb_c)
-                draw.line(poly_pts + [poly_pts[0]], fill=(30, 41, 59), width=2)
-        thumb_img = thumb_hi.resize((thumb_w, thumb_h), Image.Resampling.LANCZOS)
+        lines_im = Image.open(lines_png_path).convert('RGBA')
+        lines_scaled = lines_im.resize((int(round(width * ts * ss)), int(round(height * ts * ss))), Image.Resampling.LANCZOS)
+        thumb_hi.alpha_composite(lines_scaled, (int(round(tox * ss)), int(round(toy * ss))))
+        thumb_img = thumb_hi.resize((thumb_w, thumb_h), Image.Resampling.LANCZOS).convert('RGB')
         thumb_img.save(thumb_path, 'PNG')
     else:
         surf = cairo.ImageSurface(cairo.FORMAT_ARGB32, thumb_w, thumb_h)
         ctx = cairo.Context(surf)
-        ctx.set_source_rgb(15/255.0, 23/255.0, 42/255.0)
+        ctx.set_source_rgb(248/255.0, 250/255.0, 252/255.0)
         ctx.paint()
-        ctx.scale(1.0 / ss, 1.0 / ss)
+        ctx.save()
+        ctx.translate(tox, toy)
+        ctx.scale(ts, ts)
+        ctx.set_fill_rule(cairo.FILL_RULE_EVEN_ODD)
         for r in regions:
-            poly_pts = [(tox + pt['x'] * ts, toy + pt['y'] * ts) for pt in r['polygon']]
-            if len(poly_pts) >= 3:
-                hex_c = r['color_hex'].lstrip('#')
-                rgb_c = tuple(int(hex_c[i:i+2], 16) for i in (0, 2, 4))
-                ctx.new_path()
-                ctx.move_to(poly_pts[0][0], poly_pts[0][1])
-                for pt in poly_pts[1:]:
-                    ctx.line_to(pt[0], pt[1])
-                ctx.close_path()
-                ctx.set_source_rgb(rgb_c[0]/255.0, rgb_c[1]/255.0, rgb_c[2]/255.0)
-                ctx.fill_preserve()
-                ctx.set_source_rgba(0.94, 0.94, 0.94, 0.25)
-                ctx.set_line_width(0.8)
-                ctx.stroke()
+            poly = r.get('polygon', [])
+            if len(poly) < 3:
+                continue
+            hex_c = r['color_hex'].lstrip('#')
+            rgb_c = tuple(int(hex_c[i:i+2], 16) for i in (0, 2, 4))
+            ctx.new_path()
+            ctx.move_to(poly[0]['x'], poly[0]['y'])
+            for pt in poly[1:]:
+                ctx.line_to(pt['x'], pt['y'])
+            ctx.close_path()
+            for hole in r.get('holes', []):
+                if len(hole) >= 3:
+                    ctx.move_to(hole[0]['x'], hole[0]['y'])
+                    for pt in hole[1:]:
+                        ctx.line_to(pt['x'], pt['y'])
+                    ctx.close_path()
+            ctx.set_source_rgb(rgb_c[0]/255.0, rgb_c[1]/255.0, rgb_c[2]/255.0)
+            ctx.fill()
+        # Composite crisp ink line-art overlay on top
+        lines_surf = cairo.ImageSurface.create_from_png(lines_png_path)
+        ctx.set_source_surface(lines_surf, 0, 0)
+        ctx.paint()
+        ctx.restore()
         surf.write_to_png(thumb_path)
 
-    print(f"  [Paint-by-Number] {output_id} ({complexity}): {len(regions)} regions, {len(active_palette)} colors")
+    print(f"  [Paint-by-Number] {output_id}: {len(regions)} regions, {len(active_palette)} colors")
     return artwork
 
 def main():
@@ -992,32 +1039,28 @@ def main():
                     "thumbnailUrl": f"assets/converted/{art_id}_thumb.png",
                 })
 
-        # 2. Paint-by-Number at 3 resolutions
+        # 2. Paint-by-Number (single canonical line-preserving edition)
         pbn_img_path = os.path.join(assets_dir, item["pbn_file"]) if "pbn_file" in item else img_path
         if not os.path.exists(pbn_img_path):
             print(f"Skipping PBN {pbn_img_path}: file not found")
             pbn_img_path = img_path
-        pbn_variants = []
-        for p_res in pbn_resolutions:
-            art_id = f"{item['key']}_pbn_{p_res['suffix']}"
-            variant_title = f"{item['title']} ({p_res['name']})"
-            art = convert_to_paint_by_number(
-                img_path=pbn_img_path,
-                complexity=p_res["complexity"],
-                title=variant_title,
-                artist=item["artist"],
-                output_id=art_id,
-                output_dir=output_dir
-            )
-            pbn_variants.append({
-                "id": art_id,
-                "resolution": p_res["name"],
-                "complexity": p_res["complexity"],
-                "pieces": len(art["regions"]),
-                "colors": len(art["palette"]),
-                "jsonFile": f"assets/converted/{art_id}.json",
-                "thumbnailUrl": f"assets/converted/{art_id}_thumb.png",
-            })
+        art_id = f"{item['key']}_pbn"
+        art = convert_to_paint_by_number(
+            img_path=pbn_img_path,
+            title=item["title"],
+            artist=item["artist"],
+            output_id=art_id,
+            output_dir=output_dir
+        )
+        pbn_variants = [{
+            "id": art_id,
+            "resolution": "Original",
+            "pieces": len(art["regions"]),
+            "colors": len(art["palette"]),
+            "jsonFile": f"assets/converted/{art_id}.json",
+            "lineArtUrl": f"assets/converted/{art_id}_lines.png",
+            "thumbnailUrl": f"assets/converted/{art_id}_thumb.png",
+        }]
 
         manifest_map[item["key"]] = {
             "key": item["key"],
