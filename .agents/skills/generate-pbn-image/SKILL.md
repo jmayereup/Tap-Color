@@ -45,9 +45,9 @@ Choose a difficulty tier based on the user's request; **default to `Medium`** wh
 
 ---
 
-## 3. Prompt Template
+## 3. Prompt Template & OpenRouter Generation
 
-When generating with Gemini / `image-generator`, combine the **Base Prompt** with the **Difficulty Modifier** for the chosen tier (defaulting to **Medium**):
+Use **OpenRouter** (default model: `meta/muse-image` via `https://openrouter.ai/api/v1/images/generations`) with `OPENROUTER_API_KEY` configured in `.env` at the repo root (or in the environment). Combine the **Base Prompt** with the **Difficulty Modifier** for the chosen tier (defaulting to **Medium**):
 
 ### Base Prompt
 ```text
@@ -84,15 +84,21 @@ text, watermark, frame, border
 ## 4. Step-by-Step Workflow
 
 ### Step 1: Generate & Inspect the Image
-1. Generate a `1024×1024` (1:1) image using the prompt template above (via the `image-generator` subagent or Gemini image generation).
+1. Generate a `1024×1024` (1:1) image via OpenRouter using the skill's helper script (requires `OPENROUTER_API_KEY` in `.env` or environment, and external network access):
+   ```bash
+   python3 .agents/skills/generate-pbn-image/scripts/generate_pbn_image.py <snake_case_name> "<SUBJECT>" --tier medium
+   ```
+   - Use `--tier easy`, `--tier medium` (default), or `--tier hard`.
+   - Override the OpenRouter image model with `--model <provider/model>` (defaults to `meta/muse-image`).
+   - *(Note: Dedicated image models like `meta/muse-image` use OpenRouter's `/api/v1/images/generations` endpoint, not `/api/v1/chat/completions`.)*
 2. Visually inspect the generated image against these checks:
    - Pure `#FFFFFF` outer background with clear margin around the subject.
-   - Continuous, closed black ink outlines with no gaps.
+   - Continuous, closed black ink outlines with no gaps (especially around white/light elements like flower petals or snow so they don't merge with adjacent regions).
    - No tiny confetti/speckle regions or soft gradients.
-   - If any check fails, regenerate with stronger simplification wording before saving.
+   - If any check fails, regenerate with stronger outline/simplification wording before converting.
 
-### Step 2: Upload to `public/assets/paint_by_number/`
-Save the image using lowercase `snake_case` naming (`.jpeg`, `.jpg`, `.png`, or `.webp`):
+### Step 2: Verify Asset Placement in `public/assets/paint_by_number/`
+The helper script saves directly to `public/assets/paint_by_number/<snake_case_name>.<ext>` (using lowercase `snake_case` naming):
 ```text
 public/assets/paint_by_number/<snake_case_name>.png
 ```

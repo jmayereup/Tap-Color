@@ -196,6 +196,25 @@
           <button class="gallery-tab" data-tab="custom">📸 Make from Photo</button>
         </div>
 
+        <!-- Paint by Number Pieces Filter -->
+        <div id="pbn-pieces-filter" class="pbn-pieces-filter">
+          <div class="pbn-filter-header">
+            <label for="pbn-pieces-slider" class="pbn-filter-label">
+              🎨 Pieces: <strong id="pbn-pieces-value">All (up to 594)</strong>
+            </label>
+            <div class="pbn-filter-meta">
+              <span id="pbn-pieces-count" class="pbn-filter-count">18 pictures</span>
+              <button type="button" id="btn-reset-pbn-filter" class="pbn-filter-reset hidden">Show All</button>
+            </div>
+          </div>
+          <div class="pbn-slider-row">
+            <span id="pbn-pieces-min-label" class="pbn-slider-bound">49</span>
+            <input type="range" id="pbn-pieces-slider" class="pbn-pieces-slider" min="49" max="594" step="1" value="594"
+              aria-valuetext="All, up to 594 pieces">
+            <span id="pbn-pieces-max-label" class="pbn-slider-bound">594</span>
+          </div>
+        </div>
+
         <!-- Catalog Artwork Grid (Paint by Number & Diamond Painting) -->
         <div class="artwork-grid" id="artwork-grid">
           <!-- Populated dynamically with rich visual thumbnails -->

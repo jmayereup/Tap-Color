@@ -1,5 +1,473 @@
 [
   {
+    "key": "highland_calf_nap",
+    "title": "Highland Calf Nap",
+    "artist": "Tap Color Studio",
+    "desc": "Highland Calf Nap artwork",
+    "addedAt": 1795252325207,
+    "originalAsset": "assets/paint_by_number/highland_calf_nap.png",
+    "pbnAsset": "assets/paint_by_number/highland_calf_nap.png",
+    "diamondVariants": [
+      {
+        "id": "highland_calf_nap_diamond_80",
+        "resolution": "Cozy (6.4k)",
+        "label": "80\u00d780",
+        "grid": 80,
+        "pieces": 6400,
+        "colors": 18,
+        "jsonFile": "assets/converted/highland_calf_nap_diamond_80.json",
+        "thumbnailUrl": "assets/converted/highland_calf_nap_diamond_80_thumb.png"
+      },
+      {
+        "id": "highland_calf_nap_diamond_120",
+        "resolution": "Standard (14.4k)",
+        "label": "120\u00d7120",
+        "grid": 120,
+        "pieces": 14400,
+        "colors": 26,
+        "jsonFile": "assets/converted/highland_calf_nap_diamond_120.json",
+        "thumbnailUrl": "assets/converted/highland_calf_nap_diamond_120_thumb.png"
+      },
+      {
+        "id": "highland_calf_nap_diamond_160",
+        "resolution": "Masterpiece (25.6k)",
+        "label": "160\u00d7160",
+        "grid": 160,
+        "pieces": 25600,
+        "colors": 36,
+        "jsonFile": "assets/converted/highland_calf_nap_diamond_160.json",
+        "thumbnailUrl": "assets/converted/highland_calf_nap_diamond_160_thumb.png"
+      }
+    ],
+    "pbnVariants": [
+      {
+        "id": "highland_calf_nap_pbn",
+        "resolution": "Original",
+        "pieces": 74,
+        "colors": 25,
+        "jsonFile": "assets/converted/highland_calf_nap_pbn.json",
+        "lineArtUrl": "assets/converted/highland_calf_nap_pbn_lines.png",
+        "thumbnailUrl": "assets/converted/highland_calf_nap_pbn_thumb.png"
+      }
+    ]
+  },
+  {
+    "key": "highland_calf_bucket",
+    "title": "Highland Calf Bucket",
+    "artist": "Tap Color Studio",
+    "desc": "Highland Calf Bucket artwork",
+    "addedAt": 1795252300643,
+    "originalAsset": "assets/paint_by_number/highland_calf_bucket.png",
+    "pbnAsset": "assets/paint_by_number/highland_calf_bucket.png",
+    "diamondVariants": [
+      {
+        "id": "highland_calf_bucket_diamond_80",
+        "resolution": "Cozy (6.4k)",
+        "label": "80\u00d780",
+        "grid": 80,
+        "pieces": 6400,
+        "colors": 18,
+        "jsonFile": "assets/converted/highland_calf_bucket_diamond_80.json",
+        "thumbnailUrl": "assets/converted/highland_calf_bucket_diamond_80_thumb.png"
+      },
+      {
+        "id": "highland_calf_bucket_diamond_120",
+        "resolution": "Standard (14.4k)",
+        "label": "120\u00d7120",
+        "grid": 120,
+        "pieces": 14400,
+        "colors": 26,
+        "jsonFile": "assets/converted/highland_calf_bucket_diamond_120.json",
+        "thumbnailUrl": "assets/converted/highland_calf_bucket_diamond_120_thumb.png"
+      },
+      {
+        "id": "highland_calf_bucket_diamond_160",
+        "resolution": "Masterpiece (25.6k)",
+        "label": "160\u00d7160",
+        "grid": 160,
+        "pieces": 25600,
+        "colors": 36,
+        "jsonFile": "assets/converted/highland_calf_bucket_diamond_160.json",
+        "thumbnailUrl": "assets/converted/highland_calf_bucket_diamond_160_thumb.png"
+      }
+    ],
+    "pbnVariants": [
+      {
+        "id": "highland_calf_bucket_pbn",
+        "resolution": "Original",
+        "pieces": 105,
+        "colors": 17,
+        "jsonFile": "assets/converted/highland_calf_bucket_pbn.json",
+        "lineArtUrl": "assets/converted/highland_calf_bucket_pbn_lines.png",
+        "thumbnailUrl": "assets/converted/highland_calf_bucket_pbn_thumb.png"
+      }
+    ]
+  },
+  {
+    "key": "highland_calf_sunflowers",
+    "title": "Highland Calf Sunflowers",
+    "artist": "Tap Color Studio",
+    "desc": "Highland Calf Sunflowers artwork",
+    "addedAt": 1795252267483,
+    "originalAsset": "assets/paint_by_number/highland_calf_sunflowers.png",
+    "pbnAsset": "assets/paint_by_number/highland_calf_sunflowers.png",
+    "diamondVariants": [
+      {
+        "id": "highland_calf_sunflowers_diamond_80",
+        "resolution": "Cozy (6.4k)",
+        "label": "80\u00d780",
+        "grid": 80,
+        "pieces": 6400,
+        "colors": 18,
+        "jsonFile": "assets/converted/highland_calf_sunflowers_diamond_80.json",
+        "thumbnailUrl": "assets/converted/highland_calf_sunflowers_diamond_80_thumb.png"
+      },
+      {
+        "id": "highland_calf_sunflowers_diamond_120",
+        "resolution": "Standard (14.4k)",
+        "label": "120\u00d7120",
+        "grid": 120,
+        "pieces": 14400,
+        "colors": 26,
+        "jsonFile": "assets/converted/highland_calf_sunflowers_diamond_120.json",
+        "thumbnailUrl": "assets/converted/highland_calf_sunflowers_diamond_120_thumb.png"
+      },
+      {
+        "id": "highland_calf_sunflowers_diamond_160",
+        "resolution": "Masterpiece (25.6k)",
+        "label": "160\u00d7160",
+        "grid": 160,
+        "pieces": 25600,
+        "colors": 36,
+        "jsonFile": "assets/converted/highland_calf_sunflowers_diamond_160.json",
+        "thumbnailUrl": "assets/converted/highland_calf_sunflowers_diamond_160_thumb.png"
+      }
+    ],
+    "pbnVariants": [
+      {
+        "id": "highland_calf_sunflowers_pbn",
+        "resolution": "Original",
+        "pieces": 120,
+        "colors": 8,
+        "jsonFile": "assets/converted/highland_calf_sunflowers_pbn.json",
+        "lineArtUrl": "assets/converted/highland_calf_sunflowers_pbn_lines.png",
+        "thumbnailUrl": "assets/converted/highland_calf_sunflowers_pbn_thumb.png"
+      }
+    ]
+  },
+  {
+    "key": "highland_calf_flower_crown",
+    "title": "Highland Calf Flower Crown",
+    "artist": "Tap Color Studio",
+    "desc": "Highland Calf Flower Crown artwork",
+    "addedAt": 1795252229207,
+    "originalAsset": "assets/paint_by_number/highland_calf_flower_crown.png",
+    "pbnAsset": "assets/paint_by_number/highland_calf_flower_crown.png",
+    "diamondVariants": [
+      {
+        "id": "highland_calf_flower_crown_diamond_80",
+        "resolution": "Cozy (6.4k)",
+        "label": "80\u00d780",
+        "grid": 80,
+        "pieces": 6400,
+        "colors": 18,
+        "jsonFile": "assets/converted/highland_calf_flower_crown_diamond_80.json",
+        "thumbnailUrl": "assets/converted/highland_calf_flower_crown_diamond_80_thumb.png"
+      },
+      {
+        "id": "highland_calf_flower_crown_diamond_120",
+        "resolution": "Standard (14.4k)",
+        "label": "120\u00d7120",
+        "grid": 120,
+        "pieces": 14400,
+        "colors": 26,
+        "jsonFile": "assets/converted/highland_calf_flower_crown_diamond_120.json",
+        "thumbnailUrl": "assets/converted/highland_calf_flower_crown_diamond_120_thumb.png"
+      },
+      {
+        "id": "highland_calf_flower_crown_diamond_160",
+        "resolution": "Masterpiece (25.6k)",
+        "label": "160\u00d7160",
+        "grid": 160,
+        "pieces": 25600,
+        "colors": 36,
+        "jsonFile": "assets/converted/highland_calf_flower_crown_diamond_160.json",
+        "thumbnailUrl": "assets/converted/highland_calf_flower_crown_diamond_160_thumb.png"
+      }
+    ],
+    "pbnVariants": [
+      {
+        "id": "highland_calf_flower_crown_pbn",
+        "resolution": "Original",
+        "pieces": 57,
+        "colors": 9,
+        "jsonFile": "assets/converted/highland_calf_flower_crown_pbn.json",
+        "lineArtUrl": "assets/converted/highland_calf_flower_crown_pbn_lines.png",
+        "thumbnailUrl": "assets/converted/highland_calf_flower_crown_pbn_thumb.png"
+      }
+    ]
+  },
+  {
+    "key": "highland_calf_scarf",
+    "title": "Highland Calf Scarf",
+    "artist": "Tap Color Studio",
+    "desc": "Highland Calf Scarf artwork",
+    "addedAt": 1795252205023,
+    "originalAsset": "assets/paint_by_number/highland_calf_scarf.png",
+    "pbnAsset": "assets/paint_by_number/highland_calf_scarf.png",
+    "diamondVariants": [
+      {
+        "id": "highland_calf_scarf_diamond_80",
+        "resolution": "Cozy (6.4k)",
+        "label": "80\u00d780",
+        "grid": 80,
+        "pieces": 6400,
+        "colors": 18,
+        "jsonFile": "assets/converted/highland_calf_scarf_diamond_80.json",
+        "thumbnailUrl": "assets/converted/highland_calf_scarf_diamond_80_thumb.png"
+      },
+      {
+        "id": "highland_calf_scarf_diamond_120",
+        "resolution": "Standard (14.4k)",
+        "label": "120\u00d7120",
+        "grid": 120,
+        "pieces": 14400,
+        "colors": 26,
+        "jsonFile": "assets/converted/highland_calf_scarf_diamond_120.json",
+        "thumbnailUrl": "assets/converted/highland_calf_scarf_diamond_120_thumb.png"
+      },
+      {
+        "id": "highland_calf_scarf_diamond_160",
+        "resolution": "Masterpiece (25.6k)",
+        "label": "160\u00d7160",
+        "grid": 160,
+        "pieces": 25600,
+        "colors": 36,
+        "jsonFile": "assets/converted/highland_calf_scarf_diamond_160.json",
+        "thumbnailUrl": "assets/converted/highland_calf_scarf_diamond_160_thumb.png"
+      }
+    ],
+    "pbnVariants": [
+      {
+        "id": "highland_calf_scarf_pbn",
+        "resolution": "Original",
+        "pieces": 47,
+        "colors": 9,
+        "jsonFile": "assets/converted/highland_calf_scarf_pbn.json",
+        "lineArtUrl": "assets/converted/highland_calf_scarf_pbn_lines.png",
+        "thumbnailUrl": "assets/converted/highland_calf_scarf_pbn_thumb.png"
+      }
+    ]
+  },
+  {
+    "key": "polar_bear_aurora",
+    "title": "Polar Bear Aurora",
+    "artist": "Tap Color Studio",
+    "desc": "Polar Bear Aurora artwork",
+    "addedAt": 1795251625935,
+    "originalAsset": "assets/paint_by_number/polar_bear_aurora.png",
+    "pbnAsset": "assets/paint_by_number/polar_bear_aurora.png",
+    "diamondVariants": [
+      {
+        "id": "polar_bear_aurora_diamond_80",
+        "resolution": "Cozy (6.4k)",
+        "label": "80\u00d780",
+        "grid": 80,
+        "pieces": 6400,
+        "colors": 18,
+        "jsonFile": "assets/converted/polar_bear_aurora_diamond_80.json",
+        "thumbnailUrl": "assets/converted/polar_bear_aurora_diamond_80_thumb.png"
+      },
+      {
+        "id": "polar_bear_aurora_diamond_120",
+        "resolution": "Standard (14.4k)",
+        "label": "120\u00d7120",
+        "grid": 120,
+        "pieces": 14400,
+        "colors": 26,
+        "jsonFile": "assets/converted/polar_bear_aurora_diamond_120.json",
+        "thumbnailUrl": "assets/converted/polar_bear_aurora_diamond_120_thumb.png"
+      },
+      {
+        "id": "polar_bear_aurora_diamond_160",
+        "resolution": "Masterpiece (25.6k)",
+        "label": "160\u00d7160",
+        "grid": 160,
+        "pieces": 25600,
+        "colors": 36,
+        "jsonFile": "assets/converted/polar_bear_aurora_diamond_160.json",
+        "thumbnailUrl": "assets/converted/polar_bear_aurora_diamond_160_thumb.png"
+      }
+    ],
+    "pbnVariants": [
+      {
+        "id": "polar_bear_aurora_pbn",
+        "resolution": "Original",
+        "pieces": 594,
+        "colors": 15,
+        "jsonFile": "assets/converted/polar_bear_aurora_pbn.json",
+        "lineArtUrl": "assets/converted/polar_bear_aurora_pbn_lines.png",
+        "thumbnailUrl": "assets/converted/polar_bear_aurora_pbn_thumb.png"
+      }
+    ]
+  },
+  {
+    "key": "arctic_fox_snow",
+    "title": "Arctic Fox Snow",
+    "artist": "Tap Color Studio",
+    "desc": "Arctic Fox Snow artwork",
+    "addedAt": 1795251570275,
+    "originalAsset": "assets/paint_by_number/arctic_fox_snow.png",
+    "pbnAsset": "assets/paint_by_number/arctic_fox_snow.png",
+    "diamondVariants": [
+      {
+        "id": "arctic_fox_snow_diamond_80",
+        "resolution": "Cozy (6.4k)",
+        "label": "80\u00d780",
+        "grid": 80,
+        "pieces": 6400,
+        "colors": 18,
+        "jsonFile": "assets/converted/arctic_fox_snow_diamond_80.json",
+        "thumbnailUrl": "assets/converted/arctic_fox_snow_diamond_80_thumb.png"
+      },
+      {
+        "id": "arctic_fox_snow_diamond_120",
+        "resolution": "Standard (14.4k)",
+        "label": "120\u00d7120",
+        "grid": 120,
+        "pieces": 14400,
+        "colors": 26,
+        "jsonFile": "assets/converted/arctic_fox_snow_diamond_120.json",
+        "thumbnailUrl": "assets/converted/arctic_fox_snow_diamond_120_thumb.png"
+      },
+      {
+        "id": "arctic_fox_snow_diamond_160",
+        "resolution": "Masterpiece (25.6k)",
+        "label": "160\u00d7160",
+        "grid": 160,
+        "pieces": 25600,
+        "colors": 36,
+        "jsonFile": "assets/converted/arctic_fox_snow_diamond_160.json",
+        "thumbnailUrl": "assets/converted/arctic_fox_snow_diamond_160_thumb.png"
+      }
+    ],
+    "pbnVariants": [
+      {
+        "id": "arctic_fox_snow_pbn",
+        "resolution": "Original",
+        "pieces": 381,
+        "colors": 26,
+        "jsonFile": "assets/converted/arctic_fox_snow_pbn.json",
+        "lineArtUrl": "assets/converted/arctic_fox_snow_pbn_lines.png",
+        "thumbnailUrl": "assets/converted/arctic_fox_snow_pbn_thumb.png"
+      }
+    ]
+  },
+  {
+    "key": "winter_penguin",
+    "title": "Winter Penguin",
+    "artist": "Tap Color Studio",
+    "desc": "Winter Penguin artwork",
+    "addedAt": 1795251504011,
+    "originalAsset": "assets/paint_by_number/winter_penguin.png",
+    "pbnAsset": "assets/paint_by_number/winter_penguin.png",
+    "diamondVariants": [
+      {
+        "id": "winter_penguin_diamond_80",
+        "resolution": "Cozy (6.4k)",
+        "label": "80\u00d780",
+        "grid": 80,
+        "pieces": 6400,
+        "colors": 18,
+        "jsonFile": "assets/converted/winter_penguin_diamond_80.json",
+        "thumbnailUrl": "assets/converted/winter_penguin_diamond_80_thumb.png"
+      },
+      {
+        "id": "winter_penguin_diamond_120",
+        "resolution": "Standard (14.4k)",
+        "label": "120\u00d7120",
+        "grid": 120,
+        "pieces": 14400,
+        "colors": 26,
+        "jsonFile": "assets/converted/winter_penguin_diamond_120.json",
+        "thumbnailUrl": "assets/converted/winter_penguin_diamond_120_thumb.png"
+      },
+      {
+        "id": "winter_penguin_diamond_160",
+        "resolution": "Masterpiece (25.6k)",
+        "label": "160\u00d7160",
+        "grid": 160,
+        "pieces": 25600,
+        "colors": 36,
+        "jsonFile": "assets/converted/winter_penguin_diamond_160.json",
+        "thumbnailUrl": "assets/converted/winter_penguin_diamond_160_thumb.png"
+      }
+    ],
+    "pbnVariants": [
+      {
+        "id": "winter_penguin_pbn",
+        "resolution": "Original",
+        "pieces": 460,
+        "colors": 26,
+        "jsonFile": "assets/converted/winter_penguin_pbn.json",
+        "lineArtUrl": "assets/converted/winter_penguin_pbn_lines.png",
+        "thumbnailUrl": "assets/converted/winter_penguin_pbn_thumb.png"
+      }
+    ]
+  },
+  {
+    "key": "winter_cardinal",
+    "title": "Winter Cardinal",
+    "artist": "Tap Color Studio",
+    "desc": "Winter Cardinal artwork",
+    "addedAt": 1795251160115,
+    "originalAsset": "assets/paint_by_number/winter_cardinal.jpg",
+    "pbnAsset": "assets/paint_by_number/winter_cardinal.jpg",
+    "diamondVariants": [
+      {
+        "id": "winter_cardinal_diamond_80",
+        "resolution": "Cozy (6.4k)",
+        "label": "80\u00d780",
+        "grid": 80,
+        "pieces": 6400,
+        "colors": 18,
+        "jsonFile": "assets/converted/winter_cardinal_diamond_80.json",
+        "thumbnailUrl": "assets/converted/winter_cardinal_diamond_80_thumb.png"
+      },
+      {
+        "id": "winter_cardinal_diamond_120",
+        "resolution": "Standard (14.4k)",
+        "label": "120\u00d7120",
+        "grid": 120,
+        "pieces": 14400,
+        "colors": 26,
+        "jsonFile": "assets/converted/winter_cardinal_diamond_120.json",
+        "thumbnailUrl": "assets/converted/winter_cardinal_diamond_120_thumb.png"
+      },
+      {
+        "id": "winter_cardinal_diamond_160",
+        "resolution": "Masterpiece (25.6k)",
+        "label": "160\u00d7160",
+        "grid": 160,
+        "pieces": 25600,
+        "colors": 36,
+        "jsonFile": "assets/converted/winter_cardinal_diamond_160.json",
+        "thumbnailUrl": "assets/converted/winter_cardinal_diamond_160_thumb.png"
+      }
+    ],
+    "pbnVariants": [
+      {
+        "id": "winter_cardinal_pbn",
+        "resolution": "Original",
+        "pieces": 368,
+        "colors": 16,
+        "jsonFile": "assets/converted/winter_cardinal_pbn.json",
+        "lineArtUrl": "assets/converted/winter_cardinal_pbn_lines.png",
+        "thumbnailUrl": "assets/converted/winter_cardinal_pbn_thumb.png"
+      }
+    ]
+  },
+  {
     "key": "santa_1",
     "title": "Santa 1",
     "artist": "Tap Color Studio",

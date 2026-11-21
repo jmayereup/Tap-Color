@@ -464,6 +464,7 @@ class TapColorApp {
     this.activeNumber = 1;
     this.hintCount = 5;
     this.activeCategory = 'classic'; // 'classic', 'diamond', 'saved', 'custom'
+    this.pbnMaxPiecesFilter = null;
 
     // Multi-touch & touchscreen controls
     this.touchPinchDist = 0;
@@ -1328,14 +1329,17 @@ class TapColorApp {
         const grid = document.getElementById('artwork-grid');
         const customPanel = document.getElementById('tab-custom-panel');
         const savedPanel = document.getElementById('tab-saved-panel');
+        const pbnFilter = document.getElementById('pbn-pieces-filter');
 
         if (this.activeCategory === 'custom') {
           grid.style.display = 'none';
+          if (pbnFilter) pbnFilter.classList.add('hidden');
           if (savedPanel) savedPanel.classList.add('hidden');
           customPanel.classList.remove('hidden');
           if (this.updateStudioPreview) this.updateStudioPreview();
         } else if (this.activeCategory === 'saved') {
           grid.style.display = 'none';
+          if (pbnFilter) pbnFilter.classList.add('hidden');
           customPanel.classList.add('hidden');
           if (savedPanel) savedPanel.classList.remove('hidden');
           await this.renderSavedGallery();
@@ -1348,6 +1352,26 @@ class TapColorApp {
         }
       });
     });
+
+    // Paint by Number Pieces Slider
+    const pbnSlider = document.getElementById('pbn-pieces-slider');
+    const pbnResetBtn = document.getElementById('btn-reset-pbn-filter');
+    if (pbnSlider) {
+      pbnSlider.addEventListener('input', () => {
+        this.pbnMaxPiecesFilter = Number(pbnSlider.value);
+        this.syncPbnPiecesSliderUI();
+        this.filterGalleryCards();
+      });
+    }
+    if (pbnResetBtn) {
+      pbnResetBtn.addEventListener('click', () => {
+        if (!pbnSlider) return;
+        this.pbnMaxPiecesFilter = Number(pbnSlider.max);
+        pbnSlider.value = String(this.pbnMaxPiecesFilter);
+        this.syncPbnPiecesSliderUI();
+        this.filterGalleryCards();
+      });
+    }
 
     const btnOpenStudioEmpty = document.getElementById('btn-open-studio-from-empty');
     if (btnOpenStudioEmpty) {
@@ -2121,6 +2145,7 @@ class TapColorApp {
         : null;
 
       const piecesCount = activeVariant ? activeVariant.pieces : meta.pieces;
+      card.dataset.pieces = String(piecesCount);
 
       let resolutionSelectorHtml = '';
       if (meta.variants && meta.variants.length > 1) {
@@ -2192,19 +2217,101 @@ class TapColorApp {
       this.renderThumbnail(thumbCanvas, meta);
     });
 
+    this.updatePbnPiecesFilterBounds();
     this.filterGalleryCards();
   }
 
+  updatePbnPiecesFilterBounds() {
+    const slider = document.getElementById('pbn-pieces-slider');
+    if (!slider) return;
+
+    const classicPieces = this.artworksMeta
+      .filter(m => m.category === 'classic')
+      .map(m => {
+        const activeVariant = m.variants
+          ? (m.variants.find(v => v.id === (m.selectedVariantId || m.defaultVariantId)) || m.variants[0])
+          : null;
+        return activeVariant ? activeVariant.pieces : m.pieces;
+      })
+      .filter(n => typeof n === 'number' && !Number.isNaN(n));
+
+    if (classicPieces.length === 0) return;
+
+    const minPieces = Math.min(...classicPieces);
+    const maxPieces = Math.max(...classicPieces);
+
+    slider.min = String(minPieces);
+    slider.max = String(maxPieces);
+
+    const minLabel = document.getElementById('pbn-pieces-min-label');
+    const maxLabel = document.getElementById('pbn-pieces-max-label');
+    if (minLabel) minLabel.textContent = String(minPieces);
+    if (maxLabel) maxLabel.textContent = String(maxPieces);
+
+    if (this.pbnMaxPiecesFilter === null || this.pbnMaxPiecesFilter > maxPieces) {
+      this.pbnMaxPiecesFilter = maxPieces;
+    } else if (this.pbnMaxPiecesFilter < minPieces) {
+      this.pbnMaxPiecesFilter = minPieces;
+    }
+
+    slider.value = String(this.pbnMaxPiecesFilter);
+    this.syncPbnPiecesSliderUI();
+  }
+
+  syncPbnPiecesSliderUI() {
+    const slider = document.getElementById('pbn-pieces-slider');
+    const valueEl = document.getElementById('pbn-pieces-value');
+    const resetBtn = document.getElementById('btn-reset-pbn-filter');
+    if (!slider) return;
+
+    const min = Number(slider.min || 0);
+    const max = Number(slider.max || 100);
+    const val = Number(slider.value || max);
+
+    slider.style.setProperty('--attr-min', String(min));
+    slider.style.setProperty('--attr-max', String(max));
+    slider.style.setProperty('--control-value', String(val));
+
+    const isAll = val >= max;
+    const text = isAll ? `All (up to ${max})` : `Up to ${val}`;
+    if (valueEl) valueEl.textContent = text;
+    slider.setAttribute('aria-valuetext', isAll ? `All, up to ${max} pieces` : `Up to ${val} pieces`);
+
+    if (resetBtn) {
+      resetBtn.classList.toggle('hidden', isAll);
+    }
+  }
+
   filterGalleryCards() {
+    const pbnFilter = document.getElementById('pbn-pieces-filter');
+    const countEl = document.getElementById('pbn-pieces-count');
+    const slider = document.getElementById('pbn-pieces-slider');
+
+    if (pbnFilter) {
+      pbnFilter.classList.toggle('hidden', this.activeCategory !== 'classic');
+    }
+
+    const maxPieces = slider ? Number(slider.value) : Infinity;
+    let visibleClassicCount = 0;
+
     document.querySelectorAll('.artwork-card').forEach(card => {
       if (this.activeCategory === 'diamond') {
         card.style.display = card.dataset.category === 'diamond' ? 'flex' : 'none';
       } else if (this.activeCategory === 'classic') {
-        card.style.display = card.dataset.category === 'classic' ? 'flex' : 'none';
+        const isClassic = card.dataset.category === 'classic';
+        const pieces = Number(card.dataset.pieces || 0);
+        const matchesPieces = pieces <= maxPieces;
+        const show = isClassic && matchesPieces;
+        card.style.display = show ? 'flex' : 'none';
+        if (show) visibleClassicCount++;
       } else {
         card.style.display = 'flex';
       }
     });
+
+    if (countEl && this.activeCategory === 'classic') {
+      countEl.textContent = `${visibleClassicCount} ${visibleClassicCount === 1 ? 'picture' : 'pictures'}`;
+    }
   }
 
   async updateSavedBadge() {
