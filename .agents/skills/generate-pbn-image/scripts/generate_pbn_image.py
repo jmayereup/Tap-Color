@@ -83,7 +83,7 @@ def build_prompt(subject: str, tier: str, extra: str = "", raw_prompt: str = "")
     modifier = DIFFICULTY_MODIFIERS[tier]
     parts = [
         subject.strip(),
-        "clean unnumbered flat vector illustration",
+        "fully colored unnumbered flat vector coloring-book illustration",
         "uniform solid black ink outlines (#000000) with every shape completely closed",
         modifier,
         "strictly flat solid color fills with zero gradients, zero soft shading, and zero texture or noise",

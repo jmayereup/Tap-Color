@@ -51,7 +51,7 @@ Choose a difficulty tier based on the user's request; **default to `medium`** wh
 
 ## 3. Prompt Crafting Guidelines
 
-[generate_pbn_image.py](./scripts/generate_pbn_image.py) is the single source of truth for the base prompt and tier modifiers. It uses **positive framing** and deliberately avoids the literal phrase `"paint-by-number"` in the image prompt—asking for a **clean, unnumbered, text-free flat vector illustration** instead—because image models otherwise tend to bake printed numbers (`1, 2, 3...`) and a color legend bar into the artwork (which `convert_pbn.mjs` would extract as permanent ink in `_lines.png`). Tap Color renders region numbers dynamically at runtime.
+[generate_pbn_image.py](./scripts/generate_pbn_image.py) is the single source of truth for the base prompt and tier modifiers. It uses **positive framing** and asks for a **fully colored, unnumbered, text-free flat vector coloring-book illustration**—combining `"coloring-book"` (for thick, closed black ink outlines on every element including clouds and water) with `"flat vector"` (for clean solid fills without paper/crayon texture), while avoiding the literal phrase `"paint-by-number"` so models don't bake printed numbers (`1, 2, 3...`) or a color legend bar into `_lines.png`. Tap Color renders region numbers dynamically at runtime.
 
 ### Subject Simplification Tips
 - **Reaching Medium/Hard region counts cleanly**: Describe **structured sub-regions** (e.g., roof shingles, stone blocks, layered flower petals, scalloped tree canopies, terraced hills, stylized clouds, and ink-bordered shadow/highlight blocks) rather than fine textures.
