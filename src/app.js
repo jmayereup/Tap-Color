@@ -1,6 +1,7 @@
 // Tap Color • WebAssembly & Diamond Art Studio Engine
 import { storage } from './storage.js';
 import { vectorizeImage, generateThumbnailBlob, kmeans, detectContentBounds } from './vectorizer.js';
+import { initInAppBrowserBanner } from './inAppBrowser.js';
 
 class SoundController {
   constructor() {
@@ -786,6 +787,11 @@ class TapColorApp {
     this.isInitialized = false;
     this.galleryPopulated = false;
     try {
+      initInAppBrowserBanner({
+        onVisibilityChange: () => {
+          this.setupCanvasDpi();
+        },
+      });
       this.setupCanvasDpi();
       this.bindEvents();
 

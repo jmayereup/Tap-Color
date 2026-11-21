@@ -3545,3 +3545,85 @@ input[type="range"].pbn-pieces-slider::-moz-range-thumb {
     grid-template-columns: 1fr;
   }
 }
+
+/* ==========================================================================
+   In-App Browser Notice Banner
+   ========================================================================== */
+.iab-banner {
+  position: relative;
+  z-index: 300;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: max(10px, env(safe-area-inset-top, 0px)) 14px 10px 16px;
+  background: #FFF6E5;
+  border-bottom: 1px solid #E8CFA2;
+  color: var(--text-main);
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.iab-banner.hidden {
+  display: none;
+}
+
+.iab-banner-content {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-inline-size: 0;
+  flex: 1 1 auto;
+}
+
+.iab-banner-icon {
+  flex-shrink: 0;
+  color: #9A6312;
+}
+
+.iab-banner-text {
+  margin: 0;
+  font-weight: 500;
+  overflow-wrap: anywhere;
+}
+
+.iab-banner-dismiss {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-inline-size: 36px;
+  min-block-size: 36px;
+  border: 1px solid rgba(46, 37, 32, 0.14);
+  border-radius: var(--radius-full);
+  background: rgba(255, 255, 255, 0.72);
+  color: var(--text-main);
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.iab-banner-dismiss:hover {
+  background: rgba(255, 255, 255, 0.95);
+}
+
+.iab-banner-dismiss:focus-visible {
+  outline: 2px solid var(--accent-primary);
+  outline-offset: 2px;
+}
+
+html.has-iab-banner .modal-overlay {
+  top: var(--iab-banner-height, 0px);
+}
+
+html.has-iab-banner .modal-card {
+  max-height: calc(95dvh - var(--iab-banner-height, 0px));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .iab-banner-dismiss {
+    transition: none;
+  }
+}
