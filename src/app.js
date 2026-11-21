@@ -951,30 +951,49 @@ class TapColorApp {
     this.canvas.addEventListener('touchend', (e) => this.onTouchEnd(e), { passive: false });
     this.canvas.addEventListener('touchcancel', (e) => this.onTouchCancel(e), { passive: false });
 
-    // Tool Mode buttons (Pen vs Eraser vs Pan)
-    const btnPen = document.getElementById('btn-mode-pen');
-    const btnErase = document.getElementById('btn-mode-erase');
-    const btnPan = document.getElementById('btn-mode-pan');
+    // Simplified Tool Mode (Color vs One-Finger Move) & Undo
+    const morePopover = document.getElementById('more-menu-popover');
+    const closeMoreMenu = () => {
+      if (morePopover && typeof morePopover.hidePopover === 'function') {
+        try {
+          if (morePopover.matches(':popover-open')) {
+            morePopover.hidePopover();
+          }
+        } catch (_) {}
+      }
+    };
+
+    const btnModeToggle = document.getElementById('btn-mode-toggle');
+    const labelMoveMode = document.getElementById('label-move-mode');
     const btnClearCanvas = document.getElementById('btn-clear-canvas');
+    const btnUndo = document.getElementById('btn-undo');
 
     const setToolMode = (mode) => {
       this.toolMode = mode;
-      btnPen.classList.toggle('active', mode === 'pen');
-      if (btnErase) btnErase.classList.toggle('active', mode === 'erase');
-      btnPan.classList.toggle('active', mode === 'pan');
+      const isPan = mode === 'pan';
+      if (btnModeToggle) btnModeToggle.classList.toggle('active', isPan);
+      if (labelMoveMode) labelMoveMode.textContent = isPan ? 'On' : 'Off';
       this.canvas.style.cursor = mode === 'pen' ? 'crosshair' : (mode === 'erase' ? 'cell' : 'grab');
     };
 
-    btnPen.addEventListener('click', () => setToolMode('pen'));
-    if (btnErase) btnErase.addEventListener('click', () => setToolMode('erase'));
-    btnPan.addEventListener('click', () => setToolMode('pan'));
+    if (btnUndo) {
+      btnUndo.addEventListener('click', () => this.undoLastAction());
+    }
+
+    if (btnModeToggle) {
+      btnModeToggle.addEventListener('click', () => {
+        setToolMode(this.toolMode === 'pan' ? 'pen' : 'pan');
+        closeMoreMenu();
+      });
+    }
 
     if (btnClearCanvas) {
       btnClearCanvas.addEventListener('click', async () => {
+        closeMoreMenu();
         const ok = await this.showConfirm({
-          title: 'Clear Canvas?',
-          message: 'Clear all placed tiles on this artwork? Your current coloring progress on this canvas will be reset.',
-          confirmText: 'Clear Canvas',
+          title: 'Start This Picture Over?',
+          message: 'This will clear your colors on this picture so you can start fresh.',
+          confirmText: 'Start Over',
           cancelText: 'Keep Coloring',
           variant: 'danger',
           icon: 'trash'
@@ -988,18 +1007,27 @@ class TapColorApp {
     // Sound toggle
     document.getElementById('btn-sound').addEventListener('click', () => {
       this.sound.enabled = !this.sound.enabled;
-      document.getElementById('btn-sound').classList.toggle('active', this.sound.enabled);
+      const btnSound = document.getElementById('btn-sound');
+      const labelSound = document.getElementById('label-sound-state');
+      if (btnSound) btnSound.classList.toggle('active', this.sound.enabled);
+      if (labelSound) labelSound.textContent = this.sound.enabled ? 'On' : 'Off';
+      closeMoreMenu();
     });
 
     // Outline toggle
     document.getElementById('btn-outline').addEventListener('click', () => {
       if (!this.controller) return;
       const visible = this.controller.toggle_outlines();
-      document.getElementById('btn-outline').classList.toggle('active', visible);
+      const btnOutline = document.getElementById('btn-outline');
+      const labelOutline = document.getElementById('label-outline-state');
+      if (btnOutline) btnOutline.classList.toggle('active', visible);
+      if (labelOutline) labelOutline.textContent = visible ? 'On' : 'Off';
+      closeMoreMenu();
     });
 
     // Magic wand fill current
     document.getElementById('btn-wand').addEventListener('click', () => {
+      closeMoreMenu();
       if (!this.controller) return;
       const resJson = this.controller.fill_all_of_current();
       const res = JSON.parse(resJson);
@@ -1009,7 +1037,7 @@ class TapColorApp {
       }
     });
 
-    // Hint button: toggles matching tile highlights on/off
+    // Hint / Find button: toggles matching tile highlights on/off
     document.getElementById('btn-hint').addEventListener('click', () => this.toggleHintHighlights());
 
     // Zoom buttons
@@ -1019,14 +1047,16 @@ class TapColorApp {
       this.controller.update_pan_zoom(0, 0, 1.35, rect.width / 2, rect.height / 2);
     });
 
-    document.getElementById('btn-zoom-drill').addEventListener('click', () => {
-      // Zoom directly into diamond drill level (scale ~2.2)
-      if (!this.controller) return;
-      const rect = this.canvas.getBoundingClientRect();
-      const currentScale = this.controller.target_scale || (this.controller.engine ? this.controller.engine.target_scale : 1.0);
-      const factor = 2.2 / Math.max(0.2, currentScale);
-      this.controller.update_pan_zoom(0, 0, factor, rect.width / 2, rect.height / 2);
-    });
+    const btnZoomDrill = document.getElementById('btn-zoom-drill');
+    if (btnZoomDrill) {
+      btnZoomDrill.addEventListener('click', () => {
+        if (!this.controller) return;
+        const rect = this.canvas.getBoundingClientRect();
+        const currentScale = this.controller.target_scale || (this.controller.engine ? this.controller.engine.target_scale : 1.0);
+        const factor = 2.2 / Math.max(0.2, currentScale);
+        this.controller.update_pan_zoom(0, 0, factor, rect.width / 2, rect.height / 2);
+      });
+    }
 
     document.getElementById('btn-zoom-out').addEventListener('click', () => {
       if (!this.controller) return;
@@ -1087,6 +1117,7 @@ class TapColorApp {
     if (btnResSwitcher && dropdownQuick) {
       btnResSwitcher.addEventListener('click', (e) => {
         e.stopPropagation();
+        closeMoreMenu();
         const isHidden = dropdownQuick.classList.contains('hidden');
         if (isHidden) {
           openQuickDropdown();
@@ -1230,6 +1261,7 @@ class TapColorApp {
     const btnExportHeader = document.getElementById('btn-export-header');
     if (btnExportHeader) {
       btnExportHeader.addEventListener('click', () => {
+        closeMoreMenu();
         this.exportArtworkPng();
       });
     }
@@ -1305,7 +1337,11 @@ class TapColorApp {
       } else if (e.key === 'h' || e.key === 'H') {
         setToolMode('pan');
       } else if (e.key === 'd' || e.key === 'D') {
-        document.getElementById('btn-zoom-drill').click();
+        const drillBtn = document.getElementById('btn-zoom-drill');
+        if (drillBtn) drillBtn.click();
+      } else if ((e.metaKey || e.ctrlKey) && (e.key === 'z' || e.key === 'Z')) {
+        e.preventDefault();
+        this.undoLastAction();
       } else if (e.key === 'f' || e.key === 'F') {
         if (this.controller) this.controller.fit_to_screen();
       } else if (e.key === 'o' || e.key === 'O') {
@@ -3131,22 +3167,21 @@ class TapColorApp {
     if (resIcon) resIcon.textContent = isDiamond ? '💎' : '🎨';
     btnRes.classList.toggle('diamond-mode', isDiamond);
 
+    const formatFriendlyLevel = (v) => {
+      if (!v) return 'Medium';
+      if (v.grid === 80 || v.name === 'Cozy Canvas') return 'Easy';
+      if (v.grid === 120 || v.name === 'Standard Kit') return 'Medium';
+      if (v.grid === 160 || v.name === 'Masterpiece Ultra') return 'Detailed';
+      if (v.name === 'Original Lines') return 'Classic';
+      return v.name || v.label || 'Medium';
+    };
+
     if (this.currentArtworkMeta && this.currentArtworkMeta.variants) {
       const v = this.currentArtworkVariant;
-      const typeLabel = isDiamond ? 'Diamond' : 'Paint';
-      labelRes.textContent = v ? `${typeLabel} • ${v.name || v.label} (${v.pieces.toLocaleString()} pcs)` : `${typeLabel} Art`;
+      labelRes.textContent = formatFriendlyLevel(v);
       btnRes.classList.remove('hidden');
     } else if (this.activeImportedRecord || this.lastCustomImage) {
-      let count = 0;
-      if (this.activeImportedRecord && this.activeImportedRecord.artworkData && this.activeImportedRecord.artworkData.regions) {
-        count = this.activeImportedRecord.artworkData.regions.length;
-      } else if (this.controller && this.controller.get_artwork_info_json) {
-        try {
-          const info = JSON.parse(this.controller.get_artwork_info_json());
-          count = info.total_regions || 0;
-        } catch (_) {}
-      }
-      labelRes.textContent = isDiamond ? `Diamond (${count.toLocaleString()} drills)` : `Paint (${count.toLocaleString()} pcs)`;
+      labelRes.textContent = isDiamond ? 'Diamond Art' : 'Paint by Number';
       btnRes.classList.remove('hidden');
     } else {
       btnRes.classList.remove('hidden');
@@ -3201,15 +3236,21 @@ class TapColorApp {
         if (v.id.includes('80') || v.id.includes('detailed')) icon = '🟢';
         if (v.id.includes('160') || v.id.includes('masterpiece')) icon = '🟣';
 
+        let friendlyName = v.name || v.label;
+        if (v.grid === 80 || friendlyName === 'Cozy Canvas') friendlyName = 'Easy';
+        else if (v.grid === 120 || friendlyName === 'Standard Kit') friendlyName = 'Medium';
+        else if (v.grid === 160 || friendlyName === 'Masterpiece Ultra') friendlyName = 'Detailed';
+        else if (friendlyName === 'Original Lines') friendlyName = 'Classic';
+
         item.innerHTML = `
           <div class="quick-item-left">
             <span class="quick-item-icon">${isMetaDiamond ? icon : '🎨'}</span>
             <div class="quick-item-info">
-              <span class="quick-item-title">${v.name || v.label} ${isActive ? '✓' : ''}</span>
-              <span class="quick-item-subtitle">${isMetaDiamond ? `${v.grid}×${v.grid} grid` : 'Preserved crisp line art'} • ${v.colors} colors</span>
+              <span class="quick-item-title">${friendlyName} ${isActive ? '✓' : ''}</span>
+              <span class="quick-item-subtitle">${isMetaDiamond ? `${v.colors} colors` : 'Crisp hand-drawn outlines'} • ${v.colors} colors</span>
             </div>
           </div>
-          <span class="quick-item-badge">${v.pieces.toLocaleString()} pcs</span>
+          <span class="quick-item-badge">${isActive ? 'Selected' : 'Choose'}</span>
         `;
 
         item.addEventListener('click', () => {
@@ -3227,9 +3268,9 @@ class TapColorApp {
     // Case 2: Custom Photo
     if (isDiamond) {
       const diamondPresets = [
-        { grid: 80, colors: 18, name: 'Cozy Canvas (80×80)', icon: '🟢', drills: 6400 },
-        { grid: 120, colors: 26, name: 'Standard Kit (120×120)', icon: '🟡', drills: 14400 },
-        { grid: 160, colors: 36, name: 'Masterpiece Ultra (160×160)', icon: '🟣', drills: 25600 }
+        { grid: 80, colors: 18, name: 'Easy', icon: '🟢', drills: 6400 },
+        { grid: 120, colors: 26, name: 'Medium', icon: '🟡', drills: 14400 },
+        { grid: 160, colors: 36, name: 'Detailed', icon: '🟣', drills: 25600 }
       ];
 
       diamondPresets.forEach(preset => {
@@ -3438,11 +3479,32 @@ class TapColorApp {
   updateArtworkUI() {
     if (!this.controller) return;
     const info = JSON.parse(this.controller.get_artwork_info_json());
-    document.getElementById('artwork-title').textContent = info.title || 'Tap Color';
-    document.getElementById('artwork-artist').textContent = info.artist || 'Art Studio';
+    const cleanTitle = (this.currentArtworkMeta && this.currentArtworkMeta.title) || info.title || 'Tap Color';
+    document.getElementById('artwork-title').textContent = cleanTitle;
+    document.getElementById('artwork-artist').textContent = (this.currentArtworkMeta && this.currentArtworkMeta.artist) || info.artist || 'Art Studio';
     const percent = Math.round((info.filled_regions / Math.max(1, info.total_regions)) * 100);
     document.getElementById('progress-fill').style.width = `${percent}%`;
     document.getElementById('progress-text').textContent = `${percent}%`;
+  }
+
+  undoLastAction() {
+    if (!this.controller || typeof this.controller.undo_last !== 'function') return;
+    const resJson = this.controller.undo_last();
+    let res = null;
+    try {
+      res = JSON.parse(resJson);
+    } catch (_) {
+      return;
+    }
+    if (res && res.success) {
+      this.sound.playClick();
+      this.updateArtworkUI();
+      this.refreshPaletteUI();
+      if (res.correct_number) {
+        this.selectNumber(res.correct_number);
+      }
+      this.scheduleAutosave();
+    }
   }
 
   showVictoryModal(totalPieces) {
@@ -3454,6 +3516,18 @@ class TapColorApp {
     document.getElementById('stat-pieces').textContent = totalPieces;
     const acc = this.totalTaps > 0 ? Math.round((this.successfulTaps / this.totalTaps) * 100) : 100;
     document.getElementById('stat-accuracy').textContent = `${acc}%`;
+
+    const verses = [
+      '“Every good and perfect gift is from above.” — James 1:17',
+      '“He has made everything beautiful in its time.” — Ecclesiastes 3:11',
+      '“The Lord bless you and keep you.” — Numbers 6:24',
+      '“Let all that you do be done in love.” — 1 Corinthians 16:14',
+      '“This is the day that the Lord has made; let us rejoice and be glad in it.” — Psalm 118:24'
+    ];
+    const verseEl = document.getElementById('celebration-verse');
+    if (verseEl) {
+      verseEl.textContent = verses[Math.floor(Math.random() * verses.length)];
+    }
 
     document.getElementById('modal-victory').classList.remove('hidden');
   }

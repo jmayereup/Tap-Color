@@ -11,7 +11,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
-    href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Lora:wght@500;600;700&family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700&display=swap"
     rel="stylesheet">
   <link rel="stylesheet" href="/src/style.css">
 </head>
@@ -21,58 +21,18 @@
     <!-- Top Navigation Bar -->
     <header class="header-bar">
       <div class="header-left">
-        <button id="btn-gallery" class="btn-icon" title="Open Artwork Library">
+        <button id="btn-gallery" class="btn-icon" title="Browse Pictures">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
             stroke-linecap="round" stroke-linejoin="round">
             <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
             <circle cx="8.5" cy="8.5" r="1.5" />
             <polyline points="21 15 16 10 5 21" />
           </svg>
-          <span class="btn-label">Library</span>
+          <span class="btn-label">Pictures</span>
         </button>
         <div class="artwork-meta">
           <h1 id="artwork-title" class="artwork-title">Sweet Highland Calf</h1>
           <span id="artwork-artist" class="artwork-artist">Country Homestead</span>
-        </div>
-        <div class="header-res-dropdown-wrap" id="header-res-dropdown-wrap">
-          <button id="btn-resolution-switcher" class="btn-res-pill diamond-mode" title="Change Art Style & Detail Level"
-            aria-haspopup="true" aria-expanded="false">
-            <span class="res-icon" id="res-icon-indicator">💎</span>
-            <span id="label-current-resolution">Diamond • Standard Kit (14,400 pcs)</span>
-            <span class="res-caret">▾</span>
-          </button>
-
-          <div id="quick-dropdown-backdrop" class="quick-dropdown-backdrop hidden"></div>
-          <div id="quick-style-dropdown" class="quick-style-dropdown hidden" role="menu">
-            <div class="quick-dropdown-header">
-              <div class="quick-dropdown-title-row">
-                <span class="quick-dropdown-title" id="quick-dropdown-art-title">Art Style & Detail Level</span>
-                <button type="button" id="btn-close-quick-dropdown" class="btn-close-quick"
-                  aria-label="Close menu">&times;</button>
-              </div>
-              <span class="quick-dropdown-subtitle">Switch style or detail without leaving canvas</span>
-            </div>
-
-            <!-- Segmented Art Style Switcher -->
-            <div class="quick-dropdown-style-toggle">
-              <button type="button" class="btn-quick-style-toggle active" id="quick-toggle-diamond" data-mode="diamond">
-                <span class="toggle-icon">💎</span>
-                <span class="toggle-text">Diamond Art</span>
-              </button>
-              <button type="button" class="btn-quick-style-toggle" id="quick-toggle-pbn" data-mode="classic">
-                <span class="toggle-icon">🎨</span>
-                <span class="toggle-text">Paint by Number</span>
-              </button>
-            </div>
-
-            <!-- Detail Level Section Header -->
-            <div class="quick-dropdown-section-title">Detail / Difficulty:</div>
-
-            <!-- Dynamic Options List -->
-            <div class="quick-dropdown-options" id="quick-dropdown-options">
-              <!-- Rendered via JavaScript -->
-            </div>
-          </div>
         </div>
       </div>
 
@@ -86,94 +46,111 @@
         </div>
       </div>
 
-      <!-- Action Tools -->
+      <!-- Simplified Action Tools -->
       <div class="header-right">
-        <div class="tool-mode-group">
-          <button id="btn-mode-pen" class="btn-icon active" title="Diamond Pen (P): Touch or Click to Place Drills">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-            </svg>
-            <span class="btn-label">Pen</span>
-          </button>
-          <button id="btn-mode-erase" class="btn-icon" title="Eraser (E): Touch or Click to Clear Tiles">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-              stroke-linecap="round" stroke-linejoin="round">
-              <path d="m7 21-4.3-4.3c-1-1-1-2.5 0-3.4l9.6-9.6c1-1 2.5-1 3.4 0l5.6 5.6c1 1 1 2.5 0 3.4L13 21" />
-              <path d="M22 21H7" />
-              <path d="m5 11 9 9" />
-            </svg>
-            <span class="btn-label">Eraser</span>
-          </button>
-          <button id="btn-mode-pan" class="btn-icon" title="Pan Canvas (H): Stylus Hold, Two-Fingers, or Arrow Keys to Pan">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M18 11V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v0" />
-              <path d="M14 10V4a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v2" />
-              <path d="M10 10.5V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v8" />
-              <path
-                d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.83L7 15" />
-            </svg>
-            <span class="btn-label">Pan</span>
-          </button>
-        </div>
-
-        <button id="btn-clear-canvas" class="btn-icon" title="Clear All Placed Tiles">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-            stroke-linecap="round" stroke-linejoin="round">
-            <path d="M3 6h18" />
-            <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
-            <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
-            <line x1="10" y1="11" x2="10" y2="17" />
-            <line x1="14" y1="11" x2="14" y2="17" />
-          </svg>
-          <span class="btn-label">Clear</span>
-        </button>
-
-        <button id="btn-export-header" class="btn-icon" title="Export Full Artwork Image (PNG)">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-            <polyline points="7 10 12 15 17 10" />
-            <line x1="12" y1="15" x2="12" y2="3" />
-          </svg>
-          <span class="btn-label">Export</span>
-        </button>
-
-        <button id="btn-sound" class="btn-icon" title="Toggle Sound">
-          <svg id="icon-sound-on" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
-            <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07" />
-          </svg>
-        </button>
-
-        <button id="btn-outline" class="btn-icon active" title="Toggle Outlines (O)">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-            stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="12" r="10" />
-            <line x1="12" y1="2" x2="12" y2="22" />
-          </svg>
-          <span class="btn-label">Lines</span>
-        </button>
-
-        <button id="btn-wand" class="btn-icon btn-accent" title="Magic Fill (Complete Color)">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-            stroke-linecap="round" stroke-linejoin="round">
-            <path d="m15 4 5 2-5 2-2 5-2-5-5-2 5-2 2-5 2 5z" />
-            <path d="m14 14 1 3 3 1-3 1-1 3-1-3-3-1 3-1 1-3z" />
-          </svg>
-          <span class="btn-label">Fill Color</span>
-        </button>
-
-        <button id="btn-hint" class="btn-icon" title="Toggle Matching Tile Highlights (Space / H)">
+        <button id="btn-hint" class="btn-icon" title="Find an uncolored spot for this color">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
             stroke-linecap="round" stroke-linejoin="round">
             <circle cx="11" cy="11" r="8" />
             <line x1="21" y1="21" x2="16.65" y2="16.65" />
           </svg>
-          <span class="btn-label">Hint</span>
-          <span id="hint-badge" class="badge">OFF</span>
+          <span class="btn-label">Find</span>
         </button>
+
+        <button id="btn-undo" class="btn-icon" title="Undo your last tap">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 7v6h6" />
+            <path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13" />
+          </svg>
+          <span class="btn-label">Undo</span>
+        </button>
+
+        <div class="more-menu-wrap">
+          <button id="btn-more-menu" class="btn-icon" type="button" popovertarget="more-menu-popover" title="More options">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="1.2" />
+              <circle cx="19" cy="12" r="1.2" />
+              <circle cx="5" cy="12" r="1.2" />
+            </svg>
+            <span class="btn-label">More</span>
+          </button>
+
+          <div id="more-menu-popover" popover="auto" class="more-menu-popover">
+            <button id="btn-mode-toggle" class="more-menu-item" type="button">
+              <span class="more-item-icon">✋</span>
+              <span class="more-item-label">One-Finger Move: <strong id="label-move-mode">Off</strong></span>
+            </button>
+
+            <button id="btn-resolution-switcher" class="more-menu-item" type="button">
+              <span class="more-item-icon" id="res-icon-indicator">💎</span>
+              <span class="more-item-label">Detail: <strong id="label-current-resolution">Medium</strong></span>
+            </button>
+
+            <button id="btn-outline" class="more-menu-item active" type="button">
+              <span class="more-item-icon">✏️</span>
+              <span class="more-item-label">Show Lines: <strong id="label-outline-state">On</strong></span>
+            </button>
+
+            <button id="btn-wand" class="more-menu-item" type="button">
+              <span class="more-item-icon">✨</span>
+              <span class="more-item-label">Fill Whole Color</span>
+            </button>
+
+            <button id="btn-sound" class="more-menu-item active" type="button">
+              <span class="more-item-icon">🔊</span>
+              <span class="more-item-label">Sound: <strong id="label-sound-state">On</strong></span>
+            </button>
+
+            <div class="more-menu-divider"></div>
+
+            <button id="btn-export-header" class="more-menu-item" type="button">
+              <span class="more-item-icon">🖼️</span>
+              <span class="more-item-label">Save Picture</span>
+            </button>
+
+            <button id="btn-clear-canvas" class="more-menu-item danger" type="button">
+              <span class="more-item-icon">↺</span>
+              <span class="more-item-label">Start Over</span>
+            </button>
+          </div>
+        </div>
       </div>
     </header>
+
+    <!-- Quick Style & Detail Modal/Dropdown -->
+    <div id="quick-dropdown-backdrop" class="quick-dropdown-backdrop hidden"></div>
+    <div id="quick-style-dropdown" class="quick-style-dropdown hidden" role="menu">
+      <div class="quick-dropdown-header">
+        <div class="quick-dropdown-title-row">
+          <span class="quick-dropdown-title" id="quick-dropdown-art-title">Style &amp; Detail Level</span>
+          <button type="button" id="btn-close-quick-dropdown" class="btn-close-quick"
+            aria-label="Close menu">&times;</button>
+        </div>
+        <span class="quick-dropdown-subtitle">Switch style or detail without leaving your picture</span>
+      </div>
+
+      <!-- Segmented Art Style Switcher -->
+      <div class="quick-dropdown-style-toggle">
+        <button type="button" class="btn-quick-style-toggle active" id="quick-toggle-diamond" data-mode="diamond">
+          <span class="toggle-icon">💎</span>
+          <span class="toggle-text">Diamond Art</span>
+        </button>
+        <button type="button" class="btn-quick-style-toggle" id="quick-toggle-pbn" data-mode="classic">
+          <span class="toggle-icon">🎨</span>
+          <span class="toggle-text">Paint by Number</span>
+        </button>
+      </div>
+
+      <!-- Detail Level Section Header -->
+      <div class="quick-dropdown-section-title">Choose Detail Level:</div>
+
+      <!-- Dynamic Options List -->
+      <div class="quick-dropdown-options" id="quick-dropdown-options">
+        <!-- Rendered via JavaScript -->
+      </div>
+    </div>
 
     <!-- Canvas Workspace Viewport -->
     <main class="canvas-viewport" id="viewport">
@@ -182,8 +159,7 @@
       <!-- Floating Canvas Zoom Controls -->
       <div class="floating-controls">
         <button id="btn-zoom-in" class="btn-float" title="Zoom In">+</button>
-        <button id="btn-zoom-drill" class="btn-float btn-diamond-zoom" title="Zoom to Diamond Drills (D)">💎</button>
-        <button id="btn-zoom-reset" class="btn-float" title="Reset View (F)">⤢</button>
+        <button id="btn-zoom-reset" class="btn-float btn-float-fit" title="Fit Picture to Screen">Fit</button>
         <button id="btn-zoom-out" class="btn-float" title="Zoom Out">−</button>
       </div>
     </main>
@@ -202,9 +178,9 @@
       <div class="modal-card">
         <div class="modal-header">
           <div class="modal-header-titles">
-            <span class="modal-header-badge">💎 Diamond Art &amp; Painting Studio</span>
-            <h2>Artwork Library</h2>
-            <p class="modal-header-subtitle">Choose a sparkling diamond painting or classic canvas to begin</p>
+            <span class="modal-header-badge">🌿 Sunlit Homestead Studio</span>
+            <h2>Pictures</h2>
+            <p class="modal-header-subtitle">Take a quiet moment to relax and color</p>
           </div>
           <button id="btn-close-gallery" class="btn-close" title="Resume Art Studio"
             aria-label="Close Library">&times;</button>
@@ -397,18 +373,18 @@
                 <div class="difficulty-picker" id="difficulty-chips-diamond">
                   <button type="button" class="btn-diff-chip" data-grid="80" data-colors="18">
                     <span class="diff-icon">🟢</span>
-                    <span class="diff-name">Cozy Canvas</span>
-                    <span class="diff-desc">80×80 (6,400 gems) • 18 colors</span>
+                    <span class="diff-name">Easy</span>
+                    <span class="diff-desc">Larger pieces • 18 colors</span>
                   </button>
                   <button type="button" class="btn-diff-chip active" data-grid="120" data-colors="26">
                     <span class="diff-icon">🟡</span>
-                    <span class="diff-name">Standard Kit</span>
-                    <span class="diff-desc">120×120 (14,400 gems) • 26 colors</span>
+                    <span class="diff-name">Medium</span>
+                    <span class="diff-desc">Balanced detail • 26 colors</span>
                   </button>
                   <button type="button" class="btn-diff-chip" data-grid="160" data-colors="36">
                     <span class="diff-icon">🟣</span>
-                    <span class="diff-name">Masterpiece Ultra</span>
-                    <span class="diff-desc">160×160 (25,600 gems) • 36 colors</span>
+                    <span class="diff-name">Detailed</span>
+                    <span class="diff-desc">Fine detail • 36 colors</span>
                   </button>
                 </div>
 
@@ -464,9 +440,10 @@
       <div class="modal-card celebration-card">
         <button id="btn-close-victory" class="btn-close celebration-close-btn" aria-label="Close modal"
           title="Close and view picture">&times;</button>
-        <div class="confetti-burst-icon">🎉</div>
-        <h2 class="celebration-title">Masterpiece Complete!</h2>
-        <p class="celebration-subtitle">You brought this artwork to life with vibrant colors.</p>
+        <div class="confetti-burst-icon">🌻</div>
+        <h2 class="celebration-title">Picture Complete!</h2>
+        <p class="celebration-subtitle">What a lovely piece — you brought every detail to life.</p>
+        <p class="celebration-verse" id="celebration-verse">“Every good and perfect gift is from above.” — James 1:17</p>
 
         <div class="stats-row">
           <div class="stat-item">
@@ -491,13 +468,13 @@
             </svg>
             View Picture
           </button>
-          <button id="btn-export-png" class="btn-secondary" title="Export high-resolution image of full picture">
+          <button id="btn-export-png" class="btn-secondary" title="Save picture to your device">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
               <polyline points="7 10 12 15 17 10" />
               <line x1="12" y1="15" x2="12" y2="3" />
             </svg>
-            Export Image
+            Save Picture
           </button>
           <button id="btn-next-artwork" class="btn-primary">Next Picture</button>
         </div>

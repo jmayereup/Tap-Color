@@ -23,6 +23,7 @@ pub struct GameEngine {
     pub highlight_matching_tiles: bool,
     pub line_art_image: Option<HtmlImageElement>,
     pub hatch_pattern: Option<CanvasPattern>,
+    pub undo_stack: Vec<Vec<usize>>,
 }
 
 impl GameEngine {
@@ -48,6 +49,7 @@ impl GameEngine {
             pulse_phase: 0.0,
             line_art_image: None,
             hatch_pattern: None,
+            undo_stack: Vec::new(),
         }
     }
 
@@ -130,6 +132,7 @@ impl GameEngine {
         self.target_pan_x = 0.0;
         self.target_pan_y = 0.0;
         self.target_scale = 1.0;
+        self.undo_stack.clear();
     }
 
     pub fn screen_to_world(&self, screen_x: f64, screen_y: f64) -> Point {
@@ -220,6 +223,10 @@ impl GameEngine {
                     // Correct tap!
                     region.is_filled = true;
                     region.fill_anim = 0.0; // Starts pop/expand animation
+                    self.undo_stack.push(vec![idx]);
+                    if self.undo_stack.len() > 100 {
+                        self.undo_stack.remove(0);
+                    }
 
                     // Clear active hint if this was the hinted region
                     if self.hint_region_id == Some(reg_id) {
@@ -471,6 +478,7 @@ impl GameEngine {
             pal_item.filled_count = 0;
             pal_item.is_completed = false;
         }
+        self.undo_stack.clear();
 
         let total_regions = self.artwork.regions.len();
         TapFeedback {
@@ -489,16 +497,23 @@ impl GameEngine {
 
     /// Magic Wand: fills all remaining pieces of active number
     pub fn fill_all_of_current(&mut self) -> TapFeedback {
-        let mut filled_any = false;
+        let mut filled_indices = Vec::new();
         let active = self.active_number;
         let mut last_pt = None;
 
-        for r in self.artwork.regions.iter_mut() {
+        for (idx, r) in self.artwork.regions.iter_mut().enumerate() {
             if !r.is_filled && r.number == active {
                 r.is_filled = true;
                 r.fill_anim = 0.0;
-                filled_any = true;
+                filled_indices.push(idx);
                 last_pt = Some(r.centroid);
+            }
+        }
+        let filled_any = !filled_indices.is_empty();
+        if filled_any {
+            self.undo_stack.push(filled_indices);
+            if self.undo_stack.len() > 100 {
+                self.undo_stack.remove(0);
             }
         }
 
@@ -530,6 +545,63 @@ impl GameEngine {
             total_filled,
             total_regions: total,
             percent: (total_filled as f64 / total as f64) * 100.0,
+            target_point: last_pt,
+        }
+    }
+
+    /// Undo the most recent fill action (single tap or fill-all batch)
+    pub fn undo_last(&mut self) -> TapFeedback {
+        let total_regions = self.artwork.regions.len();
+        let Some(indices) = self.undo_stack.pop() else {
+            let total_filled = self.artwork.regions.iter().filter(|r| r.is_filled).count();
+            return TapFeedback {
+                success: false,
+                region_id: None,
+                number: None,
+                correct_number: Some(self.active_number),
+                color_completed: false,
+                artwork_completed: false,
+                total_filled,
+                total_regions,
+                percent: (total_filled as f64 / total_regions.max(1) as f64) * 100.0,
+                target_point: None,
+            };
+        };
+
+        let mut undone_number = None;
+        let mut last_pt = None;
+
+        for idx in indices {
+            if let Some(region) = self.artwork.regions.get_mut(idx) {
+                if region.is_filled {
+                    region.is_filled = false;
+                    region.fill_anim = 0.0;
+                    let num = region.number;
+                    undone_number = Some(num);
+                    last_pt = Some(region.centroid);
+                    if let Some(pal_item) = self.artwork.palette.iter_mut().find(|p| p.number == num) {
+                        pal_item.filled_count = pal_item.filled_count.saturating_sub(1);
+                        pal_item.is_completed = pal_item.filled_count >= pal_item.total_count;
+                    }
+                }
+            }
+        }
+
+        if let Some(num) = undone_number {
+            self.active_number = num;
+        }
+
+        let total_filled = self.artwork.regions.iter().filter(|r| r.is_filled).count();
+        TapFeedback {
+            success: undone_number.is_some(),
+            region_id: None,
+            number: undone_number,
+            correct_number: Some(self.active_number),
+            color_completed: false,
+            artwork_completed: false,
+            total_filled,
+            total_regions,
+            percent: (total_filled as f64 / total_regions.max(1) as f64) * 100.0,
             target_point: last_pt,
         }
     }

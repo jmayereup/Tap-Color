@@ -40,14 +40,16 @@ Diamond Painting and Tap-to-Color (Paint by Number) have different optimal sourc
 - **Naming**: Use lowercase alphanumeric characters and underscores/hyphens (e.g. `country_barn.jpeg`, `autumn_fox_pbn.jpeg`).
 
 ### Tap-to-Color (Paint by Number) Guidelines
-The PBN vectorizer runs at `380–500px` and removes narrow pixel strips and tiny facets, so thin stems, tiny dots, and fine textures will be lost. Source images must be **simple, bold, and chunky**:
-- **Style**: Minimalist flat vector coloring-page or bold stained-glass art with thick uniform dark outlines and large, simple closed regions.
-- **Regions & Palette**: 10–14 bold solid flat colors, zero shading gradients, no tiny speckles/spots/stems.
+The PBN converter (`scripts/convert_pbn.mjs`) runs at `800×800` and drops regions under `42px` (`MIN_REGION_PIXELS`), so tiny speckles and hairline strands will be lost. Use the **generate-pbn-image** skill (`.agents/skills/generate-pbn-image/SKILL.md`) for full prompt templates and difficulty-based region targets (defaulting to **Medium**):
+- **Easy**: `~80–150` regions, `10–14` flat colors (bold, chunky, beginner-friendly shapes).
+- **Medium (Default)**: `~150–300` regions, `14–20` flat colors (layered scenery with crisp ink-bordered 2-tone cel-shaded facets).
+- **Hard**: `~300–500` regions, `18–26` flat colors (intricate stained-glass / mosaic complexity with regions `≥ 8–10px` wide).
+- **Style**: Flat vector / stained-glass cel-shaded illustration with uniform closed black outlines (`#000000`), zero gradients, and a pure solid white (`#FFFFFF`) outer background.
 
 > [!TIP]
-> **Tap-to-Color (PBN) Prompt Template:**
-> `"[SUBJECT], minimalist flat vector coloring-page illustration, thick uniform dark outlines, large chunky simple shapes, no small details, no thin stems, no tiny dots or speckles, 10 to 14 bold solid flat colors only, zero shading gradients, clean geometric-organic simplification, centered on pure solid white (#FFFFFF) background, children's wooden puzzle / bold stained-glass simplicity"`
-> **Avoid:** `tiny details, intricate patterns, thin lines, grass blades, small berries, flower stamens, spots, fur strands, hatching, gradients, shadows, photorealistic, texture, noise`
+> **Tap-to-Color (PBN) Medium (Default) Prompt Template:**
+> `"[SUBJECT], flat vector paint-by-number illustration, uniform solid black ink outlines (#000000) with every shape completely closed, richly detailed stained-glass / cel-shaded vector style, 150 to 300 distinct enclosed regions (minimum 10px wide), 14 to 20 vibrant flat solid colors, layered foreground and background elements with crisp ink-bordered 2-tone color-blocking facets, zero gradients, zero soft shading, zero texture or noise, centered composition with generous margin on a pure solid white (#FFFFFF) background"`
+> **Avoid:** `gradients, soft shadows, painterly texture, watercolor, film grain, noise, colored outlines, broken lines, open contours, photorealistic, tiny confetti speckles, micro-dots, hairline strands, hatching, text, watermark`
 
 ### Diamond Painting Guidelines
 Diamond Painting samples an `80×80` to `160×160` grid (6,400–25,600 drills) with 18–36 colors and rewards depth and contrast:

@@ -674,5 +674,56 @@
         "thumbnailUrl": "assets/converted/autumn_fox_pbn_thumb.png"
       }
     ]
+  },
+  {
+    "key": "country_birdhouse",
+    "title": "Country Birdhouse",
+    "artist": "Tap Color Studio",
+    "desc": "Country Birdhouse artwork",
+    "originalAsset": "assets/paint_by_number/country_birdhouse.jpg",
+    "pbnAsset": "assets/paint_by_number/country_birdhouse.jpg",
+    "diamondVariants": [
+      {
+        "id": "country_birdhouse_diamond_80",
+        "resolution": "Cozy (6.4k)",
+        "label": "80\u00d780",
+        "grid": 80,
+        "pieces": 6400,
+        "colors": 18,
+        "jsonFile": "assets/converted/country_birdhouse_diamond_80.json",
+        "thumbnailUrl": "assets/converted/country_birdhouse_diamond_80_thumb.png"
+      },
+      {
+        "id": "country_birdhouse_diamond_120",
+        "resolution": "Standard (14.4k)",
+        "label": "120\u00d7120",
+        "grid": 120,
+        "pieces": 14400,
+        "colors": 26,
+        "jsonFile": "assets/converted/country_birdhouse_diamond_120.json",
+        "thumbnailUrl": "assets/converted/country_birdhouse_diamond_120_thumb.png"
+      },
+      {
+        "id": "country_birdhouse_diamond_160",
+        "resolution": "Masterpiece (25.6k)",
+        "label": "160\u00d7160",
+        "grid": 160,
+        "pieces": 25600,
+        "colors": 36,
+        "jsonFile": "assets/converted/country_birdhouse_diamond_160.json",
+        "thumbnailUrl": "assets/converted/country_birdhouse_diamond_160_thumb.png"
+      }
+    ],
+    "pbnVariants": [
+      {
+        "id": "country_birdhouse_pbn",
+        "resolution": "Original",
+        "pieces": 53,
+        "colors": 12,
+        "jsonFile": "assets/converted/country_birdhouse_pbn.json",
+        "lineArtUrl": "assets/converted/country_birdhouse_pbn_lines.png",
+        "thumbnailUrl": "assets/converted/country_birdhouse_pbn_thumb.png"
+      }
+    ]
   }
 ]

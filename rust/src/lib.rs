@@ -111,6 +111,11 @@ impl GameController {
         serde_json::to_string(&feedback).unwrap_or_else(|_| "{}".to_string())
     }
 
+    pub fn undo_last(&mut self) -> String {
+        let feedback = self.engine.undo_last();
+        serde_json::to_string(&feedback).unwrap_or_else(|_| "{}".to_string())
+    }
+
     pub fn toggle_matching_hints(&mut self) -> bool {
         self.engine.toggle_matching_hints()
     }
