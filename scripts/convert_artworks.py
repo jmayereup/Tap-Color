@@ -853,126 +853,175 @@ def convert_to_paint_by_number(img_path, title, artist, output_id, output_dir):
     return artwork
 
 def main():
+    import re
     base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     assets_dir = os.path.join(base_dir, "public", "assets")
+    pbn_dir = os.path.join(assets_dir, "paint_by_number")
+    diamond_only_dir = os.path.join(assets_dir, "diamond_art_only")
     output_dir = os.path.join(assets_dir, "converted")
+    os.makedirs(pbn_dir, exist_ok=True)
+    os.makedirs(diamond_only_dir, exist_ok=True)
     os.makedirs(output_dir, exist_ok=True)
 
-    catalog = [
-        {
-            "key": "fluffy_cow",
-            "file": "fluffy-cow-3.jpeg",
+    # Optional curated metadata overrides for known artwork keys
+    METADATA_BY_KEY = {
+        "fluffy_cow": {
             "title": "Sweet Highland Calf",
             "artist": "Country Homestead",
-            "desc": "Gentle fluffy highland cow calf surrounded by meadow wildflowers and rustic wooden pasture"
+            "desc": "Gentle fluffy highland cow calf surrounded by meadow wildflowers and rustic wooden pasture",
         },
-        {
-            "key": "hummingbird",
-            "file": "hummingbird.jpeg",
+        "hummingbird": {
             "title": "Garden Hummingbird",
             "artist": "Sunlit Meadow",
-            "desc": "Vibrant hummingbird sipping sweet nectar among blooming country garden flora"
+            "desc": "Vibrant hummingbird sipping sweet nectar among blooming country garden flora",
         },
-        {
-            "key": "country_barn",
-            "file": "country_barn.jpeg",
+        "country_barn": {
             "title": "Rustic Red Barn",
             "artist": "Heartland Heritage",
-            "desc": "Classic red country barn with silo, split-rail fence, and sunflowers under sunny blue sky"
+            "desc": "Classic red country barn with silo, split-rail fence, and sunflowers under sunny blue sky",
         },
-        {
-            "key": "country_rooster",
-            "file": "country_rooster.jpeg",
+        "country_rooster": {
             "title": "Morning Farm Rooster",
             "artist": "Sunrise Farmstead",
-            "desc": "Colorful country rooster greeting the morning sun from a rustic fence post"
+            "desc": "Colorful country rooster greeting the morning sun from a rustic fence post",
         },
-        {
-            "key": "country_truck",
-            "file": "country_truck.jpeg",
+        "country_truck": {
             "title": "Vintage Harvest Truck",
             "artist": "Country Roads Studio",
-            "desc": "Classic turquoise vintage pickup truck filled with harvest pumpkins and sunflowers"
+            "desc": "Classic turquoise vintage pickup truck filled with harvest pumpkins and sunflowers",
         },
-        {
-            "key": "country_puppy",
-            "file": "country_puppy.jpeg",
+        "country_puppy": {
             "title": "Porch Golden Puppy",
             "artist": "Cottage Companions",
-            "desc": "Adorable golden retriever puppy in a red bandana enjoying a sunny farm morning"
+            "desc": "Adorable golden retriever puppy in a red bandana enjoying a sunny farm morning",
         },
-        {
-            "key": "yorky_teacup",
-            "file": "yorky_teacup.jpeg",
+        "yorky_teacup": {
             "title": "Teacup Yorkie Ribbon",
             "artist": "Petite Paws Studio",
-            "desc": "Adorable teacup Yorkshire Terrier puppy with pink bow nestled in vintage porcelain"
+            "desc": "Adorable teacup Yorkshire Terrier puppy with pink bow nestled in vintage porcelain",
         },
-        {
-            "key": "yorky_garden",
-            "file": "yorky_garden.jpeg",
+        "yorky_garden": {
             "title": "Garden Blossom Yorkie",
             "artist": "Cottage Petals",
-            "desc": "Cheerful Yorkshire Terrier puppy surrounded by blooming pansies and meadow lavender"
+            "desc": "Cheerful Yorkshire Terrier puppy surrounded by blooming pansies and meadow lavender",
         },
-        {
-            "key": "yorky_autumn",
-            "file": "yorky_autumn.jpeg",
+        "yorky_autumn": {
             "title": "Cozy Autumn Yorkie",
             "artist": "Harvest Hearth",
-            "desc": "Sweet Yorkshire Terrier in a cozy red knit sweater among autumn maple leaves and pumpkins"
+            "desc": "Sweet Yorkshire Terrier in a cozy red knit sweater among autumn maple leaves and pumpkins",
         },
-        {
-            "key": "yorky_playful",
-            "file": "yorky_playful.jpeg",
+        "yorky_playful": {
             "title": "Playful Meadow Yorkie",
             "artist": "Sunny Pastures",
-            "desc": "Joyful Yorkshire Terrier puppy in a polka dot bandana playing with a ball in buttercups"
+            "desc": "Joyful Yorkshire Terrier puppy in a polka dot bandana playing with a ball in buttercups",
         },
-        {
-            "key": "rural_windmill",
-            "file": "rural_windmill.jpeg",
+        "rural_windmill": {
             "title": "Prairie Windmill Sunset",
             "artist": "Heartland Horizons",
-            "desc": "Classic American farm windmill standing tall above golden wheat fields and prairie sunflowers"
+            "desc": "Classic American farm windmill standing tall above golden wheat fields and prairie sunflowers",
         },
-        {
-            "key": "country_store",
-            "file": "country_store.jpeg",
+        "country_store": {
             "title": "Old Country Store",
             "artist": "Heritage Homestead",
-            "desc": "Charming general store with wooden porch, rocking chairs, bushel of apples, and hanging lanterns"
+            "desc": "Charming general store with wooden porch, rocking chairs, bushel of apples, and hanging lanterns",
         },
-        {
-            "key": "pasture_horses",
-            "file": "pasture_horses.jpeg",
+        "pasture_horses": {
             "title": "Pasture Mare & Foal",
             "artist": "Meadow Run Stables",
-            "desc": "Loving chestnut farm mare and playful young foal beside a rustic split-rail pasture fence"
+            "desc": "Loving chestnut farm mare and playful young foal beside a rustic split-rail pasture fence",
         },
-        {
-            "key": "vintage_tractor",
-            "file": "vintage_tractor.jpeg",
+        "vintage_tractor": {
             "title": "Heartland Antique Tractor",
             "artist": "Country Roads Studio",
-            "desc": "Classic vintage farm tractor in vibrant green and yellow beside summer cornfields and harvest crates"
+            "desc": "Classic vintage farm tractor in vibrant green and yellow beside summer cornfields and harvest crates",
         },
-        {
-            "key": "covered_bridge",
-            "file": "covered_bridge.jpeg",
+        "covered_bridge": {
             "title": "Rustic Covered Bridge",
             "artist": "Valley Stream Folk",
-            "desc": "Historic red wooden covered bridge spanning a peaceful babbling stream surrounded by wildflowers"
+            "desc": "Historic red wooden covered bridge spanning a peaceful babbling stream surrounded by wildflowers",
         },
-        {
-            "key": "autumn_fox",
-            "file": "autumn_fox.jpeg",
-            "pbn_file": "autumn_fox_pbn.jpeg",
+        "autumn_fox": {
             "title": "Cozy Autumn Fox",
             "artist": "Woodland Folk",
-            "desc": "Cozy red fox curled up among autumn leaves, red-capped mushrooms, and meadow wildflowers"
+            "desc": "Cozy red fox curled up among autumn leaves, red-capped mushrooms, and meadow wildflowers",
+        },
+    }
+
+    STEM_ALIASES = {
+        "fluffy-cow-3": "fluffy_cow",
+        "autumn_fox_pbn": "autumn_fox",
+    }
+
+    IMAGE_EXTS = {".jpg", ".jpeg", ".png", ".webp"}
+
+    def stem_to_key(stem):
+        if stem in STEM_ALIASES:
+            return STEM_ALIASES[stem]
+        if stem.endswith("_pbn"):
+            stem = stem[:-4]
+        return re.sub(r"[^a-z0-9_]+", "_", stem.lower()).strip("_")
+
+    def get_meta(key, raw_stem):
+        if key in METADATA_BY_KEY:
+            return METADATA_BY_KEY[key]
+        title = raw_stem.replace("_", " ").replace("-", " ").title()
+        return {
+            "title": title,
+            "artist": "Tap Color Studio",
+            "desc": f"{title} artwork",
         }
-    ]
+
+    def is_up_to_date(src_path, out_paths):
+        src_mtime = os.path.getmtime(src_path)
+        for p in out_paths:
+            if not os.path.exists(p) or os.path.getmtime(p) < src_mtime:
+                return False
+        return True
+
+    # Discover artworks from paint_by_number/ and diamond_art_only/
+    discovered = {}
+
+    for fname in sorted(os.listdir(pbn_dir)):
+        ext = os.path.splitext(fname)[1].lower()
+        if ext not in IMAGE_EXTS:
+            continue
+        stem = os.path.splitext(fname)[0]
+        key = stem_to_key(stem)
+        rel_path = f"assets/paint_by_number/{fname}"
+        abs_path = os.path.join(pbn_dir, fname)
+        entry = discovered.setdefault(key, {
+            "key": key,
+            "raw_stem": stem,
+            "pbn_path": None,
+            "pbn_rel": None,
+            "diamond_path": None,
+            "diamond_rel": None,
+        })
+        entry["pbn_path"] = abs_path
+        entry["pbn_rel"] = rel_path
+        if entry["diamond_path"] is None:
+            entry["diamond_path"] = abs_path
+            entry["diamond_rel"] = rel_path
+
+    for fname in sorted(os.listdir(diamond_only_dir)):
+        ext = os.path.splitext(fname)[1].lower()
+        if ext not in IMAGE_EXTS:
+            continue
+        stem = os.path.splitext(fname)[0]
+        key = stem_to_key(stem)
+        rel_path = f"assets/diamond_art_only/{fname}"
+        abs_path = os.path.join(diamond_only_dir, fname)
+        entry = discovered.setdefault(key, {
+            "key": key,
+            "raw_stem": stem,
+            "pbn_path": None,
+            "pbn_rel": None,
+            "diamond_path": None,
+            "diamond_rel": None,
+        })
+        # diamond_art_only overrides diamond source (so complex artwork can be used for diamond)
+        entry["diamond_path"] = abs_path
+        entry["diamond_rel"] = rel_path
 
     diamond_resolutions = [
         {"name": "Cozy (6.4k)", "grid": 80, "colors": 18, "suffix": "80", "label": "80×80"},
@@ -980,109 +1029,117 @@ def main():
         {"name": "Masterpiece (25.6k)", "grid": 160, "colors": 36, "suffix": "160", "label": "160×160"},
     ]
 
-    pbn_resolutions = [
-        {"name": "Detailed (800+)", "complexity": "detailed", "suffix": "detailed", "label": "Detailed"},
-        {"name": "Intricate (2,000+)", "complexity": "intricate", "suffix": "intricate", "label": "Intricate"},
-        {"name": "Masterpiece (4,000+)", "complexity": "masterpiece", "suffix": "masterpiece", "label": "Masterpiece"},
-    ]
-
     pbn_only = '--pbn-only' in sys.argv
+    force = '--force' in sys.argv
     args = [a for a in sys.argv[1:] if not a.startswith('-')]
     target_key = args[0].strip() if args else None
 
     manifest_path = os.path.join(output_dir, "manifest.json")
-    manifest_map = {}
+    existing_manifest = {}
     if os.path.exists(manifest_path):
         try:
             with open(manifest_path, 'r', encoding='utf-8') as f:
                 for entry in json.load(f):
-                    manifest_map[entry["key"]] = entry
+                    existing_manifest[entry["key"]] = entry
         except Exception as e:
             print(f"Warning: could not read existing manifest ({e})")
 
-    for item in catalog:
-        if target_key and item["key"] != target_key:
+    manifest_entries = []
+    preferred_order = list(METADATA_BY_KEY.keys())
+    ordered_keys = [k for k in preferred_order if k in discovered] + [
+        k for k in sorted(discovered.keys()) if k not in preferred_order
+    ]
+
+    for key in ordered_keys:
+        if target_key and key != target_key:
+            if key in existing_manifest:
+                manifest_entries.append(existing_manifest[key])
             continue
 
-        img_path = os.path.join(assets_dir, item["file"])
-        if not os.path.exists(img_path):
-            print(f"Skipping {img_path}: file not found")
-            continue
+        item = discovered[key]
+        meta = get_meta(key, item["raw_stem"])
+        prev = existing_manifest.get(key, {})
 
-        print(f"\nProcessing '{item['title']}' ({item['file']}):")
-
-        # 1. Diamond Art at 3 resolutions
-        if pbn_only and item["key"] in manifest_map and "diamondVariants" in manifest_map[item["key"]]:
-            diamond_variants = manifest_map[item["key"]]["diamondVariants"]
-        else:
-            diamond_variants = []
+        # 1. Diamond Art (generated for both diamond_art_only/ and paint_by_number/ images)
+        diamond_variants = []
+        if item["diamond_path"]:
+            d_outputs = []
             for d_res in diamond_resolutions:
-                art_id = f"{item['key']}_diamond_{d_res['suffix']}"
-                variant_title = f"{item['title']} ({d_res['name']} Diamond)"
-                art = convert_to_diamond_art(
-                    img_path=img_path,
-                    N=d_res["grid"],
-                    K=d_res["colors"],
-                    title=variant_title,
-                    artist=item["artist"],
+                art_id = f"{key}_diamond_{d_res['suffix']}"
+                d_outputs.append(os.path.join(output_dir, f"{art_id}.json"))
+                d_outputs.append(os.path.join(output_dir, f"{art_id}_thumb.png"))
+
+            if not force and (pbn_only or is_up_to_date(item["diamond_path"], d_outputs)) and prev.get("diamondVariants"):
+                diamond_variants = prev["diamondVariants"]
+            else:
+                print(f"\nConverting Diamond Art for '{meta['title']}' ({item['diamond_rel']}):")
+                for d_res in diamond_resolutions:
+                    art_id = f"{key}_diamond_{d_res['suffix']}"
+                    variant_title = f"{meta['title']} ({d_res['name']} Diamond)"
+                    art = convert_to_diamond_art(
+                        img_path=item["diamond_path"],
+                        N=d_res["grid"],
+                        K=d_res["colors"],
+                        title=variant_title,
+                        artist=meta["artist"],
+                        output_id=art_id,
+                        output_dir=output_dir
+                    )
+                    diamond_variants.append({
+                        "id": art_id,
+                        "resolution": d_res["name"],
+                        "label": d_res["label"],
+                        "grid": d_res["grid"],
+                        "pieces": len(art["regions"]),
+                        "colors": len(art["palette"]),
+                        "jsonFile": f"assets/converted/{art_id}.json",
+                        "thumbnailUrl": f"assets/converted/{art_id}_thumb.png",
+                    })
+
+        # 2. Paint-by-Number (ONLY for images in public/assets/paint_by_number/)
+        pbn_variants = []
+        if item["pbn_path"]:
+            art_id = f"{key}_pbn"
+            p_outputs = [
+                os.path.join(output_dir, f"{art_id}.json"),
+                os.path.join(output_dir, f"{art_id}_lines.png"),
+                os.path.join(output_dir, f"{art_id}_thumb.png"),
+            ]
+            if not force and is_up_to_date(item["pbn_path"], p_outputs) and prev.get("pbnVariants"):
+                pbn_variants = prev["pbnVariants"]
+            else:
+                print(f"\nConverting Paint-by-Number for '{meta['title']}' ({item['pbn_rel']}):")
+                art = convert_to_paint_by_number(
+                    img_path=item["pbn_path"],
+                    title=meta["title"],
+                    artist=meta["artist"],
                     output_id=art_id,
                     output_dir=output_dir
                 )
-                diamond_variants.append({
+                pbn_variants = [{
                     "id": art_id,
-                    "resolution": d_res["name"],
-                    "label": d_res["label"],
-                    "grid": d_res["grid"],
+                    "resolution": "Original",
                     "pieces": len(art["regions"]),
                     "colors": len(art["palette"]),
                     "jsonFile": f"assets/converted/{art_id}.json",
+                    "lineArtUrl": f"assets/converted/{art_id}_lines.png",
                     "thumbnailUrl": f"assets/converted/{art_id}_thumb.png",
-                })
+                }]
 
-        # 2. Paint-by-Number (single canonical line-preserving edition)
-        pbn_img_path = os.path.join(assets_dir, item["pbn_file"]) if "pbn_file" in item else img_path
-        if not os.path.exists(pbn_img_path):
-            print(f"Skipping PBN {pbn_img_path}: file not found")
-            pbn_img_path = img_path
-        art_id = f"{item['key']}_pbn"
-        art = convert_to_paint_by_number(
-            img_path=pbn_img_path,
-            title=item["title"],
-            artist=item["artist"],
-            output_id=art_id,
-            output_dir=output_dir
-        )
-        pbn_variants = [{
-            "id": art_id,
-            "resolution": "Original",
-            "pieces": len(art["regions"]),
-            "colors": len(art["palette"]),
-            "jsonFile": f"assets/converted/{art_id}.json",
-            "lineArtUrl": f"assets/converted/{art_id}_lines.png",
-            "thumbnailUrl": f"assets/converted/{art_id}_thumb.png",
-        }]
-
-        manifest_map[item["key"]] = {
-            "key": item["key"],
-            "title": item["title"],
-            "artist": item["artist"],
-            "desc": item["desc"],
-            "originalAsset": f"assets/{item['file']}",
+        manifest_entries.append({
+            "key": key,
+            "title": meta["title"],
+            "artist": meta["artist"],
+            "desc": meta["desc"],
+            "originalAsset": item["diamond_rel"] or item["pbn_rel"],
+            "pbnAsset": item["pbn_rel"],
             "diamondVariants": diamond_variants,
             "pbnVariants": pbn_variants,
-        }
-
-    ordered_manifest = []
-    for item in catalog:
-        if item["key"] in manifest_map:
-            ordered_manifest.append(manifest_map[item["key"]])
-    for k, v in manifest_map.items():
-        if not any(item["key"] == k for item in catalog):
-            ordered_manifest.append(v)
+        })
 
     with open(manifest_path, 'w', encoding='utf-8') as f:
-        json.dump(ordered_manifest, f, indent=2)
-    print(f"\nManifest saved to {manifest_path} with {len(ordered_manifest)} gallery entries.")
+        json.dump(manifest_entries, f, indent=2)
+    print(f"Manifest saved to {manifest_path} with {len(manifest_entries)} gallery entries.")
 
 if __name__ == '__main__':
     main()

@@ -806,9 +806,75 @@ class TapColorApp {
     ];
   }
 
+  async loadManifestMeta() {
+    try {
+      const res = await fetch('assets/converted/manifest.json');
+      if (!res.ok) return;
+      const entries = await res.json();
+      if (!Array.isArray(entries) || entries.length === 0) return;
+
+      const dynamicMeta = [];
+
+      // 1. Diamond Art entries (from both diamond_art_only/ and paint_by_number/)
+      for (const entry of entries) {
+        if (entry.diamondVariants && entry.diamondVariants.length > 0) {
+          const defVar = entry.diamondVariants.find(v => v.id.endsWith('_120')) || entry.diamondVariants[0];
+          const variants = entry.diamondVariants.map(v => ({
+            ...v,
+            name: v.grid === 80 ? 'Cozy Canvas' : (v.grid === 120 ? 'Standard Kit' : (v.grid === 160 ? 'Masterpiece Ultra' : v.resolution)),
+          }));
+          dynamicMeta.push({
+            id: `${entry.key}_diamond`,
+            title: entry.title,
+            artist: entry.artist,
+            category: 'diamond',
+            pieces: defVar.pieces,
+            desc: entry.desc,
+            defaultVariantId: defVar.id,
+            selectedVariantId: defVar.id,
+            originalAsset: entry.originalAsset,
+            thumbnailUrl: defVar.thumbnailUrl,
+            variants,
+          });
+        }
+      }
+
+      // 2. Paint by Number entries (ONLY from paint_by_number/)
+      for (const entry of entries) {
+        if (entry.pbnVariants && entry.pbnVariants.length > 0) {
+          const pbnVar = entry.pbnVariants[0];
+          dynamicMeta.push({
+            id: `${entry.key}_pbn`,
+            title: entry.title,
+            artist: entry.artist,
+            category: 'classic',
+            pieces: pbnVar.pieces,
+            desc: entry.desc,
+            defaultVariantId: pbnVar.id,
+            selectedVariantId: pbnVar.id,
+            originalAsset: entry.pbnAsset || entry.originalAsset,
+            thumbnailUrl: pbnVar.thumbnailUrl,
+            variants: entry.pbnVariants.map(v => ({
+              ...v,
+              label: v.label || 'Original',
+              name: v.name || 'Original Lines',
+            })),
+          });
+        }
+      }
+
+      if (dynamicMeta.length > 0) {
+        this.artworksMeta = dynamicMeta;
+      }
+    } catch (e) {
+      console.warn('Could not load manifest.json, using fallback catalog:', e);
+    }
+  }
+
   async init() {
     this.setupCanvasDpi();
     this.bindEvents();
+    await this.loadManifestMeta();
     this.populateGalleryModal();
     await this.updateSavedBadge();
 

@@ -4,7 +4,8 @@
     "title": "Sweet Highland Calf",
     "artist": "Country Homestead",
     "desc": "Gentle fluffy highland cow calf surrounded by meadow wildflowers and rustic wooden pasture",
-    "originalAsset": "assets/fluffy-cow-3.jpeg",
+    "originalAsset": "assets/paint_by_number/fluffy-cow-3.jpeg",
+    "pbnAsset": "assets/paint_by_number/fluffy-cow-3.jpeg",
     "diamondVariants": [
       {
         "id": "fluffy_cow_diamond_80",
@@ -54,7 +55,8 @@
     "title": "Garden Hummingbird",
     "artist": "Sunlit Meadow",
     "desc": "Vibrant hummingbird sipping sweet nectar among blooming country garden flora",
-    "originalAsset": "assets/hummingbird.jpeg",
+    "originalAsset": "assets/diamond_art_only/hummingbird.jpeg",
+    "pbnAsset": null,
     "diamondVariants": [
       {
         "id": "hummingbird_diamond_80",
@@ -94,7 +96,8 @@
     "title": "Rustic Red Barn",
     "artist": "Heartland Heritage",
     "desc": "Classic red country barn with silo, split-rail fence, and sunflowers under sunny blue sky",
-    "originalAsset": "assets/country_barn.jpeg",
+    "originalAsset": "assets/diamond_art_only/country_barn.jpeg",
+    "pbnAsset": null,
     "diamondVariants": [
       {
         "id": "country_barn_diamond_80",
@@ -134,7 +137,8 @@
     "title": "Morning Farm Rooster",
     "artist": "Sunrise Farmstead",
     "desc": "Colorful country rooster greeting the morning sun from a rustic fence post",
-    "originalAsset": "assets/country_rooster.jpeg",
+    "originalAsset": "assets/diamond_art_only/country_rooster.jpeg",
+    "pbnAsset": null,
     "diamondVariants": [
       {
         "id": "country_rooster_diamond_80",
@@ -174,7 +178,8 @@
     "title": "Vintage Harvest Truck",
     "artist": "Country Roads Studio",
     "desc": "Classic turquoise vintage pickup truck filled with harvest pumpkins and sunflowers",
-    "originalAsset": "assets/country_truck.jpeg",
+    "originalAsset": "assets/diamond_art_only/country_truck.jpeg",
+    "pbnAsset": null,
     "diamondVariants": [
       {
         "id": "country_truck_diamond_80",
@@ -214,7 +219,8 @@
     "title": "Porch Golden Puppy",
     "artist": "Cottage Companions",
     "desc": "Adorable golden retriever puppy in a red bandana enjoying a sunny farm morning",
-    "originalAsset": "assets/country_puppy.jpeg",
+    "originalAsset": "assets/diamond_art_only/country_puppy.jpeg",
+    "pbnAsset": null,
     "diamondVariants": [
       {
         "id": "country_puppy_diamond_80",
@@ -254,7 +260,8 @@
     "title": "Teacup Yorkie Ribbon",
     "artist": "Petite Paws Studio",
     "desc": "Adorable teacup Yorkshire Terrier puppy with pink bow nestled in vintage porcelain",
-    "originalAsset": "assets/yorky_teacup.jpeg",
+    "originalAsset": "assets/diamond_art_only/yorky_teacup.jpeg",
+    "pbnAsset": null,
     "diamondVariants": [
       {
         "id": "yorky_teacup_diamond_80",
@@ -294,7 +301,8 @@
     "title": "Garden Blossom Yorkie",
     "artist": "Cottage Petals",
     "desc": "Cheerful Yorkshire Terrier puppy surrounded by blooming pansies and meadow lavender",
-    "originalAsset": "assets/yorky_garden.jpeg",
+    "originalAsset": "assets/diamond_art_only/yorky_garden.jpeg",
+    "pbnAsset": null,
     "diamondVariants": [
       {
         "id": "yorky_garden_diamond_80",
@@ -334,7 +342,8 @@
     "title": "Cozy Autumn Yorkie",
     "artist": "Harvest Hearth",
     "desc": "Sweet Yorkshire Terrier in a cozy red knit sweater among autumn maple leaves and pumpkins",
-    "originalAsset": "assets/yorky_autumn.jpeg",
+    "originalAsset": "assets/diamond_art_only/yorky_autumn.jpeg",
+    "pbnAsset": null,
     "diamondVariants": [
       {
         "id": "yorky_autumn_diamond_80",
@@ -374,7 +383,8 @@
     "title": "Playful Meadow Yorkie",
     "artist": "Sunny Pastures",
     "desc": "Joyful Yorkshire Terrier puppy in a polka dot bandana playing with a ball in buttercups",
-    "originalAsset": "assets/yorky_playful.jpeg",
+    "originalAsset": "assets/diamond_art_only/yorky_playful.jpeg",
+    "pbnAsset": null,
     "diamondVariants": [
       {
         "id": "yorky_playful_diamond_80",
@@ -414,7 +424,8 @@
     "title": "Prairie Windmill Sunset",
     "artist": "Heartland Horizons",
     "desc": "Classic American farm windmill standing tall above golden wheat fields and prairie sunflowers",
-    "originalAsset": "assets/rural_windmill.jpeg",
+    "originalAsset": "assets/diamond_art_only/rural_windmill.jpeg",
+    "pbnAsset": null,
     "diamondVariants": [
       {
         "id": "rural_windmill_diamond_80",
@@ -454,7 +465,8 @@
     "title": "Old Country Store",
     "artist": "Heritage Homestead",
     "desc": "Charming general store with wooden porch, rocking chairs, bushel of apples, and hanging lanterns",
-    "originalAsset": "assets/country_store.jpeg",
+    "originalAsset": "assets/diamond_art_only/country_store.jpeg",
+    "pbnAsset": null,
     "diamondVariants": [
       {
         "id": "country_store_diamond_80",
@@ -494,7 +506,8 @@
     "title": "Pasture Mare & Foal",
     "artist": "Meadow Run Stables",
     "desc": "Loving chestnut farm mare and playful young foal beside a rustic split-rail pasture fence",
-    "originalAsset": "assets/pasture_horses.jpeg",
+    "originalAsset": "assets/diamond_art_only/pasture_horses.jpeg",
+    "pbnAsset": null,
     "diamondVariants": [
       {
         "id": "pasture_horses_diamond_80",
@@ -534,7 +547,8 @@
     "title": "Heartland Antique Tractor",
     "artist": "Country Roads Studio",
     "desc": "Classic vintage farm tractor in vibrant green and yellow beside summer cornfields and harvest crates",
-    "originalAsset": "assets/vintage_tractor.jpeg",
+    "originalAsset": "assets/diamond_art_only/vintage_tractor.jpeg",
+    "pbnAsset": null,
     "diamondVariants": [
       {
         "id": "vintage_tractor_diamond_80",
@@ -574,7 +588,8 @@
     "title": "Rustic Covered Bridge",
     "artist": "Valley Stream Folk",
     "desc": "Historic red wooden covered bridge spanning a peaceful babbling stream surrounded by wildflowers",
-    "originalAsset": "assets/covered_bridge.jpeg",
+    "originalAsset": "assets/diamond_art_only/covered_bridge.jpeg",
+    "pbnAsset": null,
     "diamondVariants": [
       {
         "id": "covered_bridge_diamond_80",
@@ -614,7 +629,8 @@
     "title": "Cozy Autumn Fox",
     "artist": "Woodland Folk",
     "desc": "Cozy red fox curled up among autumn leaves, red-capped mushrooms, and meadow wildflowers",
-    "originalAsset": "assets/autumn_fox.jpeg",
+    "originalAsset": "assets/diamond_art_only/autumn_fox.jpeg",
+    "pbnAsset": "assets/paint_by_number/autumn_fox_pbn.jpeg",
     "diamondVariants": [
       {
         "id": "autumn_fox_diamond_80",
