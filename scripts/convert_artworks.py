@@ -967,15 +967,8 @@ def main():
             "desc": f"{title} artwork",
         }
 
-    conv_script_dir = os.path.dirname(os.path.abspath(__file__))
-    pbn_script_path = os.path.join(conv_script_dir, "convert_pbn.mjs")
-    script_mtime = max(
-        os.path.getmtime(__file__),
-        os.path.getmtime(pbn_script_path) if os.path.exists(pbn_script_path) else 0
-    )
-
     def is_up_to_date(src_path, out_paths):
-        src_mtime = max(os.path.getmtime(src_path), script_mtime)
+        src_mtime = os.path.getmtime(src_path)
         for p in out_paths:
             if not os.path.exists(p) or os.path.getmtime(p) < src_mtime:
                 return False
@@ -1078,7 +1071,7 @@ def main():
                 d_outputs.append(os.path.join(output_dir, f"{art_id}.json"))
                 d_outputs.append(os.path.join(output_dir, f"{art_id}_thumb.png"))
 
-            if not force and (pbn_only or is_up_to_date(item["diamond_path"], d_outputs)) and prev.get("diamondVariants"):
+            if (pbn_only or (not force and is_up_to_date(item["diamond_path"], d_outputs))) and prev.get("diamondVariants"):
                 diamond_variants = prev["diamondVariants"]
             else:
                 print(f"\nConverting Diamond Art for '{meta['title']}' ({item['diamond_rel']}):")

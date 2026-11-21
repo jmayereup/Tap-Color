@@ -309,8 +309,9 @@ for (let i = 0; i < N; i++) {
   compPixels.set(cid, pixList);
 }
 
-// --- Step 4: Filter Tiny Noise & Preserve Eye Sparkles (Two-Pass, Order-Independent) ---
-const MIN_REGION_PIXELS = 42; // ~6.5x6.5 px at 800x800
+// --- Step 4: Filter Tiny Noise (Two-Stage: Preserve Ink-Enclosed Regions & Eye Sparkles) ---
+const MIN_REGION_PIXELS = 42;    // ~6.5x6.5 px at 800x800 for non-enclosed color-jump regions
+const MIN_ENCLOSED_PIXELS = 10;  // ~3.2x3.2 seed px (~25-35 visible px) for ink-enclosed pockets
 const validCompIds = new Set();
 const tinyComps = [];
 
@@ -319,40 +320,135 @@ for (const [cid, pix] of compPixels.entries()) {
     validCompIds.add(cid);
   } else {
     tinyComps.push([cid, pix]);
-  }
-}
-
-for (const [cid, pix] of tinyComps) {
-  // Check if this tiny region is a bright white highlight completely surrounded by ink (e.g. eye sparkle)
-  let sumLum = 0;
-  let touchesOtherValid = false;
-  for (let k = 0; k < pix.length; k++) {
-    const p = pix[k];
-    sumLum += lum[p];
-    const px = p % W, py = (p - px) / W;
-    if (px > 0 && validCompIds.has(seedMap[p - 1])) touchesOtherValid = true;
-    if (px < W - 1 && validCompIds.has(seedMap[p + 1])) touchesOtherValid = true;
-    if (py > 0 && validCompIds.has(seedMap[p - W])) touchesOtherValid = true;
-    if (py < H - 1 && validCompIds.has(seedMap[p + W])) touchesOtherValid = true;
-  }
-
-  if (!touchesOtherValid && (sumLum / pix.length) > 190) {
-    // Bake tiny white eye-sparkle directly into the line-art overlay so it stays crisp!
+    // Clear from seedMap initially so Pass A absorbs non-enclosed specks into neighbors
     for (let k = 0; k < pix.length; k++) {
-      const o = pix[k] * 4;
-      linesRgba[o] = 255;
-      linesRgba[o + 1] = 255;
-      linesRgba[o + 2] = 255;
-      linesRgba[o + 3] = 255;
+      seedMap[pix[k]] = 0;
     }
   }
-  // Clear from seedMap so Voronoi expansion absorbs it cleanly
-  for (let k = 0; k < pix.length; k++) {
-    seedMap[pix[k]] = 0;
+}
+
+// --- Step 5: Voronoi / Multi-Source BFS Expansion ---
+// Pass A1: Expand primary (>= MIN_REGION_PIXELS) seeds into non-coreInk interior gaps/halos.
+// Any tiny component touching a primary region (directly or through other non-ink pixels) gets absorbed.
+const labelMap = new Int32Array(seedMap); // copy of primary valid seeds
+const visibleMap = new Int32Array(N); // tracks visible (non-coreInk) pixels per region for label placement
+const distSteps = new Uint8Array(N);
+
+qHead = 0; qTail = 0;
+for (let i = 0; i < N; i++) {
+  if (labelMap[i] > 0) {
+    queue[qTail++] = i;
+    distSteps[i] = 1;
+    if (!coreInk[i]) visibleMap[i] = labelMap[i];
   }
 }
 
-// --- Step 5: Compute Pure Median RGB for Each Valid Region (O(K) Histogram) ---
+function runPassABfs() {
+  while (qHead < qTail) {
+    const curr = queue[qHead++];
+    const cid = labelMap[curr];
+    const cx = curr % W;
+    const cy = (curr - cx) / W;
+
+    const expand = (nb) => {
+      if (labelMap[nb] !== 0 || isExteriorBg[nb] || coreInk[nb]) return;
+      labelMap[nb] = cid;
+      visibleMap[nb] = cid;
+      queue[qTail++] = nb;
+    };
+    if (cx > 0) expand(curr - 1);
+    if (cx < W - 1) expand(curr + 1);
+    if (cy > 0) expand(curr - W);
+    if (cy < H - 1) expand(curr + W);
+  }
+}
+
+runPassABfs();
+
+// Pass A2: Rescue clearly defined ink-enclosed regions (>= MIN_ENCLOSED_PIXELS seed pixels)
+// that Pass A1 could not reach because they are completely surrounded by coreInk.
+qHead = 0; qTail = 0;
+const stillTinyEnclosed = [];
+for (const [cid, pix] of tinyComps) {
+  if (labelMap[pix[0]] !== 0) continue; // already absorbed by a neighbor in Pass A1
+  if (pix.length >= MIN_ENCLOSED_PIXELS) {
+    validCompIds.add(cid);
+    for (let k = 0; k < pix.length; k++) {
+      const p = pix[k];
+      seedMap[p] = cid;
+      labelMap[p] = cid;
+      if (!coreInk[p]) visibleMap[p] = cid;
+      queue[qTail++] = p;
+    }
+  } else {
+    stillTinyEnclosed.push([cid, pix]);
+  }
+}
+
+if (qTail > 0) {
+  runPassABfs();
+}
+
+// Handle truly microscopic (< MIN_ENCLOSED_PIXELS) ink-enclosed pockets (e.g. eye sparkles & pinholes)
+// by baking them into linesRgba so they never become unfillable white holes.
+for (const [, pix] of stillTinyEnclosed) {
+  if (labelMap[pix[0]] !== 0) continue; // absorbed by a rescued sibling in Pass A2
+  let sumR = 0, sumG = 0, sumB = 0, sumLum = 0, sumChroma = 0;
+  for (let k = 0; k < pix.length; k++) {
+    const p = pix[k];
+    const o = p * 4;
+    sumR += data[o];
+    sumG += data[o + 1];
+    sumB += data[o + 2];
+    sumLum += lum[p];
+    sumChroma += chromaArr[p];
+  }
+  const n = pix.length;
+  const isWhiteSparkle = (sumLum / n) > 215 && (sumChroma / n) < 25;
+  const fillR = isWhiteSparkle ? 255 : Math.round(sumR / n);
+  const fillG = isWhiteSparkle ? 255 : Math.round(sumG / n);
+  const fillB = isWhiteSparkle ? 255 : Math.round(sumB / n);
+
+  // Flood-fill the tiny enclosed pocket's non-coreInk pixels (including its 1px halo) into linesRgba
+  qHead = 0; qTail = 0;
+  for (let k = 0; k < pix.length; k++) {
+    const p = pix[k];
+    if (labelMap[p] === 0) {
+      labelMap[p] = -1; // mark visited so we don't revisit
+      queue[qTail++] = p;
+    }
+  }
+  while (qHead < qTail) {
+    const curr = queue[qHead++];
+    const o = curr * 4;
+    if (linesRgba[o + 3] < 255) {
+      // Blend baked fill behind any existing anti-aliased ink alpha
+      const a = linesRgba[o + 3] / 255;
+      linesRgba[o] = Math.round(linesRgba[o] * a + fillR * (1 - a));
+      linesRgba[o + 1] = Math.round(linesRgba[o + 1] * a + fillG * (1 - a));
+      linesRgba[o + 2] = Math.round(linesRgba[o + 2] * a + fillB * (1 - a));
+      linesRgba[o + 3] = 255;
+    }
+    const cx = curr % W;
+    const cy = (curr - cx) / W;
+    const tryPocket = (nb) => {
+      if (labelMap[nb] !== 0 || isExteriorBg[nb] || coreInk[nb]) return;
+      labelMap[nb] = -1;
+      queue[qTail++] = nb;
+    };
+    if (cx > 0) tryPocket(curr - 1);
+    if (cx < W - 1) tryPocket(curr + 1);
+    if (cy > 0) tryPocket(curr - W);
+    if (cy < H - 1) tryPocket(curr + W);
+  }
+}
+
+// Clear temporary -1 markers from labelMap before Pass B
+for (let i = 0; i < N; i++) {
+  if (labelMap[i] < 0) labelMap[i] = 0;
+}
+
+// --- Step 6: Compute Pure Median RGB for Each Valid Region (O(K) Histogram) ---
 const compColor = new Map();
 const histR = new Int32Array(256);
 const histG = new Int32Array(256);
@@ -380,41 +476,6 @@ for (const cid of validCompIds) {
     medianFromHist(histG, mid),
     medianFromHist(histB, mid),
   ]);
-}
-
-// --- Step 6: Voronoi / Multi-Source BFS Expansion ---
-// First expand into non-ink interior gaps/halos (unlimited steps inside non-exterior non-coreInk),
-// then expand 3px underneath coreInk so regions meet cleanly behind the crisp ink overlay with zero halos!
-const labelMap = new Int32Array(seedMap); // copy of valid seeds
-const visibleMap = new Int32Array(N); // tracks visible (non-coreInk) pixels per region for label placement
-const distSteps = new Uint8Array(N);
-
-qHead = 0; qTail = 0;
-for (let i = 0; i < N; i++) {
-  if (labelMap[i] > 0) {
-    queue[qTail++] = i;
-    distSteps[i] = 1;
-    if (!coreInk[i]) visibleMap[i] = labelMap[i];
-  }
-}
-
-// Pass A: Fill all non-coreInk, non-exterior pixels (anti-aliased halos + absorbed tiny specks)
-while (qHead < qTail) {
-  const curr = queue[qHead++];
-  const cid = labelMap[curr];
-  const cx = curr % W;
-  const cy = (curr - cx) / W;
-
-  const expand = (nb) => {
-    if (labelMap[nb] !== 0 || isExteriorBg[nb] || coreInk[nb]) return;
-    labelMap[nb] = cid;
-    visibleMap[nb] = cid;
-    queue[qTail++] = nb;
-  };
-  if (cx > 0) expand(curr - 1);
-  if (cx < W - 1) expand(curr + 1);
-  if (cy > 0) expand(curr - W);
-  if (cy < H - 1) expand(curr + W);
 }
 
 // Pass B: Expand up to 3px underneath coreInk (stopping before exterior background)

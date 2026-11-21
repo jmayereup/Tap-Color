@@ -21,7 +21,7 @@
     "wasm-bindgen",
     "web-sys"
   ],
-  "author": "Tap Color Team",
+  "author": "Jacob Mayer",
   "license": "MIT",
   "devDependencies": {
     "vite": "^8.3.2"
