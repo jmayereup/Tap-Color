@@ -1002,51 +1002,76 @@ class TapColorApp {
 
   async init() {
     this.isInitialized = false;
-    this.setupCanvasDpi();
-    this.bindEvents();
-    await this.loadManifestMeta();
-    this.populateGalleryModal();
-    await this.updateSavedBadge();
-
-    const initialTarget = await this.resolveInitialArtwork();
-    if (initialTarget) {
-      this.currentArtworkId = initialTarget.id;
-      if (initialTarget.category) {
-        this.setActiveGalleryTab(initialTarget.category);
-      }
-    }
-
-    // Attempt to load compiled Rust WebAssembly module
+    this.galleryPopulated = false;
     try {
-      const baseUrl = import.meta.env.BASE_URL || '/';
-      const wasmUrl = new URL(`${baseUrl.replace(/\/$/, '')}/pkg/tap_color.js`, window.location.href).href;
-      const wasmModule = await import(/* @vite-ignore */ wasmUrl);
-      await wasmModule.default();
-      this.controller = new wasmModule.GameController('game-canvas', this.currentArtworkId);
-      this.isWasmActive = true;
-    } catch (e) {
-      console.warn('WASM module not yet compiled or unavailable. Launching client preview engine.', e);
-      this.controller = new FallbackJsController(this.canvas, this.currentArtworkId);
-    }
+      this.setupCanvasDpi();
+      this.bindEvents();
 
-    if (initialTarget && initialTarget.savedRecord) {
-      this.loadSavedArtwork(initialTarget.savedRecord);
-    } else {
-      await this.selectArtwork(this.currentArtworkId, initialTarget ? initialTarget.variantId : null);
-    }
+      // Start WASM loading in parallel with manifest metadata & saved badge
+      const wasmPromise = (async () => {
+        try {
+          const baseUrl = import.meta.env.BASE_URL || '/';
+          const wasmUrl = new URL(`${baseUrl.replace(/\/$/, '')}/pkg/tap_color.js`, window.location.href).href;
+          const wasmModule = await import(/* @vite-ignore */ wasmUrl);
+          await wasmModule.default();
+          return wasmModule;
+        } catch (e) {
+          console.warn('WASM module not yet compiled or unavailable. Launching client preview engine.', e);
+          return null;
+        }
+      })();
 
-    if (initialTarget && initialTarget.openDirectly) {
-      const modalGallery = document.getElementById('modal-gallery');
-      if (modalGallery) modalGallery.classList.add('hidden');
-      this.isInitialized = true;
-      this.persistCurrentArtworkState();
-    } else {
-      this.isInitialized = true;
-    }
+      await Promise.all([
+        this.loadManifestMeta(),
+        this.updateSavedBadge(),
+      ]);
 
-    this.updateArtworkUI();
-    this.refreshPaletteUI();
-    this.startRenderLoop();
+      const initialTarget = await this.resolveInitialArtwork();
+      if (initialTarget) {
+        this.currentArtworkId = initialTarget.id;
+        if (initialTarget.category === 'classic' || initialTarget.category === 'diamond') {
+          this.activeCategory = initialTarget.category;
+          document.querySelectorAll('.gallery-tab').forEach(t => {
+            t.classList.toggle('active', t.dataset.tab === initialTarget.category);
+          });
+        }
+      }
+
+      // Only populate gallery thumbnails immediately when landing on the gallery;
+      // when opening an artwork directly (e.g. via ?art=...), defer until the user opens the gallery.
+      if (!initialTarget || !initialTarget.openDirectly) {
+        this.populateGalleryModal();
+      }
+
+      const wasmModule = await wasmPromise;
+      if (wasmModule) {
+        this.controller = new wasmModule.GameController('game-canvas', this.currentArtworkId);
+        this.isWasmActive = true;
+      } else {
+        this.controller = new FallbackJsController(this.canvas, this.currentArtworkId);
+      }
+
+      if (initialTarget && initialTarget.savedRecord) {
+        this.loadSavedArtwork(initialTarget.savedRecord);
+      } else {
+        await this.selectArtwork(this.currentArtworkId, initialTarget ? initialTarget.variantId : null);
+      }
+
+      if (initialTarget && initialTarget.openDirectly) {
+        const modalGallery = document.getElementById('modal-gallery');
+        if (modalGallery) modalGallery.classList.add('hidden');
+        this.isInitialized = true;
+        this.persistCurrentArtworkState();
+      } else {
+        this.isInitialized = true;
+      }
+
+      this.updateArtworkUI();
+      this.refreshPaletteUI();
+      this.startRenderLoop();
+    } finally {
+      document.documentElement.classList.remove('has-art-param');
+    }
   }
 
   setupCanvasDpi() {
@@ -1226,6 +1251,8 @@ class TapColorApp {
       modalGallery.classList.remove('hidden');
       if (this.activeCategory === 'saved') {
         await this.renderSavedGallery();
+      } else if (!this.galleryPopulated && (this.activeCategory === 'classic' || this.activeCategory === 'diamond')) {
+        this.setActiveGalleryTab(this.activeCategory);
       }
     });
 
@@ -2133,8 +2160,15 @@ class TapColorApp {
   populateGalleryModal() {
     const grid = document.getElementById('artwork-grid');
     grid.innerHTML = '';
+    this.galleryPopulated = true;
 
-    this.artworksMeta.forEach(meta => {
+    const category = (this.activeCategory === 'classic' || this.activeCategory === 'diamond')
+      ? this.activeCategory
+      : 'classic';
+
+    this.artworksMeta
+      .filter(meta => meta.category === category)
+      .forEach(meta => {
       const card = document.createElement('div');
       card.className = 'artwork-card';
       card.dataset.category = meta.category;
