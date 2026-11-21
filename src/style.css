@@ -344,11 +344,6 @@ body {
   -webkit-touch-callout: none;
   -webkit-user-select: none;
   user-select: none;
-  cursor: grab;
-}
-
-.canvas-viewport:active {
-  cursor: grabbing;
 }
 
 /* Stylus Hold-to-Scroll Feedback Ring */

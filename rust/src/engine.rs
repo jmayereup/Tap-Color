@@ -238,8 +238,54 @@ impl GameEngine {
     /// Handles a tap/click at canvas coordinates
     pub fn handle_tap(&mut self, screen_x: f64, screen_y: f64) -> TapFeedback {
         let world_pt = self.screen_to_world(screen_x, screen_y);
-        let found_idx = self.find_region_at_world_point(world_pt);
+        let mut found_idx = self.find_region_at_world_point(world_pt);
         let total_regions = self.artwork.regions.len();
+
+        // Smart ~7px screen-space snap for tiny regions/slivers when exact point missed or hit a filled/wrong neighbor
+        let exact_matches_active = found_idx
+            .and_then(|i| self.artwork.regions.get(i))
+            .map_or(false, |r| !r.is_filled && r.number == self.active_number);
+
+        if !exact_matches_active {
+            let snap_r = 7.0 / self.scale.max(0.1);
+            let dirs = [
+                (snap_r, 0.0), (-snap_r, 0.0), (0.0, snap_r), (0.0, -snap_r),
+                (snap_r * 0.707, snap_r * 0.707), (-snap_r * 0.707, snap_r * 0.707),
+                (snap_r * 0.707, -snap_r * 0.707), (-snap_r * 0.707, -snap_r * 0.707),
+                (snap_r * 0.45, 0.0), (-snap_r * 0.45, 0.0), (0.0, snap_r * 0.45), (0.0, -snap_r * 0.45),
+            ];
+            let mut best_idx = None;
+            let mut best_dist_sq = f64::INFINITY;
+            for (i, r) in self.artwork.regions.iter().enumerate().rev() {
+                if r.is_filled || r.number != self.active_number || r.polygon.len() < 3 {
+                    continue;
+                }
+                let (min_x, min_y, max_x, max_y) = r.bbox;
+                if world_pt.x < min_x - snap_r
+                    || world_pt.x > max_x + snap_r
+                    || world_pt.y < min_y - snap_r
+                    || world_pt.y > max_y + snap_r
+                {
+                    continue;
+                }
+                let hit = dirs.iter().any(|(ox, oy)| {
+                    let probe = Point::new(world_pt.x + ox, world_pt.y + oy);
+                    r.contains_point(probe)
+                });
+                if hit {
+                    let dx = r.centroid.x - world_pt.x;
+                    let dy = r.centroid.y - world_pt.y;
+                    let d_sq = dx * dx + dy * dy;
+                    if d_sq < best_dist_sq {
+                        best_dist_sq = d_sq;
+                        best_idx = Some(i);
+                    }
+                }
+            }
+            if best_idx.is_some() {
+                found_idx = best_idx;
+            }
+        }
 
         if let Some(idx) = found_idx {
             let region = &mut self.artwork.regions[idx];

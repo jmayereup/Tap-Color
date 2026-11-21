@@ -965,8 +965,11 @@ class TapColorApp {
       const isPan = mode === 'pan';
       if (btnModeToggle) btnModeToggle.classList.toggle('active', isPan);
       if (labelMoveMode) labelMoveMode.textContent = isPan ? 'On' : 'Off';
-      this.canvas.style.cursor = mode === 'pen' ? 'crosshair' : (mode === 'erase' ? 'cell' : 'grab');
+      if (this.canvas) {
+        this.canvas.style.cursor = mode === 'pen' ? 'crosshair' : (mode === 'erase' ? 'cell' : 'grab');
+      }
     };
+    setToolMode(this.toolMode);
 
     if (btnUndo) {
       btnUndo.addEventListener('click', () => this.undoLastAction());
@@ -1431,6 +1434,9 @@ class TapColorApp {
 
   onPointerDown(e) {
     if (e.pointerType === 'touch') return; // Handled by TouchEvents on mobile & touchscreens
+    if (this.canvas) {
+      this.canvasRect = this.canvas.getBoundingClientRect();
+    }
 
     this.isDragging = true;
     this.dragDistance = 0;
@@ -1640,6 +1646,9 @@ class TapColorApp {
   // Touchscreen Controls: 1-finger touch to place/glide, 2-fingers pan & pinch-zoom
   onTouchStart(e) {
     e.preventDefault();
+    if (this.canvas) {
+      this.canvasRect = this.canvas.getBoundingClientRect();
+    }
 
     // If stylus pointerdown is active or touch is from a stylus handled by Pointer Events, prevent conflict
     if (this.isStylusActive || (e.touches.length === 1 && e.touches[0].touchType === 'stylus')) {
@@ -4962,6 +4971,47 @@ class FallbackJsController {
         }
         return true;
       });
+    }
+
+    if (idx === -1 || !this.artwork.regions[idx] || this.artwork.regions[idx].is_filled || this.artwork.regions[idx].number !== this.activeNumber) {
+      const snapR = 7.0 / Math.max(0.1, this.scale);
+      let bestSnapIdx = -1;
+      let bestDistSq = Infinity;
+      for (let i = this.artwork.regions.length - 1; i >= 0; i--) {
+        const r = this.artwork.regions[i];
+        if (r.is_filled || r.number !== this.activeNumber || !r.polygon || r.polygon.length < 3) continue;
+        const b = r._bbox;
+        if (b && (wx < b[0] - snapR || wx > b[2] + snapR || wy < b[1] - snapR || wy > b[3] + snapR)) continue;
+        const dx = r.centroid.x - wx;
+        const dy = r.centroid.y - wy;
+        const dSq = dx * dx + dy * dy;
+        let hit = false;
+        const probeR = snapR;
+        const offsets = [
+          [probeR, 0], [-probeR, 0], [0, probeR], [0, -probeR],
+          [probeR * 0.7, probeR * 0.7], [-probeR * 0.7, probeR * 0.7],
+          [probeR * 0.7, -probeR * 0.7], [-probeR * 0.7, -probeR * 0.7],
+        ];
+        for (const [ox, oy] of offsets) {
+          const px = wx + ox, py = wy + oy;
+          if (this.pointInPoly(px, py, r.polygon)) {
+            let inHole = false;
+            if (r.holes) {
+              for (const hole of r.holes) {
+                if (this.pointInPoly(px, py, hole)) { inHole = true; break; }
+              }
+            }
+            if (!inHole) { hit = true; break; }
+          }
+        }
+        if (hit && dSq < bestDistSq) {
+          bestDistSq = dSq;
+          bestSnapIdx = i;
+        }
+      }
+      if (bestSnapIdx !== -1) {
+        idx = bestSnapIdx;
+      }
     }
 
     if (idx !== -1) {
