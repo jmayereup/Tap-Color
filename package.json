@@ -7,7 +7,7 @@
     "build:assets": "python3 scripts/convert_artworks.py",
     "build:wasm": "wasm-pack build --target web --out-dir public/pkg",
     "dev": "vite",
-    "build": "npm run build:assets && npm run build:wasm && vite build",
+    "build": "npm run build:assets && npm run build:wasm && vite build && python3 scripts/shrink_dist_assets.py",
     "preview": "vite preview",
     "serve": "npx serve -l 8080 .",
     "deploy": "npm run build && npx wrangler pages deploy dist"

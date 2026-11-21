@@ -3375,7 +3375,8 @@ class TapColorApp {
     if (jsonPath) {
       try {
         const res = await fetch(jsonPath);
-        const artworkData = await res.json();
+        const rawArtworkData = await res.json();
+        const artworkData = this.expandCompactArtwork(rawArtworkData);
         if (this.controller && this.controller.load_artwork_json) {
           this.controller.load_artwork_json(JSON.stringify(artworkData));
         } else if (this.controller) {
@@ -3404,6 +3405,63 @@ class TapColorApp {
     this.refreshPaletteUI();
     this.updateResolutionBarUI();
     this.persistCurrentArtworkState();
+  }
+
+  expandCompactArtwork(data) {
+    if (!data || !Array.isArray(data.cells) || Array.isArray(data.regions)) {
+      return data;
+    }
+
+    const N = data.grid || Math.round(Math.sqrt(data.cells.length));
+    const width = data.width || 800;
+    const height = data.height || 800;
+    const margin = data.margin ?? 28;
+    const avail = width - margin * 2;
+    const cellSize = avail / N;
+
+    const hexByNum = Object.create(null);
+    for (const item of data.palette || []) {
+      hexByNum[item.number] = item.hex;
+    }
+
+    const round2 = (v) => Math.round(v * 100) / 100;
+    const regions = new Array(N * N);
+
+    for (let r = 0; r < N; r++) {
+      const y0Raw = margin + r * cellSize;
+      const y1Raw = y0Raw + cellSize;
+      const y0 = round2(y0Raw);
+      const y1 = round2(y1Raw);
+      const cy = round2((y0Raw + y1Raw) * 0.5);
+
+      for (let c = 0; c < N; c++) {
+        const idx = r * N + c;
+        const num = data.cells[idx];
+        const x0Raw = margin + c * cellSize;
+        const x1Raw = x0Raw + cellSize;
+        const x0 = round2(x0Raw);
+        const x1 = round2(x1Raw);
+        const cx = round2((x0Raw + x1Raw) * 0.5);
+
+        regions[idx] = {
+          id: idx,
+          number: num,
+          polygon: [
+            { x: x0, y: y0 },
+            { x: x1, y: y0 },
+            { x: x1, y: y1 },
+            { x: x0, y: y1 },
+          ],
+          centroid: { x: cx, y: cy },
+          color_hex: hexByNum[num] || '#FFFFFF',
+          is_filled: false,
+          fill_anim: 0.0,
+        };
+      }
+    }
+
+    const { cells: _cells, ...rest } = data;
+    return { ...rest, regions };
   }
 
   getCurrentArtMode() {

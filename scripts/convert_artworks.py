@@ -195,44 +195,18 @@ def convert_to_diamond_art(img_path, N, K, title, artist, output_id, output_dir)
     width = 800
     height = 800
     margin = 28
-    avail = width - margin * 2
-    cell_size = avail / N
 
-    regions = []
-    reg_id = 0
+    cells = []
     cR = [c[0] for c in centers]
     cG = [c[1] for c in centers]
     cB = [c[2] for c in centers]
 
     for r in range(N):
-        y0 = margin + r * cell_size
-        y1 = y0 + cell_size
-        cy = (y0 + y1) * 0.5
         for c in range(N):
             pr, pg, pb = grid_rgb[r * N + c]
             best_k = min(range(K), key=lambda k: (pr-cR[k])**2 + (pg-cG[k])**2 + (pb-cB[k])**2)
             palette[best_k]["total_count"] += 1
-            num = best_k + 1
-
-            x0 = margin + c * cell_size
-            x1 = x0 + cell_size
-            cx = (x0 + x1) * 0.5
-
-            regions.append({
-                "id": reg_id,
-                "number": num,
-                "polygon": [
-                    {"x": round(x0, 2), "y": round(y0, 2)},
-                    {"x": round(x1, 2), "y": round(y0, 2)},
-                    {"x": round(x1, 2), "y": round(y1, 2)},
-                    {"x": round(x0, 2), "y": round(y1, 2)},
-                ],
-                "centroid": {"x": round(cx, 2), "y": round(cy, 2)},
-                "color_hex": palette[best_k]["hex"],
-                "is_filled": False,
-                "fill_anim": 0.0
-            })
-            reg_id += 1
+            cells.append(best_k + 1)
 
     artwork = {
         "id": output_id,
@@ -241,8 +215,10 @@ def convert_to_diamond_art(img_path, N, K, title, artist, output_id, output_dir)
         "category": "diamond",
         "width": width,
         "height": height,
+        "grid": N,
+        "margin": margin,
         "palette": palette,
-        "regions": regions
+        "cells": cells
     }
 
     with open(json_path, 'w', encoding='utf-8') as f:
@@ -263,9 +239,9 @@ def convert_to_diamond_art(img_path, N, K, title, artist, output_id, output_dir)
         drill_idx = 0
         for r in range(N):
             for c in range(N):
-                drill = regions[drill_idx]
+                num = cells[drill_idx]
                 drill_idx += 1
-                col_hex = drill["color_hex"].lstrip('#')
+                col_hex = palette[num - 1]["hex"].lstrip('#')
                 col = tuple(int(col_hex[i:i+2], 16) for i in (0, 2, 4))
                 x0 = t_ox + c * t_cell
                 y0 = t_oy + r * t_cell
@@ -280,9 +256,9 @@ def convert_to_diamond_art(img_path, N, K, title, artist, output_id, output_dir)
         drill_idx = 0
         for r in range(N):
             for c in range(N):
-                drill = regions[drill_idx]
+                num = cells[drill_idx]
                 drill_idx += 1
-                col_hex = drill["color_hex"].lstrip('#')
+                col_hex = palette[num - 1]["hex"].lstrip('#')
                 col = tuple(int(col_hex[i:i+2], 16) for i in (0, 2, 4))
                 x0 = t_ox + c * t_cell
                 y0 = t_oy + r * t_cell
@@ -294,7 +270,7 @@ def convert_to_diamond_art(img_path, N, K, title, artist, output_id, output_dir)
                 ctx.fill()
         surf.write_to_png(thumb_path)
 
-    print(f"  [Diamond] {output_id}: {N}x{N} ({len(regions)} drills, {len(palette)} colors)")
+    print(f"  [Diamond] {output_id}: {N}x{N} ({len(cells)} drills, {len(palette)} colors)")
     return artwork
 
 
@@ -1097,7 +1073,7 @@ def main():
                         "resolution": d_res["name"],
                         "label": d_res["label"],
                         "grid": d_res["grid"],
-                        "pieces": len(art["regions"]),
+                        "pieces": len(art["cells"]) if "cells" in art else len(art["regions"]),
                         "colors": len(art["palette"]),
                         "jsonFile": f"assets/converted/{art_id}.json",
                         "thumbnailUrl": f"assets/converted/{art_id}_thumb.png",
