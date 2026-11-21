@@ -67,7 +67,8 @@
         </button>
 
         <div class="more-menu-wrap">
-          <button id="btn-more-menu" class="btn-icon" type="button" popovertarget="more-menu-popover" title="More options">
+          <button id="btn-more-menu" class="btn-icon" type="button" popovertarget="more-menu-popover"
+            title="More options">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
               stroke-linecap="round" stroke-linejoin="round">
               <circle cx="12" cy="12" r="1.2" />
@@ -84,8 +85,8 @@
             </button>
 
             <button id="btn-resolution-switcher" class="more-menu-item" type="button">
-              <span class="more-item-icon" id="res-icon-indicator">💎</span>
-              <span class="more-item-label">Detail: <strong id="label-current-resolution">Medium</strong></span>
+              <span class="more-item-icon" id="res-icon-indicator">🎨</span>
+              <span class="more-item-label">Detail: <strong id="label-current-resolution">Classic</strong></span>
             </button>
 
             <button id="btn-outline" class="more-menu-item active" type="button">
@@ -133,11 +134,11 @@
 
       <!-- Segmented Art Style Switcher -->
       <div class="quick-dropdown-style-toggle">
-        <button type="button" class="btn-quick-style-toggle active" id="quick-toggle-diamond" data-mode="diamond">
+        <button type="button" class="btn-quick-style-toggle" id="quick-toggle-diamond" data-mode="diamond">
           <span class="toggle-icon">💎</span>
           <span class="toggle-text">Diamond Art</span>
         </button>
-        <button type="button" class="btn-quick-style-toggle" id="quick-toggle-pbn" data-mode="classic">
+        <button type="button" class="btn-quick-style-toggle active" id="quick-toggle-pbn" data-mode="classic">
           <span class="toggle-icon">🎨</span>
           <span class="toggle-text">Paint by Number</span>
         </button>
@@ -178,7 +179,7 @@
       <div class="modal-card">
         <div class="modal-header">
           <div class="modal-header-titles">
-            <span class="modal-header-badge">🌿 Sunlit Homestead Studio</span>
+            <span class="modal-header-badge">🌿 Betty's Coloring Studio</span>
             <h2>Pictures</h2>
             <p class="modal-header-subtitle">Take a quiet moment to relax and color</p>
           </div>
@@ -188,8 +189,8 @@
 
         <!-- Gallery Category Tabs -->
         <div class="gallery-tabs">
-          <button class="gallery-tab active" data-tab="diamond">💎 Diamond Painting</button>
-          <button class="gallery-tab" data-tab="classic">🎨 Paint by Number</button>
+          <button class="gallery-tab active" data-tab="classic">🎨 Paint by Number</button>
+          <button class="gallery-tab" data-tab="diamond">💎 Diamond Painting</button>
           <button class="gallery-tab" data-tab="saved" id="tab-saved-btn">🖼️ My Pictures <span class="tab-badge"
               id="saved-badge">0</span></button>
           <button class="gallery-tab" data-tab="custom">📸 Make from Photo</button>
@@ -285,7 +286,8 @@
           <div class="studio-step-section">
             <div class="studio-mode-banner" id="studio-mode-banner">
               <span class="mode-banner-badge" id="mode-banner-badge">💎 Custom Diamond Painting Studio</span>
-              <span class="mode-banner-text" id="mode-banner-text">Turn any photo or picture into a sparkling gemstone mosaic grid. (Paint by Number uses our curated line-art gallery!)</span>
+              <span class="mode-banner-text" id="mode-banner-text">Turn any photo or picture into a sparkling gemstone
+                mosaic grid. (Paint by Number uses our curated line-art gallery!)</span>
             </div>
           </div>
 
@@ -302,39 +304,54 @@
                   <span class="collection-hint">Clean lines & solid colors — ready to paint:</span>
                 </div>
                 <div class="preset-buttons asset-preset-buttons">
-                  <button class="btn-preset active" data-preset="asset:fluffy_cow" data-asset="assets/paint_by_number/fluffy-cow-3.jpeg"
-                    data-key="fluffy_cow" data-title="Sweet Highland Calf">🐮 Highland Calf</button>
-                  <button class="btn-preset" data-preset="asset:hummingbird" data-asset="assets/diamond_art_only/hummingbird.jpeg"
-                    data-key="hummingbird" data-title="Garden Hummingbird">🐦 Hummingbird</button>
-                  <button class="btn-preset" data-preset="asset:country_barn" data-asset="assets/diamond_art_only/country_barn.jpeg"
-                    data-key="country_barn" data-title="Rustic Red Barn">🏡 Red Barn</button>
+                  <button class="btn-preset active" data-preset="asset:fluffy_cow"
+                    data-asset="assets/paint_by_number/fluffy-cow-3.jpeg" data-key="fluffy_cow"
+                    data-title="Sweet Highland Calf">🐮 Highland Calf</button>
+                  <button class="btn-preset" data-preset="asset:hummingbird"
+                    data-asset="assets/diamond_art_only/hummingbird.jpeg" data-key="hummingbird"
+                    data-title="Garden Hummingbird">🐦 Hummingbird</button>
+                  <button class="btn-preset" data-preset="asset:country_barn"
+                    data-asset="assets/diamond_art_only/country_barn.jpeg" data-key="country_barn"
+                    data-title="Rustic Red Barn">🏡 Red Barn</button>
                   <button class="btn-preset" data-preset="asset:country_rooster"
                     data-asset="assets/diamond_art_only/country_rooster.jpeg" data-key="country_rooster"
                     data-title="Morning Farm Rooster">🐓 Rooster</button>
-                  <button class="btn-preset" data-preset="asset:country_truck" data-asset="assets/diamond_art_only/country_truck.jpeg"
-                    data-key="country_truck" data-title="Vintage Harvest Truck">🛻 Harvest Truck</button>
-                  <button class="btn-preset" data-preset="asset:country_puppy" data-asset="assets/diamond_art_only/country_puppy.jpeg"
-                    data-key="country_puppy" data-title="Porch Golden Puppy">🐶 Porch Puppy</button>
-                  <button class="btn-preset" data-preset="asset:yorky_teacup" data-asset="assets/diamond_art_only/yorky_teacup.jpeg"
-                    data-key="yorky_teacup" data-title="Teacup Yorkie Ribbon">🎀 Teacup Yorkie</button>
-                  <button class="btn-preset" data-preset="asset:yorky_garden" data-asset="assets/diamond_art_only/yorky_garden.jpeg"
-                    data-key="yorky_garden" data-title="Garden Blossom Yorkie">🌸 Garden Yorkie</button>
-                  <button class="btn-preset" data-preset="asset:yorky_autumn" data-asset="assets/diamond_art_only/yorky_autumn.jpeg"
-                    data-key="yorky_autumn" data-title="Cozy Autumn Yorkie">🍂 Autumn Yorkie</button>
-                  <button class="btn-preset" data-preset="asset:yorky_playful" data-asset="assets/diamond_art_only/yorky_playful.jpeg"
-                    data-key="yorky_playful" data-title="Playful Meadow Yorkie">🎾 Playful Yorkie</button>
-                  <button class="btn-preset" data-preset="asset:rural_windmill" data-asset="assets/diamond_art_only/rural_windmill.jpeg"
-                    data-key="rural_windmill" data-title="Prairie Windmill Sunset">🌾 Prairie Windmill</button>
-                  <button class="btn-preset" data-preset="asset:country_store" data-asset="assets/diamond_art_only/country_store.jpeg"
-                    data-key="country_store" data-title="Old Country Store">🏪 Country Store</button>
-                  <button class="btn-preset" data-preset="asset:pasture_horses" data-asset="assets/diamond_art_only/pasture_horses.jpeg"
-                    data-key="pasture_horses" data-title="Pasture Mare & Foal">🐴 Pasture Horses</button>
-                  <button class="btn-preset" data-preset="asset:vintage_tractor" data-asset="assets/diamond_art_only/vintage_tractor.jpeg"
-                    data-key="vintage_tractor" data-title="Heartland Antique Tractor">🚜 Antique Tractor</button>
-                  <button class="btn-preset" data-preset="asset:covered_bridge" data-asset="assets/diamond_art_only/covered_bridge.jpeg"
-                    data-key="covered_bridge" data-title="Rustic Covered Bridge">🌉 Covered Bridge</button>
-                  <button class="btn-preset" data-preset="asset:autumn_fox" data-asset="assets/diamond_art_only/autumn_fox.jpeg"
-                    data-key="autumn_fox" data-title="Cozy Autumn Fox">🦊 Autumn Fox</button>
+                  <button class="btn-preset" data-preset="asset:country_truck"
+                    data-asset="assets/diamond_art_only/country_truck.jpeg" data-key="country_truck"
+                    data-title="Vintage Harvest Truck">🛻 Harvest Truck</button>
+                  <button class="btn-preset" data-preset="asset:country_puppy"
+                    data-asset="assets/diamond_art_only/country_puppy.jpeg" data-key="country_puppy"
+                    data-title="Porch Golden Puppy">🐶 Porch Puppy</button>
+                  <button class="btn-preset" data-preset="asset:yorky_teacup"
+                    data-asset="assets/diamond_art_only/yorky_teacup.jpeg" data-key="yorky_teacup"
+                    data-title="Teacup Yorkie Ribbon">🎀 Teacup Yorkie</button>
+                  <button class="btn-preset" data-preset="asset:yorky_garden"
+                    data-asset="assets/diamond_art_only/yorky_garden.jpeg" data-key="yorky_garden"
+                    data-title="Garden Blossom Yorkie">🌸 Garden Yorkie</button>
+                  <button class="btn-preset" data-preset="asset:yorky_autumn"
+                    data-asset="assets/diamond_art_only/yorky_autumn.jpeg" data-key="yorky_autumn"
+                    data-title="Cozy Autumn Yorkie">🍂 Autumn Yorkie</button>
+                  <button class="btn-preset" data-preset="asset:yorky_playful"
+                    data-asset="assets/diamond_art_only/yorky_playful.jpeg" data-key="yorky_playful"
+                    data-title="Playful Meadow Yorkie">🎾 Playful Yorkie</button>
+                  <button class="btn-preset" data-preset="asset:rural_windmill"
+                    data-asset="assets/diamond_art_only/rural_windmill.jpeg" data-key="rural_windmill"
+                    data-title="Prairie Windmill Sunset">🌾 Prairie Windmill</button>
+                  <button class="btn-preset" data-preset="asset:country_store"
+                    data-asset="assets/diamond_art_only/country_store.jpeg" data-key="country_store"
+                    data-title="Old Country Store">🏪 Country Store</button>
+                  <button class="btn-preset" data-preset="asset:pasture_horses"
+                    data-asset="assets/diamond_art_only/pasture_horses.jpeg" data-key="pasture_horses"
+                    data-title="Pasture Mare & Foal">🐴 Pasture Horses</button>
+                  <button class="btn-preset" data-preset="asset:vintage_tractor"
+                    data-asset="assets/diamond_art_only/vintage_tractor.jpeg" data-key="vintage_tractor"
+                    data-title="Heartland Antique Tractor">🚜 Antique Tractor</button>
+                  <button class="btn-preset" data-preset="asset:covered_bridge"
+                    data-asset="assets/diamond_art_only/covered_bridge.jpeg" data-key="covered_bridge"
+                    data-title="Rustic Covered Bridge">🌉 Covered Bridge</button>
+                  <button class="btn-preset" data-preset="asset:autumn_fox"
+                    data-asset="assets/diamond_art_only/autumn_fox.jpeg" data-key="autumn_fox"
+                    data-title="Cozy Autumn Fox">🦊 Autumn Fox</button>
                 </div>
 
                 <div class="upload-box">
@@ -443,7 +460,8 @@
         <div class="confetti-burst-icon">🌻</div>
         <h2 class="celebration-title">Picture Complete!</h2>
         <p class="celebration-subtitle">What a lovely piece — you brought every detail to life.</p>
-        <p class="celebration-verse" id="celebration-verse">“Every good and perfect gift is from above.” — James 1:17</p>
+        <p class="celebration-verse" id="celebration-verse">“Every good and perfect gift is from above.” — James 1:17
+        </p>
 
         <div class="stats-row">
           <div class="stat-item">
@@ -497,9 +515,11 @@
     </div>
 
     <!-- Confirm / Alert Dialog Modal -->
-    <div id="modal-dialog" class="modal-overlay modal-dialog-overlay hidden" role="alertdialog" aria-modal="true" aria-labelledby="dialog-title" aria-describedby="dialog-message">
+    <div id="modal-dialog" class="modal-overlay modal-dialog-overlay hidden" role="alertdialog" aria-modal="true"
+      aria-labelledby="dialog-title" aria-describedby="dialog-message">
       <div class="modal-card dialog-card">
-        <button id="btn-dialog-close" class="btn-close dialog-close-btn" aria-label="Close dialog" title="Close dialog">&times;</button>
+        <button id="btn-dialog-close" class="btn-close dialog-close-btn" aria-label="Close dialog"
+          title="Close dialog">&times;</button>
         <div id="dialog-icon-wrapper" class="dialog-icon-wrapper" aria-hidden="true"></div>
         <div class="dialog-body">
           <h3 id="dialog-title" class="dialog-title">Confirm Action</h3>

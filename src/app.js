@@ -460,10 +460,10 @@ class TapColorApp {
     this.initialPinchDistance = 0;
     this.toolMode = 'pen'; // 'pen', 'erase', or 'pan'
     this.highlightMatching = false; // Matching tiles are not highlighted by default
-    this.currentArtworkId = 'fluffy_cow_diamond';
+    this.currentArtworkId = 'fluffy_cow_pbn';
     this.activeNumber = 1;
     this.hintCount = 5;
-    this.activeCategory = 'diamond'; // 'classic', 'diamond', 'saved', 'custom'
+    this.activeCategory = 'classic'; // 'classic', 'diamond', 'saved', 'custom'
 
     // Multi-touch & touchscreen controls
     this.touchPinchDist = 0;
@@ -493,6 +493,7 @@ class TapColorApp {
     this.successfulTaps = 0;
     this.activeImportedRecord = null;
     this.autosaveTimer = null;
+    this.isInitialized = false;
 
     // Custom alert & confirm dialog state
     this.dialogResolve = null;
@@ -871,12 +872,147 @@ class TapColorApp {
     }
   }
 
+  findCatalogArtwork(artId, variantId = null) {
+    if (!artId) return null;
+    let meta = this.artworksMeta.find(a => a.id === artId);
+    let resolvedVariantId = variantId;
+
+    if (!meta) {
+      for (const m of this.artworksMeta) {
+        if (m.variants) {
+          const v = m.variants.find(item => item.id === artId);
+          if (v) {
+            meta = m;
+            resolvedVariantId = v.id;
+            break;
+          }
+        }
+      }
+    } else if (resolvedVariantId && meta.variants) {
+      const v = meta.variants.find(item => item.id === resolvedVariantId);
+      resolvedVariantId = v ? v.id : null;
+    }
+
+    if (!meta) return null;
+    return { meta, variantId: resolvedVariantId };
+  }
+
+  setActiveGalleryTab(category) {
+    if (category !== 'classic' && category !== 'diamond') return;
+    this.activeCategory = category;
+    document.querySelectorAll('.gallery-tab').forEach(t => {
+      t.classList.toggle('active', t.dataset.tab === category);
+    });
+    this.populateGalleryModal();
+    this.filterGalleryCards();
+  }
+
+  persistCurrentArtworkState() {
+    if (!this.isInitialized) return;
+
+    const variantId = this.currentArtworkVariant ? this.currentArtworkVariant.id : null;
+    const savedRecordId = this.activeImportedRecord ? this.activeImportedRecord.id : null;
+    const state = {
+      id: this.currentArtworkMeta ? this.currentArtworkMeta.id : this.currentArtworkId,
+      variantId,
+      savedRecordId,
+    };
+
+    try {
+      localStorage.setItem('tap_color_last_artwork', JSON.stringify(state));
+    } catch (e) {
+      console.warn('Could not save last artwork to localStorage:', e);
+    }
+
+    try {
+      const url = new URL(window.location.href);
+      url.searchParams.delete('artwork');
+      url.searchParams.delete('variant');
+      if (this.currentArtworkMeta) {
+        const shareId = variantId || this.currentArtworkMeta.id;
+        url.searchParams.set('art', shareId);
+      } else {
+        url.searchParams.delete('art');
+      }
+      window.history.replaceState(null, '', url.toString());
+    } catch (e) {
+      console.warn('Could not update URL query params:', e);
+    }
+  }
+
+  async resolveInitialArtwork() {
+    // 1. Query params take precedence for shared links (e.g. ?art=autumn_fox_pbn)
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const paramArt = params.get('art') || params.get('artwork');
+      const paramVariant = params.get('variant');
+      if (paramArt) {
+        const match = this.findCatalogArtwork(paramArt.trim(), paramVariant ? paramVariant.trim() : null);
+        if (match) {
+          return {
+            id: match.meta.id,
+            variantId: match.variantId,
+            category: match.meta.category,
+            openDirectly: true,
+          };
+        }
+      }
+    } catch (e) {
+      console.warn('Could not parse URL query params:', e);
+    }
+
+    // 2. Otherwise reopen the image the user was last working on in this browser
+    try {
+      const raw = localStorage.getItem('tap_color_last_artwork');
+      if (raw) {
+        const savedState = JSON.parse(raw);
+        if (savedState && savedState.savedRecordId) {
+          const record = await storage.getArtworkById(savedState.savedRecordId);
+          if (record && record.artworkData) {
+            const parentMeta = record.parentArtworkId ? this.findCatalogArtwork(record.parentArtworkId, record.variantId) : null;
+            return {
+              id: record.parentArtworkId || record.artworkData.id || savedState.id,
+              variantId: record.variantId || savedState.variantId || null,
+              category: parentMeta ? parentMeta.meta.category : null,
+              savedRecord: record,
+              openDirectly: true,
+            };
+          }
+        }
+        if (savedState && savedState.id) {
+          const match = this.findCatalogArtwork(savedState.id, savedState.variantId || null);
+          if (match) {
+            return {
+              id: match.meta.id,
+              variantId: match.variantId,
+              category: match.meta.category,
+              openDirectly: true,
+            };
+          }
+        }
+      }
+    } catch (e) {
+      console.warn('Could not restore last artwork from localStorage:', e);
+    }
+
+    return null;
+  }
+
   async init() {
+    this.isInitialized = false;
     this.setupCanvasDpi();
     this.bindEvents();
     await this.loadManifestMeta();
     this.populateGalleryModal();
     await this.updateSavedBadge();
+
+    const initialTarget = await this.resolveInitialArtwork();
+    if (initialTarget) {
+      this.currentArtworkId = initialTarget.id;
+      if (initialTarget.category) {
+        this.setActiveGalleryTab(initialTarget.category);
+      }
+    }
 
     // Attempt to load compiled Rust WebAssembly module
     try {
@@ -891,7 +1027,20 @@ class TapColorApp {
       this.controller = new FallbackJsController(this.canvas, this.currentArtworkId);
     }
 
-    await this.selectArtwork(this.currentArtworkId);
+    if (initialTarget && initialTarget.savedRecord) {
+      this.loadSavedArtwork(initialTarget.savedRecord);
+    } else {
+      await this.selectArtwork(this.currentArtworkId, initialTarget ? initialTarget.variantId : null);
+    }
+
+    if (initialTarget && initialTarget.openDirectly) {
+      const modalGallery = document.getElementById('modal-gallery');
+      if (modalGallery) modalGallery.classList.add('hidden');
+      this.isInitialized = true;
+      this.persistCurrentArtworkState();
+    } else {
+      this.isInitialized = true;
+    }
 
     this.updateArtworkUI();
     this.refreshPaletteUI();
@@ -1080,6 +1229,7 @@ class TapColorApp {
 
     document.getElementById('btn-close-gallery').addEventListener('click', () => {
       modalGallery.classList.add('hidden');
+      this.persistCurrentArtworkState();
     });
 
     // Flush autosave when window loses focus or unloads
@@ -2498,6 +2648,7 @@ class TapColorApp {
     this.updateArtworkUI();
     this.refreshPaletteUI();
     this.updateResolutionBarUI();
+    this.persistCurrentArtworkState();
   }
 
   loadImportedArtwork(record) {
@@ -3020,6 +3171,7 @@ class TapColorApp {
           completed: false,
         };
         this.updateSavedBadge();
+        this.persistCurrentArtworkState();
       });
     }).catch(e => console.warn('Could not save diamond artwork to IndexedDB:', e));
 
@@ -3038,6 +3190,7 @@ class TapColorApp {
     this.updateArtworkUI();
     this.refreshPaletteUI();
     this.updateResolutionBarUI();
+    this.persistCurrentArtworkState();
   }
 
   syncLineArtOverlay(artworkData) {
@@ -3142,6 +3295,7 @@ class TapColorApp {
     this.updateArtworkUI();
     this.refreshPaletteUI();
     this.updateResolutionBarUI();
+    this.persistCurrentArtworkState();
   }
 
   getCurrentArtMode() {

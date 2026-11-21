@@ -676,6 +676,159 @@
     ]
   },
   {
+    "key": "christmas_scene",
+    "title": "Christmas Scene",
+    "artist": "Tap Color Studio",
+    "desc": "Christmas Scene artwork",
+    "originalAsset": "assets/paint_by_number/christmas-scene.webp",
+    "pbnAsset": "assets/paint_by_number/christmas-scene.webp",
+    "diamondVariants": [
+      {
+        "id": "christmas_scene_diamond_80",
+        "resolution": "Cozy (6.4k)",
+        "label": "80\u00d780",
+        "grid": 80,
+        "pieces": 6400,
+        "colors": 18,
+        "jsonFile": "assets/converted/christmas_scene_diamond_80.json",
+        "thumbnailUrl": "assets/converted/christmas_scene_diamond_80_thumb.png"
+      },
+      {
+        "id": "christmas_scene_diamond_120",
+        "resolution": "Standard (14.4k)",
+        "label": "120\u00d7120",
+        "grid": 120,
+        "pieces": 14400,
+        "colors": 26,
+        "jsonFile": "assets/converted/christmas_scene_diamond_120.json",
+        "thumbnailUrl": "assets/converted/christmas_scene_diamond_120_thumb.png"
+      },
+      {
+        "id": "christmas_scene_diamond_160",
+        "resolution": "Masterpiece (25.6k)",
+        "label": "160\u00d7160",
+        "grid": 160,
+        "pieces": 25600,
+        "colors": 36,
+        "jsonFile": "assets/converted/christmas_scene_diamond_160.json",
+        "thumbnailUrl": "assets/converted/christmas_scene_diamond_160_thumb.png"
+      }
+    ],
+    "pbnVariants": [
+      {
+        "id": "christmas_scene_pbn",
+        "resolution": "Original",
+        "pieces": 107,
+        "colors": 15,
+        "jsonFile": "assets/converted/christmas_scene_pbn.json",
+        "lineArtUrl": "assets/converted/christmas_scene_pbn_lines.png",
+        "thumbnailUrl": "assets/converted/christmas_scene_pbn_thumb.png"
+      }
+    ]
+  },
+  {
+    "key": "christmas_tree",
+    "title": "Christmas Tree",
+    "artist": "Tap Color Studio",
+    "desc": "Christmas Tree artwork",
+    "originalAsset": "assets/paint_by_number/christmas-tree.webp",
+    "pbnAsset": "assets/paint_by_number/christmas_tree.jpg",
+    "diamondVariants": [
+      {
+        "id": "christmas_tree_diamond_80",
+        "resolution": "Cozy (6.4k)",
+        "label": "80\u00d780",
+        "grid": 80,
+        "pieces": 6400,
+        "colors": 18,
+        "jsonFile": "assets/converted/christmas_tree_diamond_80.json",
+        "thumbnailUrl": "assets/converted/christmas_tree_diamond_80_thumb.png"
+      },
+      {
+        "id": "christmas_tree_diamond_120",
+        "resolution": "Standard (14.4k)",
+        "label": "120\u00d7120",
+        "grid": 120,
+        "pieces": 14400,
+        "colors": 26,
+        "jsonFile": "assets/converted/christmas_tree_diamond_120.json",
+        "thumbnailUrl": "assets/converted/christmas_tree_diamond_120_thumb.png"
+      },
+      {
+        "id": "christmas_tree_diamond_160",
+        "resolution": "Masterpiece (25.6k)",
+        "label": "160\u00d7160",
+        "grid": 160,
+        "pieces": 25600,
+        "colors": 36,
+        "jsonFile": "assets/converted/christmas_tree_diamond_160.json",
+        "thumbnailUrl": "assets/converted/christmas_tree_diamond_160_thumb.png"
+      }
+    ],
+    "pbnVariants": [
+      {
+        "id": "christmas_tree_pbn",
+        "resolution": "Original",
+        "pieces": 287,
+        "colors": 26,
+        "jsonFile": "assets/converted/christmas_tree_pbn.json",
+        "lineArtUrl": "assets/converted/christmas_tree_pbn_lines.png",
+        "thumbnailUrl": "assets/converted/christmas_tree_pbn_thumb.png"
+      }
+    ]
+  },
+  {
+    "key": "christmas_wreath",
+    "title": "Christmas Wreath",
+    "artist": "Tap Color Studio",
+    "desc": "Christmas Wreath artwork",
+    "originalAsset": "assets/paint_by_number/christmas_wreath.jpg",
+    "pbnAsset": "assets/paint_by_number/christmas_wreath.jpg",
+    "diamondVariants": [
+      {
+        "id": "christmas_wreath_diamond_80",
+        "resolution": "Cozy (6.4k)",
+        "label": "80\u00d780",
+        "grid": 80,
+        "pieces": 6400,
+        "colors": 18,
+        "jsonFile": "assets/converted/christmas_wreath_diamond_80.json",
+        "thumbnailUrl": "assets/converted/christmas_wreath_diamond_80_thumb.png"
+      },
+      {
+        "id": "christmas_wreath_diamond_120",
+        "resolution": "Standard (14.4k)",
+        "label": "120\u00d7120",
+        "grid": 120,
+        "pieces": 14400,
+        "colors": 26,
+        "jsonFile": "assets/converted/christmas_wreath_diamond_120.json",
+        "thumbnailUrl": "assets/converted/christmas_wreath_diamond_120_thumb.png"
+      },
+      {
+        "id": "christmas_wreath_diamond_160",
+        "resolution": "Masterpiece (25.6k)",
+        "label": "160\u00d7160",
+        "grid": 160,
+        "pieces": 25600,
+        "colors": 36,
+        "jsonFile": "assets/converted/christmas_wreath_diamond_160.json",
+        "thumbnailUrl": "assets/converted/christmas_wreath_diamond_160_thumb.png"
+      }
+    ],
+    "pbnVariants": [
+      {
+        "id": "christmas_wreath_pbn",
+        "resolution": "Original",
+        "pieces": 481,
+        "colors": 18,
+        "jsonFile": "assets/converted/christmas_wreath_pbn.json",
+        "lineArtUrl": "assets/converted/christmas_wreath_pbn_lines.png",
+        "thumbnailUrl": "assets/converted/christmas_wreath_pbn_thumb.png"
+      }
+    ]
+  },
+  {
     "key": "country_birdhouse",
     "title": "Country Birdhouse",
     "artist": "Tap Color Studio",
@@ -723,6 +876,465 @@
         "jsonFile": "assets/converted/country_birdhouse_pbn.json",
         "lineArtUrl": "assets/converted/country_birdhouse_pbn_lines.png",
         "thumbnailUrl": "assets/converted/country_birdhouse_pbn_thumb.png"
+      }
+    ]
+  },
+  {
+    "key": "cozy_fireplace",
+    "title": "Cozy Fireplace",
+    "artist": "Tap Color Studio",
+    "desc": "Cozy Fireplace artwork",
+    "originalAsset": "assets/paint_by_number/cozy_fireplace.jpg",
+    "pbnAsset": "assets/paint_by_number/cozy_fireplace.jpg",
+    "diamondVariants": [
+      {
+        "id": "cozy_fireplace_diamond_80",
+        "resolution": "Cozy (6.4k)",
+        "label": "80\u00d780",
+        "grid": 80,
+        "pieces": 6400,
+        "colors": 18,
+        "jsonFile": "assets/converted/cozy_fireplace_diamond_80.json",
+        "thumbnailUrl": "assets/converted/cozy_fireplace_diamond_80_thumb.png"
+      },
+      {
+        "id": "cozy_fireplace_diamond_120",
+        "resolution": "Standard (14.4k)",
+        "label": "120\u00d7120",
+        "grid": 120,
+        "pieces": 14400,
+        "colors": 26,
+        "jsonFile": "assets/converted/cozy_fireplace_diamond_120.json",
+        "thumbnailUrl": "assets/converted/cozy_fireplace_diamond_120_thumb.png"
+      },
+      {
+        "id": "cozy_fireplace_diamond_160",
+        "resolution": "Masterpiece (25.6k)",
+        "label": "160\u00d7160",
+        "grid": 160,
+        "pieces": 25600,
+        "colors": 36,
+        "jsonFile": "assets/converted/cozy_fireplace_diamond_160.json",
+        "thumbnailUrl": "assets/converted/cozy_fireplace_diamond_160_thumb.png"
+      }
+    ],
+    "pbnVariants": [
+      {
+        "id": "cozy_fireplace_pbn",
+        "resolution": "Original",
+        "pieces": 352,
+        "colors": 20,
+        "jsonFile": "assets/converted/cozy_fireplace_pbn.json",
+        "lineArtUrl": "assets/converted/cozy_fireplace_pbn_lines.png",
+        "thumbnailUrl": "assets/converted/cozy_fireplace_pbn_thumb.png"
+      }
+    ]
+  },
+  {
+    "key": "jolly_snowman",
+    "title": "Jolly Snowman",
+    "artist": "Tap Color Studio",
+    "desc": "Jolly Snowman artwork",
+    "originalAsset": "assets/paint_by_number/jolly_snowman.jpg",
+    "pbnAsset": "assets/paint_by_number/jolly_snowman.jpg",
+    "diamondVariants": [
+      {
+        "id": "jolly_snowman_diamond_80",
+        "resolution": "Cozy (6.4k)",
+        "label": "80\u00d780",
+        "grid": 80,
+        "pieces": 6400,
+        "colors": 18,
+        "jsonFile": "assets/converted/jolly_snowman_diamond_80.json",
+        "thumbnailUrl": "assets/converted/jolly_snowman_diamond_80_thumb.png"
+      },
+      {
+        "id": "jolly_snowman_diamond_120",
+        "resolution": "Standard (14.4k)",
+        "label": "120\u00d7120",
+        "grid": 120,
+        "pieces": 14400,
+        "colors": 26,
+        "jsonFile": "assets/converted/jolly_snowman_diamond_120.json",
+        "thumbnailUrl": "assets/converted/jolly_snowman_diamond_120_thumb.png"
+      },
+      {
+        "id": "jolly_snowman_diamond_160",
+        "resolution": "Masterpiece (25.6k)",
+        "label": "160\u00d7160",
+        "grid": 160,
+        "pieces": 25600,
+        "colors": 36,
+        "jsonFile": "assets/converted/jolly_snowman_diamond_160.json",
+        "thumbnailUrl": "assets/converted/jolly_snowman_diamond_160_thumb.png"
+      }
+    ],
+    "pbnVariants": [
+      {
+        "id": "jolly_snowman_pbn",
+        "resolution": "Original",
+        "pieces": 305,
+        "colors": 25,
+        "jsonFile": "assets/converted/jolly_snowman_pbn.json",
+        "lineArtUrl": "assets/converted/jolly_snowman_pbn_lines.png",
+        "thumbnailUrl": "assets/converted/jolly_snowman_pbn_thumb.png"
+      }
+    ]
+  },
+  {
+    "key": "nativity_1",
+    "title": "Nativity 1",
+    "artist": "Tap Color Studio",
+    "desc": "Nativity 1 artwork",
+    "originalAsset": "assets/paint_by_number/nativity-1.webp",
+    "pbnAsset": "assets/paint_by_number/nativity-1.webp",
+    "diamondVariants": [
+      {
+        "id": "nativity_1_diamond_80",
+        "resolution": "Cozy (6.4k)",
+        "label": "80\u00d780",
+        "grid": 80,
+        "pieces": 6400,
+        "colors": 18,
+        "jsonFile": "assets/converted/nativity_1_diamond_80.json",
+        "thumbnailUrl": "assets/converted/nativity_1_diamond_80_thumb.png"
+      },
+      {
+        "id": "nativity_1_diamond_120",
+        "resolution": "Standard (14.4k)",
+        "label": "120\u00d7120",
+        "grid": 120,
+        "pieces": 14400,
+        "colors": 26,
+        "jsonFile": "assets/converted/nativity_1_diamond_120.json",
+        "thumbnailUrl": "assets/converted/nativity_1_diamond_120_thumb.png"
+      },
+      {
+        "id": "nativity_1_diamond_160",
+        "resolution": "Masterpiece (25.6k)",
+        "label": "160\u00d7160",
+        "grid": 160,
+        "pieces": 25600,
+        "colors": 36,
+        "jsonFile": "assets/converted/nativity_1_diamond_160.json",
+        "thumbnailUrl": "assets/converted/nativity_1_diamond_160_thumb.png"
+      }
+    ],
+    "pbnVariants": [
+      {
+        "id": "nativity_1_pbn",
+        "resolution": "Original",
+        "pieces": 101,
+        "colors": 19,
+        "jsonFile": "assets/converted/nativity_1_pbn.json",
+        "lineArtUrl": "assets/converted/nativity_1_pbn_lines.png",
+        "thumbnailUrl": "assets/converted/nativity_1_pbn_thumb.png"
+      }
+    ]
+  },
+  {
+    "key": "nativity_2",
+    "title": "Nativity 2",
+    "artist": "Tap Color Studio",
+    "desc": "Nativity 2 artwork",
+    "originalAsset": "assets/paint_by_number/nativity-2.webp",
+    "pbnAsset": "assets/paint_by_number/nativity-2.webp",
+    "diamondVariants": [
+      {
+        "id": "nativity_2_diamond_80",
+        "resolution": "Cozy (6.4k)",
+        "label": "80\u00d780",
+        "grid": 80,
+        "pieces": 6400,
+        "colors": 18,
+        "jsonFile": "assets/converted/nativity_2_diamond_80.json",
+        "thumbnailUrl": "assets/converted/nativity_2_diamond_80_thumb.png"
+      },
+      {
+        "id": "nativity_2_diamond_120",
+        "resolution": "Standard (14.4k)",
+        "label": "120\u00d7120",
+        "grid": 120,
+        "pieces": 14400,
+        "colors": 26,
+        "jsonFile": "assets/converted/nativity_2_diamond_120.json",
+        "thumbnailUrl": "assets/converted/nativity_2_diamond_120_thumb.png"
+      },
+      {
+        "id": "nativity_2_diamond_160",
+        "resolution": "Masterpiece (25.6k)",
+        "label": "160\u00d7160",
+        "grid": 160,
+        "pieces": 25600,
+        "colors": 36,
+        "jsonFile": "assets/converted/nativity_2_diamond_160.json",
+        "thumbnailUrl": "assets/converted/nativity_2_diamond_160_thumb.png"
+      }
+    ],
+    "pbnVariants": [
+      {
+        "id": "nativity_2_pbn",
+        "resolution": "Original",
+        "pieces": 84,
+        "colors": 16,
+        "jsonFile": "assets/converted/nativity_2_pbn.json",
+        "lineArtUrl": "assets/converted/nativity_2_pbn_lines.png",
+        "thumbnailUrl": "assets/converted/nativity_2_pbn_thumb.png"
+      }
+    ]
+  },
+  {
+    "key": "nativity_3",
+    "title": "Nativity 3",
+    "artist": "Tap Color Studio",
+    "desc": "Nativity 3 artwork",
+    "originalAsset": "assets/paint_by_number/nativity-3.webp",
+    "pbnAsset": "assets/paint_by_number/nativity-3.webp",
+    "diamondVariants": [
+      {
+        "id": "nativity_3_diamond_80",
+        "resolution": "Cozy (6.4k)",
+        "label": "80\u00d780",
+        "grid": 80,
+        "pieces": 6400,
+        "colors": 18,
+        "jsonFile": "assets/converted/nativity_3_diamond_80.json",
+        "thumbnailUrl": "assets/converted/nativity_3_diamond_80_thumb.png"
+      },
+      {
+        "id": "nativity_3_diamond_120",
+        "resolution": "Standard (14.4k)",
+        "label": "120\u00d7120",
+        "grid": 120,
+        "pieces": 14400,
+        "colors": 26,
+        "jsonFile": "assets/converted/nativity_3_diamond_120.json",
+        "thumbnailUrl": "assets/converted/nativity_3_diamond_120_thumb.png"
+      },
+      {
+        "id": "nativity_3_diamond_160",
+        "resolution": "Masterpiece (25.6k)",
+        "label": "160\u00d7160",
+        "grid": 160,
+        "pieces": 25600,
+        "colors": 36,
+        "jsonFile": "assets/converted/nativity_3_diamond_160.json",
+        "thumbnailUrl": "assets/converted/nativity_3_diamond_160_thumb.png"
+      }
+    ],
+    "pbnVariants": [
+      {
+        "id": "nativity_3_pbn",
+        "resolution": "Original",
+        "pieces": 128,
+        "colors": 18,
+        "jsonFile": "assets/converted/nativity_3_pbn.json",
+        "lineArtUrl": "assets/converted/nativity_3_pbn_lines.png",
+        "thumbnailUrl": "assets/converted/nativity_3_pbn_thumb.png"
+      }
+    ]
+  },
+  {
+    "key": "santa_sleigh",
+    "title": "Santa Sleigh",
+    "artist": "Tap Color Studio",
+    "desc": "Santa Sleigh artwork",
+    "originalAsset": "assets/paint_by_number/santa_sleigh.jpg",
+    "pbnAsset": "assets/paint_by_number/santa_sleigh.jpg",
+    "diamondVariants": [
+      {
+        "id": "santa_sleigh_diamond_80",
+        "resolution": "Cozy (6.4k)",
+        "label": "80\u00d780",
+        "grid": 80,
+        "pieces": 6400,
+        "colors": 18,
+        "jsonFile": "assets/converted/santa_sleigh_diamond_80.json",
+        "thumbnailUrl": "assets/converted/santa_sleigh_diamond_80_thumb.png"
+      },
+      {
+        "id": "santa_sleigh_diamond_120",
+        "resolution": "Standard (14.4k)",
+        "label": "120\u00d7120",
+        "grid": 120,
+        "pieces": 14400,
+        "colors": 26,
+        "jsonFile": "assets/converted/santa_sleigh_diamond_120.json",
+        "thumbnailUrl": "assets/converted/santa_sleigh_diamond_120_thumb.png"
+      },
+      {
+        "id": "santa_sleigh_diamond_160",
+        "resolution": "Masterpiece (25.6k)",
+        "label": "160\u00d7160",
+        "grid": 160,
+        "pieces": 25600,
+        "colors": 36,
+        "jsonFile": "assets/converted/santa_sleigh_diamond_160.json",
+        "thumbnailUrl": "assets/converted/santa_sleigh_diamond_160_thumb.png"
+      }
+    ],
+    "pbnVariants": [
+      {
+        "id": "santa_sleigh_pbn",
+        "resolution": "Original",
+        "pieces": 345,
+        "colors": 26,
+        "jsonFile": "assets/converted/santa_sleigh_pbn.json",
+        "lineArtUrl": "assets/converted/santa_sleigh_pbn_lines.png",
+        "thumbnailUrl": "assets/converted/santa_sleigh_pbn_thumb.png"
+      }
+    ]
+  },
+  {
+    "key": "sermon_on_the_mount",
+    "title": "Sermon On The Mount",
+    "artist": "Tap Color Studio",
+    "desc": "Sermon On The Mount artwork",
+    "originalAsset": "assets/paint_by_number/sermon_on_the_mount.jpg",
+    "pbnAsset": "assets/paint_by_number/sermon_on_the_mount.jpg",
+    "diamondVariants": [
+      {
+        "id": "sermon_on_the_mount_diamond_80",
+        "resolution": "Cozy (6.4k)",
+        "label": "80\u00d780",
+        "grid": 80,
+        "pieces": 6400,
+        "colors": 18,
+        "jsonFile": "assets/converted/sermon_on_the_mount_diamond_80.json",
+        "thumbnailUrl": "assets/converted/sermon_on_the_mount_diamond_80_thumb.png"
+      },
+      {
+        "id": "sermon_on_the_mount_diamond_120",
+        "resolution": "Standard (14.4k)",
+        "label": "120\u00d7120",
+        "grid": 120,
+        "pieces": 14400,
+        "colors": 26,
+        "jsonFile": "assets/converted/sermon_on_the_mount_diamond_120.json",
+        "thumbnailUrl": "assets/converted/sermon_on_the_mount_diamond_120_thumb.png"
+      },
+      {
+        "id": "sermon_on_the_mount_diamond_160",
+        "resolution": "Masterpiece (25.6k)",
+        "label": "160\u00d7160",
+        "grid": 160,
+        "pieces": 25600,
+        "colors": 36,
+        "jsonFile": "assets/converted/sermon_on_the_mount_diamond_160.json",
+        "thumbnailUrl": "assets/converted/sermon_on_the_mount_diamond_160_thumb.png"
+      }
+    ],
+    "pbnVariants": [
+      {
+        "id": "sermon_on_the_mount_pbn",
+        "resolution": "Original",
+        "pieces": 515,
+        "colors": 26,
+        "jsonFile": "assets/converted/sermon_on_the_mount_pbn.json",
+        "lineArtUrl": "assets/converted/sermon_on_the_mount_pbn_lines.png",
+        "thumbnailUrl": "assets/converted/sermon_on_the_mount_pbn_thumb.png"
+      }
+    ]
+  },
+  {
+    "key": "snowy_cottage",
+    "title": "Snowy Cottage",
+    "artist": "Tap Color Studio",
+    "desc": "Snowy Cottage artwork",
+    "originalAsset": "assets/paint_by_number/snowy_cottage.jpg",
+    "pbnAsset": "assets/paint_by_number/snowy_cottage.jpg",
+    "diamondVariants": [
+      {
+        "id": "snowy_cottage_diamond_80",
+        "resolution": "Cozy (6.4k)",
+        "label": "80\u00d780",
+        "grid": 80,
+        "pieces": 6400,
+        "colors": 18,
+        "jsonFile": "assets/converted/snowy_cottage_diamond_80.json",
+        "thumbnailUrl": "assets/converted/snowy_cottage_diamond_80_thumb.png"
+      },
+      {
+        "id": "snowy_cottage_diamond_120",
+        "resolution": "Standard (14.4k)",
+        "label": "120\u00d7120",
+        "grid": 120,
+        "pieces": 14400,
+        "colors": 26,
+        "jsonFile": "assets/converted/snowy_cottage_diamond_120.json",
+        "thumbnailUrl": "assets/converted/snowy_cottage_diamond_120_thumb.png"
+      },
+      {
+        "id": "snowy_cottage_diamond_160",
+        "resolution": "Masterpiece (25.6k)",
+        "label": "160\u00d7160",
+        "grid": 160,
+        "pieces": 25600,
+        "colors": 36,
+        "jsonFile": "assets/converted/snowy_cottage_diamond_160.json",
+        "thumbnailUrl": "assets/converted/snowy_cottage_diamond_160_thumb.png"
+      }
+    ],
+    "pbnVariants": [
+      {
+        "id": "snowy_cottage_pbn",
+        "resolution": "Original",
+        "pieces": 476,
+        "colors": 26,
+        "jsonFile": "assets/converted/snowy_cottage_pbn.json",
+        "lineArtUrl": "assets/converted/snowy_cottage_pbn_lines.png",
+        "thumbnailUrl": "assets/converted/snowy_cottage_pbn_thumb.png"
+      }
+    ]
+  },
+  {
+    "key": "washing_of_the_feet",
+    "title": "Washing Of The Feet",
+    "artist": "Tap Color Studio",
+    "desc": "Washing Of The Feet artwork",
+    "originalAsset": "assets/paint_by_number/washing_of_the_feet.jpg",
+    "pbnAsset": "assets/paint_by_number/washing_of_the_feet.jpg",
+    "diamondVariants": [
+      {
+        "id": "washing_of_the_feet_diamond_80",
+        "resolution": "Cozy (6.4k)",
+        "label": "80\u00d780",
+        "grid": 80,
+        "pieces": 6400,
+        "colors": 18,
+        "jsonFile": "assets/converted/washing_of_the_feet_diamond_80.json",
+        "thumbnailUrl": "assets/converted/washing_of_the_feet_diamond_80_thumb.png"
+      },
+      {
+        "id": "washing_of_the_feet_diamond_120",
+        "resolution": "Standard (14.4k)",
+        "label": "120\u00d7120",
+        "grid": 120,
+        "pieces": 14400,
+        "colors": 26,
+        "jsonFile": "assets/converted/washing_of_the_feet_diamond_120.json",
+        "thumbnailUrl": "assets/converted/washing_of_the_feet_diamond_120_thumb.png"
+      },
+      {
+        "id": "washing_of_the_feet_diamond_160",
+        "resolution": "Masterpiece (25.6k)",
+        "label": "160\u00d7160",
+        "grid": 160,
+        "pieces": 25600,
+        "colors": 36,
+        "jsonFile": "assets/converted/washing_of_the_feet_diamond_160.json",
+        "thumbnailUrl": "assets/converted/washing_of_the_feet_diamond_160_thumb.png"
+      }
+    ],
+    "pbnVariants": [
+      {
+        "id": "washing_of_the_feet_pbn",
+        "resolution": "Original",
+        "pieces": 480,
+        "colors": 26,
+        "jsonFile": "assets/converted/washing_of_the_feet_pbn.json",
+        "lineArtUrl": "assets/converted/washing_of_the_feet_pbn_lines.png",
+        "thumbnailUrl": "assets/converted/washing_of_the_feet_pbn_thumb.png"
       }
     ]
   }
