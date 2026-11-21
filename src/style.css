@@ -950,7 +950,19 @@ progress.loading-spinner:indeterminate {
   font-variant-numeric: tabular-nums;
 }
 
-input[type="range"].pbn-pieces-slider {
+.visually-hidden:where(:not(:focus-within, :active)) {
+  position: absolute !important;
+  clip-path: inset(50%) !important;
+  overflow: hidden !important;
+  width: 1px !important;
+  height: 1px !important;
+  margin: -1px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  white-space: nowrap !important;
+}
+
+.pbn-dual-slider {
   --slider-track-size: 0.5rem;
   --slider-thumb-size: 1.25rem;
   --slider-track-radius: 999px;
@@ -958,11 +970,40 @@ input[type="range"].pbn-pieces-slider {
   --slider-track-color: #8C7D70;
   --slider-fill-color: var(--accent-primary);
   --slider-thumb-color: var(--accent-primary);
-  --slider-direction: to right;
-  --slider-progress: 100%;
+  --range-start: 0%;
+  --range-end: 100%;
 
-  appearance: none;
+  position: relative;
   flex: 1;
+  inline-size: 100%;
+  block-size: 2.5rem;
+  display: flex;
+  align-items: center;
+}
+
+.pbn-dual-slider-track {
+  position: absolute;
+  inset-inline: 0;
+  block-size: var(--slider-track-size);
+  border-radius: var(--slider-track-radius);
+  background: var(--slider-track-color);
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.pbn-dual-slider-fill {
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: var(--range-start);
+  inline-size: max(0%, calc(var(--range-end) - var(--range-start)));
+  background: var(--slider-fill-color);
+  border-radius: var(--slider-track-radius);
+}
+
+input[type="range"].pbn-pieces-slider {
+  position: absolute;
+  inset: 0;
+  appearance: none;
   inline-size: 100%;
   block-size: 2.5rem;
   margin: 0;
@@ -970,31 +1011,24 @@ input[type="range"].pbn-pieces-slider {
   border: 0;
   border-radius: 0;
   background: transparent;
-  cursor: pointer;
-}
-
-input[type="range"].pbn-pieces-slider:dir(rtl) {
-  --slider-direction: to left;
+  pointer-events: none;
 }
 
 input[type="range"].pbn-pieces-slider:focus-visible {
-  outline: 2px solid var(--slider-fill-color);
-  outline-offset: 4px;
-  border-radius: var(--radius-sm);
+  outline: none;
 }
 
 input[type="range"].pbn-pieces-slider::-webkit-slider-runnable-track {
   block-size: var(--slider-track-size);
   border: 0;
-  border-radius: var(--slider-track-radius);
-  background: linear-gradient(var(--slider-direction),
-      var(--slider-fill-color) var(--slider-progress),
-      var(--slider-track-color) var(--slider-progress));
+  background: transparent;
 }
 
 input[type="range"].pbn-pieces-slider::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
+  pointer-events: auto;
+  cursor: pointer;
   inline-size: var(--slider-thumb-size);
   block-size: var(--slider-thumb-size);
   margin-block-start: calc((var(--slider-track-size) - var(--slider-thumb-size)) / 2);
@@ -1009,26 +1043,41 @@ input[type="range"].pbn-pieces-slider::-webkit-slider-thumb:hover {
   transform: scale(1.1);
 }
 
+input[type="range"].pbn-pieces-slider:focus-visible::-webkit-slider-thumb {
+  outline: 2px solid var(--slider-fill-color);
+  outline-offset: 3px;
+}
+
 input[type="range"].pbn-pieces-slider::-moz-range-track {
   block-size: var(--slider-track-size);
   border: 0;
-  border-radius: var(--slider-track-radius);
-  background: var(--slider-track-color);
+  background: transparent;
 }
 
 input[type="range"].pbn-pieces-slider::-moz-range-progress {
   block-size: var(--slider-track-size);
-  border-radius: var(--slider-track-radius);
-  background: var(--slider-fill-color);
+  background: transparent;
 }
 
 input[type="range"].pbn-pieces-slider::-moz-range-thumb {
+  pointer-events: auto;
+  cursor: pointer;
   inline-size: var(--slider-thumb-size);
   block-size: var(--slider-thumb-size);
   border: 2px solid #FFFDF9;
   border-radius: var(--slider-thumb-radius);
   background: var(--slider-thumb-color);
   box-shadow: 0 2px 6px rgba(46, 37, 32, 0.25);
+  transition: transform 0.15s ease;
+}
+
+input[type="range"].pbn-pieces-slider::-moz-range-thumb:hover {
+  transform: scale(1.1);
+}
+
+input[type="range"].pbn-pieces-slider:focus-visible::-moz-range-thumb {
+  outline: 2px solid var(--slider-fill-color);
+  outline-offset: 3px;
 }
 
 /* Gallery Artwork Grid */

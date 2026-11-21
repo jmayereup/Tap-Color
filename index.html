@@ -225,18 +225,27 @@
         <!-- Paint by Number Pieces Filter -->
         <div id="pbn-pieces-filter" class="pbn-pieces-filter">
           <div class="pbn-filter-header">
-            <label for="pbn-pieces-slider" class="pbn-filter-label">
-              🎨 Pieces: <strong id="pbn-pieces-value">All (up to 594)</strong>
-            </label>
+            <span id="pbn-pieces-filter-heading" class="pbn-filter-label">
+              🎨 Pieces: <strong id="pbn-pieces-value">All (49–594)</strong>
+            </span>
             <div class="pbn-filter-meta">
               <span id="pbn-pieces-count" class="pbn-filter-count">18 pictures</span>
               <button type="button" id="btn-reset-pbn-filter" class="pbn-filter-reset hidden">Show All</button>
             </div>
           </div>
-          <div class="pbn-slider-row">
+          <div class="pbn-slider-row" role="group" aria-labelledby="pbn-pieces-filter-heading">
             <span id="pbn-pieces-min-label" class="pbn-slider-bound">49</span>
-            <input type="range" id="pbn-pieces-slider" class="pbn-pieces-slider" min="49" max="594" step="1" value="594"
-              aria-valuetext="All, up to 594 pieces">
+            <div class="pbn-dual-slider" id="pbn-dual-slider">
+              <div class="pbn-dual-slider-track" aria-hidden="true">
+                <div class="pbn-dual-slider-fill" id="pbn-dual-slider-fill"></div>
+              </div>
+              <label for="pbn-pieces-min-slider" class="visually-hidden">Minimum pieces</label>
+              <input type="range" id="pbn-pieces-min-slider" class="pbn-pieces-slider pbn-pieces-slider--min" min="49" max="594" step="1" value="49"
+                aria-valuetext="Minimum 49 pieces">
+              <label for="pbn-pieces-max-slider" class="visually-hidden">Maximum pieces</label>
+              <input type="range" id="pbn-pieces-max-slider" class="pbn-pieces-slider pbn-pieces-slider--max" min="49" max="594" step="1" value="594"
+                aria-valuetext="Maximum 594 pieces">
+            </div>
             <span id="pbn-pieces-max-label" class="pbn-slider-bound">594</span>
           </div>
         </div>

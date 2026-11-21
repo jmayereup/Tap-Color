@@ -228,6 +228,7 @@ class TapColorApp {
     this.currentArtworkId = 'fluffy_cow_pbn';
     this.activeNumber = 1;
     this.activeCategory = 'classic'; // 'classic', 'diamond', 'saved', 'custom'
+    this.pbnMinPiecesFilter = null;
     this.pbnMaxPiecesFilter = null;
 
     // Async generation tokens & timers
@@ -1211,21 +1212,41 @@ class TapColorApp {
       });
     });
 
-    // Paint by Number Pieces Slider
-    const pbnSlider = document.getElementById('pbn-pieces-slider');
+    // Paint by Number Dual Pieces Slider
+    const pbnMinSlider = document.getElementById('pbn-pieces-min-slider');
+    const pbnMaxSlider = document.getElementById('pbn-pieces-max-slider');
     const pbnResetBtn = document.getElementById('btn-reset-pbn-filter');
-    if (pbnSlider) {
-      pbnSlider.addEventListener('input', () => {
-        this.pbnMaxPiecesFilter = Number(pbnSlider.value);
+    if (pbnMinSlider) {
+      pbnMinSlider.addEventListener('input', () => {
+        const maxBound = this.pbnMaxPiecesFilter ?? Number(pbnMinSlider.max);
+        const clamped = Math.min(Number(pbnMinSlider.value), maxBound);
+        this.pbnMinPiecesFilter = clamped;
+        pbnMinSlider.value = String(clamped);
+        pbnMinSlider.style.zIndex = '4';
+        if (pbnMaxSlider) pbnMaxSlider.style.zIndex = '2';
+        this.syncPbnPiecesSliderUI();
+        this.filterGalleryCards();
+      });
+    }
+    if (pbnMaxSlider) {
+      pbnMaxSlider.addEventListener('input', () => {
+        const minBound = this.pbnMinPiecesFilter ?? Number(pbnMaxSlider.min);
+        const clamped = Math.max(Number(pbnMaxSlider.value), minBound);
+        this.pbnMaxPiecesFilter = clamped;
+        pbnMaxSlider.value = String(clamped);
+        pbnMaxSlider.style.zIndex = '4';
+        if (pbnMinSlider) pbnMinSlider.style.zIndex = '2';
         this.syncPbnPiecesSliderUI();
         this.filterGalleryCards();
       });
     }
     if (pbnResetBtn) {
       pbnResetBtn.addEventListener('click', () => {
-        if (!pbnSlider) return;
-        this.pbnMaxPiecesFilter = Number(pbnSlider.max);
-        pbnSlider.value = String(this.pbnMaxPiecesFilter);
+        if (!pbnMinSlider || !pbnMaxSlider) return;
+        this.pbnMinPiecesFilter = Number(pbnMinSlider.min);
+        this.pbnMaxPiecesFilter = Number(pbnMaxSlider.max);
+        pbnMinSlider.value = String(this.pbnMinPiecesFilter);
+        pbnMaxSlider.value = String(this.pbnMaxPiecesFilter);
         this.syncPbnPiecesSliderUI();
         this.filterGalleryCards();
       });
@@ -2250,8 +2271,9 @@ class TapColorApp {
   }
 
   updatePbnPiecesFilterBounds() {
-    const slider = document.getElementById('pbn-pieces-slider');
-    if (!slider) return;
+    const minSlider = document.getElementById('pbn-pieces-min-slider');
+    const maxSlider = document.getElementById('pbn-pieces-max-slider');
+    if (!minSlider || !maxSlider) return;
 
     const classicPieces = this.artworksMeta
       .filter(m => m.category === 'classic')
@@ -2268,13 +2290,21 @@ class TapColorApp {
     const minPieces = Math.min(...classicPieces);
     const maxPieces = Math.max(...classicPieces);
 
-    slider.min = String(minPieces);
-    slider.max = String(maxPieces);
+    minSlider.min = String(minPieces);
+    minSlider.max = String(maxPieces);
+    maxSlider.min = String(minPieces);
+    maxSlider.max = String(maxPieces);
 
     const minLabel = document.getElementById('pbn-pieces-min-label');
     const maxLabel = document.getElementById('pbn-pieces-max-label');
     if (minLabel) minLabel.textContent = String(minPieces);
     if (maxLabel) maxLabel.textContent = String(maxPieces);
+
+    if (this.pbnMinPiecesFilter === null || this.pbnMinPiecesFilter < minPieces) {
+      this.pbnMinPiecesFilter = minPieces;
+    } else if (this.pbnMinPiecesFilter > maxPieces) {
+      this.pbnMinPiecesFilter = maxPieces;
+    }
 
     if (this.pbnMaxPiecesFilter === null || this.pbnMaxPiecesFilter > maxPieces) {
       this.pbnMaxPiecesFilter = maxPieces;
@@ -2282,27 +2312,62 @@ class TapColorApp {
       this.pbnMaxPiecesFilter = minPieces;
     }
 
-    slider.value = String(this.pbnMaxPiecesFilter);
+    if (this.pbnMinPiecesFilter > this.pbnMaxPiecesFilter) {
+      this.pbnMinPiecesFilter = this.pbnMaxPiecesFilter;
+    }
+
+    minSlider.value = String(this.pbnMinPiecesFilter);
+    maxSlider.value = String(this.pbnMaxPiecesFilter);
     this.syncPbnPiecesSliderUI();
   }
 
   syncPbnPiecesSliderUI() {
-    const slider = document.getElementById('pbn-pieces-slider');
+    const dualSlider = document.getElementById('pbn-dual-slider');
+    const minSlider = document.getElementById('pbn-pieces-min-slider');
+    const maxSlider = document.getElementById('pbn-pieces-max-slider');
     const valueEl = document.getElementById('pbn-pieces-value');
     const resetBtn = document.getElementById('btn-reset-pbn-filter');
-    if (!slider) return;
+    if (!minSlider || !maxSlider) return;
 
-    const min = Number(slider.min || 0);
-    const max = Number(slider.max || 100);
-    const val = Number(slider.value || max);
+    const min = Number(minSlider.min || 0);
+    const max = Number(maxSlider.max || 100);
+    const minVal = Number(minSlider.value || min);
+    const maxVal = Number(maxSlider.value || max);
 
-    const pct = max > min ? ((val - min) / (max - min)) * 100 : 100;
-    slider.style.setProperty('--slider-progress', `${Math.max(0, Math.min(100, pct))}%`);
+    const span = max - min;
+    const startPct = span > 0 ? ((minVal - min) / span) * 100 : 0;
+    const endPct = span > 0 ? ((maxVal - min) / span) * 100 : 100;
+    if (dualSlider) {
+      dualSlider.style.setProperty('--range-start', `${Math.max(0, Math.min(100, startPct))}%`);
+      dualSlider.style.setProperty('--range-end', `${Math.max(0, Math.min(100, endPct))}%`);
+    }
 
-    const isAll = val >= max;
-    const text = isAll ? `All (up to ${max})` : `Up to ${val}`;
+    // Prevent thumbs from trapping each other at the endpoints
+    if (minVal === maxVal) {
+      if (minVal >= max) {
+        minSlider.style.zIndex = '4';
+        maxSlider.style.zIndex = '2';
+      } else if (minVal <= min) {
+        minSlider.style.zIndex = '2';
+        maxSlider.style.zIndex = '4';
+      }
+    }
+
+    const isAll = minVal <= min && maxVal >= max;
+    let text;
+    if (isAll) {
+      text = `All (${min}–${max})`;
+    } else if (minVal > min && maxVal < max) {
+      text = `${minVal}–${maxVal}`;
+    } else if (minVal > min) {
+      text = `${minVal}+`;
+    } else {
+      text = `Up to ${maxVal}`;
+    }
+
     if (valueEl) valueEl.textContent = text;
-    slider.setAttribute('aria-valuetext', isAll ? `All, up to ${max} pieces` : `Up to ${val} pieces`);
+    minSlider.setAttribute('aria-valuetext', `Minimum ${minVal} pieces`);
+    maxSlider.setAttribute('aria-valuetext', `Maximum ${maxVal} pieces`);
 
     if (resetBtn) {
       resetBtn.classList.toggle('hidden', isAll);
@@ -2312,13 +2377,15 @@ class TapColorApp {
   filterGalleryCards() {
     const pbnFilter = document.getElementById('pbn-pieces-filter');
     const countEl = document.getElementById('pbn-pieces-count');
-    const slider = document.getElementById('pbn-pieces-slider');
+    const minSlider = document.getElementById('pbn-pieces-min-slider');
+    const maxSlider = document.getElementById('pbn-pieces-max-slider');
 
     if (pbnFilter) {
       pbnFilter.classList.toggle('hidden', this.activeCategory !== 'classic');
     }
 
-    const maxPieces = slider ? Number(slider.value) : Infinity;
+    const minPieces = minSlider ? Number(minSlider.value) : 0;
+    const maxPieces = maxSlider ? Number(maxSlider.value) : Infinity;
     let visibleClassicCount = 0;
 
     document.querySelectorAll('.artwork-card').forEach(card => {
@@ -2327,7 +2394,7 @@ class TapColorApp {
       } else if (this.activeCategory === 'classic') {
         const isClassic = card.dataset.category === 'classic';
         const pieces = Number(card.dataset.pieces || 0);
-        const matchesPieces = pieces <= maxPieces;
+        const matchesPieces = pieces >= minPieces && pieces <= maxPieces;
         const show = isClassic && matchesPieces;
         card.style.display = show ? 'flex' : 'none';
         if (show) visibleClassicCount++;
