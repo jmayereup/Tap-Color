@@ -188,6 +188,13 @@ impl GameController {
         serde_json::to_string(&self.engine.artwork.palette).unwrap_or_else(|_| "[]".to_string())
     }
 
+    pub fn get_visible_unfilled_numbers_json(&self) -> String {
+        let nums = self
+            .engine
+            .get_visible_unfilled_numbers(self.viewport_w, self.viewport_h);
+        serde_json::to_string(&nums).unwrap_or_else(|_| "[]".to_string())
+    }
+
     pub fn get_artwork_info_json(&self) -> String {
         serde_json::to_string(&serde_json::json!({
             "id": self.engine.artwork.id,

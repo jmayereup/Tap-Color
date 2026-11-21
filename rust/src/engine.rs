@@ -179,6 +179,173 @@ impl GameEngine {
         self.dirty = true;
     }
 
+    fn point_in_rect(x: f64, y: f64, min_x: f64, min_y: f64, max_x: f64, max_y: f64) -> bool {
+        x >= min_x && x <= max_x && y >= min_y && y <= max_y
+    }
+
+    fn segment_intersects_rect(
+        x1: f64,
+        y1: f64,
+        x2: f64,
+        y2: f64,
+        min_x: f64,
+        min_y: f64,
+        max_x: f64,
+        max_y: f64,
+    ) -> bool {
+        let dx = x2 - x1;
+        let dy = y2 - y1;
+        let mut t0 = 0.0_f64;
+        let mut t1 = 1.0_f64;
+        let checks = [
+            (-dx, x1 - min_x),
+            (dx, max_x - x1),
+            (-dy, y1 - min_y),
+            (dy, max_y - y1),
+        ];
+        for (p, q) in checks {
+            if p.abs() < 1e-12 {
+                if q < 0.0 {
+                    return false;
+                }
+            } else {
+                let r = q / p;
+                if p < 0.0 {
+                    if r > t1 {
+                        return false;
+                    }
+                    if r > t0 {
+                        t0 = r;
+                    }
+                } else {
+                    if r < t0 {
+                        return false;
+                    }
+                    if r < t1 {
+                        t1 = r;
+                    }
+                }
+            }
+        }
+        t0 <= t1
+    }
+
+    fn region_intersects_rect(
+        region: &Region,
+        min_x: f64,
+        min_y: f64,
+        max_x: f64,
+        max_y: f64,
+        view_center: Point,
+    ) -> bool {
+        if Self::point_in_rect(region.centroid.x, region.centroid.y, min_x, min_y, max_x, max_y) {
+            return true;
+        }
+        let n = region.polygon.len();
+        for pt in &region.polygon {
+            if Self::point_in_rect(pt.x, pt.y, min_x, min_y, max_x, max_y) {
+                return true;
+            }
+        }
+        for i in 0..n {
+            let p1 = &region.polygon[i];
+            let p2 = &region.polygon[(i + 1) % n];
+            if Self::segment_intersects_rect(p1.x, p1.y, p2.x, p2.y, min_x, min_y, max_x, max_y) {
+                return true;
+            }
+        }
+        region.contains_point(view_center)
+    }
+
+    /// Returns the distinct unfilled palette numbers currently visible within the viewport
+    pub fn get_visible_unfilled_numbers(&self, viewport_w: f64, viewport_h: f64) -> Vec<usize> {
+        let (pan_x, pan_y, scale) = if self.last_time > 0.0 {
+            (self.pan_x, self.pan_y, self.scale)
+        } else {
+            (self.target_pan_x, self.target_pan_y, self.target_scale)
+        };
+
+        if scale <= 0.0 || viewport_w <= 0.0 || viewport_h <= 0.0 {
+            return self
+                .artwork
+                .palette
+                .iter()
+                .filter(|p| !p.is_completed)
+                .map(|p| p.number)
+                .collect();
+        }
+
+        let incomplete_total = self.artwork.palette.iter().filter(|p| !p.is_completed).count();
+        if incomplete_total == 0 {
+            return Vec::new();
+        }
+
+        let view_min_x = -pan_x / scale;
+        let view_max_x = (viewport_w - pan_x) / scale;
+        let view_min_y = -pan_y / scale;
+        let view_max_y = (viewport_h - pan_y) / scale;
+        let view_center = Point::new(
+            (view_min_x + view_max_x) * 0.5,
+            (view_min_y + view_max_y) * 0.5,
+        );
+
+        let max_num = self.artwork.palette.iter().map(|p| p.number).max().unwrap_or(0);
+        let mut seen = vec![false; max_num + 1];
+        let mut seen_count = 0usize;
+        let is_diamond = self.is_diamond_art();
+
+        for region in &self.artwork.regions {
+            if region.is_filled {
+                continue;
+            }
+            let num = region.number;
+            if num < seen.len() && seen[num] {
+                continue;
+            }
+            if region.polygon.len() < 3 {
+                continue;
+            }
+            let (r_min_x, r_min_y, r_max_x, r_max_y) = region.bbox;
+            if r_max_x < view_min_x
+                || r_min_x > view_max_x
+                || r_max_y < view_min_y
+                || r_min_y > view_max_y
+            {
+                continue;
+            }
+
+            let is_visible = if is_diamond {
+                true
+            } else {
+                Self::region_intersects_rect(
+                    region,
+                    view_min_x,
+                    view_min_y,
+                    view_max_x,
+                    view_max_y,
+                    view_center,
+                )
+            };
+
+            if is_visible {
+                if num < seen.len() {
+                    seen[num] = true;
+                }
+                seen_count += 1;
+                if seen_count >= incomplete_total {
+                    break;
+                }
+            }
+        }
+
+        self.artwork
+            .palette
+            .iter()
+            .filter(|p| !p.is_completed && p.number < seen.len() && seen[p.number])
+            .map(|p| p.number)
+            .collect()
+    }
+
     /// Fast O(1) grid hit-testing for Diamond Art, fallback to polygon test
     pub fn find_region_at_world_point(&self, world_pt: Point) -> Option<usize> {
         let total_regions = self.artwork.regions.len();

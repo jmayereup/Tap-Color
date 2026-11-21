@@ -242,6 +242,9 @@ class TapColorApp {
     this.viewportHeight = 0;
     this.isConverting = false;
     this._saveInFlight = null;
+    this._visiblePaletteSig = null;
+    this._lastPaletteVisibilitySync = 0;
+    this._allColorsCompleted = false;
 
     // Multi-touch & touchscreen controls
     this.touchPinchDist = 0;
@@ -899,6 +902,7 @@ class TapColorApp {
   startRenderLoop() {
     if (this.renderRafId) return;
     const modalGallery = document.getElementById('modal-gallery');
+    let wasRendering = false;
     const loop = (timestamp) => {
       const galleryOpen = modalGallery && !modalGallery.classList.contains('hidden');
       if (this.controller && !galleryOpen) {
@@ -907,6 +911,15 @@ class TapColorApp {
           : true;
         if (shouldRender) {
           this.controller.render(timestamp);
+          if (timestamp - this._lastPaletteVisibilitySync >= 80) {
+            this._lastPaletteVisibilitySync = timestamp;
+            this.syncVisiblePalette();
+          }
+          wasRendering = true;
+        } else if (wasRendering) {
+          wasRendering = false;
+          this._lastPaletteVisibilitySync = timestamp;
+          this.syncVisiblePalette();
         }
       }
       this.renderRafId = requestAnimationFrame(loop);
@@ -1969,6 +1982,14 @@ class TapColorApp {
 
     this.refreshPaletteUI();
 
+    // If a color just completed, prefer auto-selecting an unfilled number currently visible on screen
+    if (res.color_completed && !res.artwork_completed) {
+      const visibleNums = this.getVisibleUnfilledNumbers();
+      if (visibleNums && visibleNums.length > 0 && !visibleNums.includes(this.activeNumber)) {
+        this.selectNumber(visibleNums[0]);
+      }
+    }
+
     // Persist coloring progress automatically to IndexedDB
     this.triggerAutosave();
 
@@ -2075,6 +2096,64 @@ class TapColorApp {
     });
   }
 
+  getVisibleUnfilledNumbers() {
+    if (!this.controller || typeof this.controller.get_visible_unfilled_numbers_json !== 'function') {
+      return null;
+    }
+    try {
+      const parsed = JSON.parse(this.controller.get_visible_unfilled_numbers_json());
+      return Array.isArray(parsed) ? parsed : null;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  syncVisiblePalette(force = false) {
+    const visibleNums = this.getVisibleUnfilledNumbers();
+    if (!visibleNums) return;
+
+    const track = document.getElementById('palette-track');
+    if (!track) return;
+
+    const sig = `${this._allColorsCompleted ? '1' : '0'}:${visibleNums.join(',')}`;
+    if (!force && this._visiblePaletteSig === sig) return;
+    this._visiblePaletteSig = sig;
+
+    const visibleSet = new Set(visibleNums);
+    const items = track.querySelectorAll('.palette-item');
+    items.forEach(el => {
+      const num = parseInt(el.dataset.number, 10);
+      const isVisible = visibleSet.has(num);
+      el.hidden = !isVisible;
+      el.classList.toggle('palette-item--hidden', !isVisible);
+      el.setAttribute('aria-hidden', isVisible ? 'false' : 'true');
+    });
+
+    let emptyHint = track.querySelector('.palette-empty-hint');
+    if (visibleSet.size === 0 && items.length > 0) {
+      if (!emptyHint) {
+        emptyHint = document.createElement('div');
+        emptyHint.className = 'palette-empty-hint';
+        track.appendChild(emptyHint);
+      }
+      if (this._allColorsCompleted) {
+        emptyHint.innerHTML = '<span>✨ All colors complete!</span>';
+      } else {
+        emptyHint.innerHTML = '<span>No unfilled numbers in view</span><button type="button" class="palette-empty-fit-btn">Fit</button>';
+        const fitBtn = emptyHint.querySelector('.palette-empty-fit-btn');
+        if (fitBtn) {
+          fitBtn.addEventListener('click', () => {
+            if (this.controller && typeof this.controller.fit_to_screen === 'function') {
+              this.controller.fit_to_screen();
+            }
+          });
+        }
+      }
+    } else if (emptyHint) {
+      emptyHint.remove();
+    }
+  }
+
   refreshPaletteUI() {
     if (!this.controller) return;
     let palette, info;
@@ -2085,15 +2164,17 @@ class TapColorApp {
       return;
     }
     if (info.active_number) this.activeNumber = info.active_number;
+    this._allColorsCompleted = palette.length > 0 && palette.every(p => p.is_completed);
 
     const track = document.getElementById('palette-track');
     if (!track) return;
 
+    const existingItems = track.querySelectorAll('.palette-item');
     const sig = `${info.id || ''}:${palette.map(p => p.number).join(',')}`;
-    if (this._paletteSig === sig && track.children.length === palette.length) {
+    if (this._paletteSig === sig && existingItems.length === palette.length) {
       for (let i = 0; i < palette.length; i++) {
         const item = palette[i];
-        const el = track.children[i];
+        const el = existingItems[i];
         const isActive = item.number === this.activeNumber;
         el.classList.toggle('active', isActive);
         el.classList.toggle('completed', !!item.is_completed);
@@ -2104,10 +2185,12 @@ class TapColorApp {
           countEl.textContent = item.is_completed ? '✓' : String(remaining);
         }
       }
+      this.syncVisiblePalette(true);
       return;
     }
 
     this._paletteSig = sig;
+    this._visiblePaletteSig = null;
     track.innerHTML = '';
 
     palette.forEach(item => {
@@ -2143,6 +2226,8 @@ class TapColorApp {
 
       track.appendChild(el);
     });
+
+    this.syncVisiblePalette(true);
   }
 
   getContrastTextColor(hex) {
@@ -5402,6 +5487,110 @@ class FallbackJsController {
 
   get_palette_json() {
     return JSON.stringify(this.artwork.palette);
+  }
+
+  _segmentIntersectsRect(x1, y1, x2, y2, minX, minY, maxX, maxY) {
+    const dx = x2 - x1;
+    const dy = y2 - y1;
+    let t0 = 0;
+    let t1 = 1;
+    const checks = [
+      [-dx, x1 - minX],
+      [dx, maxX - x1],
+      [-dy, y1 - minY],
+      [dy, maxY - y1],
+    ];
+    for (const [p, q] of checks) {
+      if (Math.abs(p) < 1e-12) {
+        if (q < 0) return false;
+      } else {
+        const r = q / p;
+        if (p < 0) {
+          if (r > t1) return false;
+          if (r > t0) t0 = r;
+        } else {
+          if (r < t0) return false;
+          if (r < t1) t1 = r;
+        }
+      }
+    }
+    return t0 <= t1;
+  }
+
+  _regionIntersectsRect(region, minX, minY, maxX, maxY, cxView, cyView) {
+    const cx = region.centroid.x;
+    const cy = region.centroid.y;
+    if (cx >= minX && cx <= maxX && cy >= minY && cy <= maxY) return true;
+
+    const poly = region.polygon;
+    const n = poly.length;
+    for (let i = 0; i < n; i++) {
+      const pt = poly[i];
+      if (pt.x >= minX && pt.x <= maxX && pt.y >= minY && pt.y <= maxY) return true;
+    }
+    for (let i = 0; i < n; i++) {
+      const p1 = poly[i];
+      const p2 = poly[(i + 1) % n];
+      if (this._segmentIntersectsRect(p1.x, p1.y, p2.x, p2.y, minX, minY, maxX, maxY)) return true;
+    }
+    if (!this.pointInPoly(cxView, cyView, poly)) return false;
+    if (region.holes) {
+      for (const hole of region.holes) {
+        if (this.pointInPoly(cxView, cyView, hole)) return false;
+      }
+    }
+    return true;
+  }
+
+  get_visible_unfilled_numbers_json() {
+    const panX = this.lastTime > 0 ? this.panX : this.targetPanX;
+    const panY = this.lastTime > 0 ? this.panY : this.targetPanY;
+    const scale = this.lastTime > 0 ? this.scale : this.targetScale;
+    const w = this.viewportW;
+    const h = this.viewportH;
+
+    if (scale <= 0 || w <= 0 || h <= 0) {
+      return JSON.stringify(this.artwork.palette.filter(p => !p.is_completed).map(p => p.number));
+    }
+
+    const incompleteTotal = this.artwork.palette.filter(p => !p.is_completed).length;
+    if (incompleteTotal === 0) return '[]';
+
+    const viewMinX = -panX / scale;
+    const viewMaxX = (w - panX) / scale;
+    const viewMinY = -panY / scale;
+    const viewMaxY = (h - panY) / scale;
+    const cxView = (viewMinX + viewMaxX) * 0.5;
+    const cyView = (viewMinY + viewMaxY) * 0.5;
+
+    const seen = new Set();
+    const isDiamond = this.is_diamond_mode;
+
+    for (const region of this.artwork.regions) {
+      if (region.is_filled) continue;
+      if (seen.has(region.number)) continue;
+      if (!region.polygon || region.polygon.length < 3) continue;
+
+      if (region._bbox) {
+        const b = region._bbox;
+        if (b[2] < viewMinX || b[0] > viewMaxX || b[3] < viewMinY || b[1] > viewMaxY) continue;
+      }
+
+      const isVisible = isDiamond
+        ? true
+        : this._regionIntersectsRect(region, viewMinX, viewMinY, viewMaxX, viewMaxY, cxView, cyView);
+
+      if (isVisible) {
+        seen.add(region.number);
+        if (seen.size >= incompleteTotal) break;
+      }
+    }
+
+    return JSON.stringify(
+      this.artwork.palette
+        .filter(p => !p.is_completed && seen.has(p.number))
+        .map(p => p.number)
+    );
   }
 
   get_artwork_info_json() {

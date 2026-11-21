@@ -462,7 +462,37 @@ body {
   gap: 14px;
   margin: 0 auto;
   width: max-content;
+  min-height: 74px;
   padding: 2px 8px;
+}
+
+.palette-empty-hint {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-muted);
+  padding: 0 8px;
+  white-space: nowrap;
+}
+
+.palette-empty-fit-btn {
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-surface-elevated);
+  color: var(--accent-primary);
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 6px 12px;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.palette-empty-fit-btn:hover {
+  background: #F4ECE0;
+  border-color: var(--accent-primary);
 }
 
 /* Circular Color Swatch Item */
@@ -474,6 +504,11 @@ body {
   cursor: pointer;
   position: relative;
   transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.palette-item.palette-item--hidden,
+.palette-item[hidden] {
+  display: none;
 }
 
 .palette-item:hover {
@@ -3482,6 +3517,10 @@ input[type="range"].pbn-pieces-slider:focus-visible::-moz-range-thumb {
   .palette-container {
     padding: 8px 10px;
     padding-bottom: calc(8px + env(safe-area-inset-bottom, 0px));
+  }
+
+  .palette-track {
+    min-height: 62px;
   }
 
   .swatch-circle {
