@@ -6,51 +6,64 @@ class SoundController {
   constructor() {
     this.ctx = null;
     this.enabled = true;
+    this.lastTapTime = 0;
     // Pentatonic scale frequencies for harmonic satisfaction
     this.scale = [261.63, 293.66, 329.63, 392.00, 440.00, 523.25, 587.33, 659.25, 783.99, 880.00, 1046.50];
   }
 
   ensureContext() {
-    if (!this.ctx) {
-      const AudioCtx = window.AudioContext || window.webkitAudioContext;
-      if (AudioCtx) this.ctx = new AudioCtx();
-    }
-    if (this.ctx && this.ctx.state === 'suspended') {
-      this.ctx.resume();
+    try {
+      if (!this.ctx) {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (AudioCtx) this.ctx = new AudioCtx();
+      }
+      if (this.ctx && this.ctx.state === 'suspended') {
+        this.ctx.resume().catch(() => {});
+      }
+    } catch (_) {
+      this.ctx = null;
     }
   }
 
   playTap(colorIndex = 1) {
     if (!this.enabled) return;
+    const now = performance.now();
+    if (now - this.lastTapTime < 35) return;
+    this.lastTapTime = now;
     this.ensureContext();
     if (!this.ctx) return;
 
-    const freq = this.scale[(colorIndex - 1) % this.scale.length];
+    const idx = Math.max(0, (Number(colorIndex) || 1) - 1) % this.scale.length;
+    const freq = this.scale[idx];
+    const t = this.ctx.currentTime;
     const osc = this.ctx.createOscillator();
     const gain = this.ctx.createGain();
 
     osc.type = 'sine';
-    osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
-    osc.frequency.exponentialRampToValueAtTime(freq * 1.02, this.ctx.currentTime + 0.15);
+    osc.frequency.setValueAtTime(freq, t);
+    osc.frequency.exponentialRampToValueAtTime(freq * 1.02, t + 0.15);
 
-    gain.gain.setValueAtTime(0.2, this.ctx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.35);
+    gain.gain.setValueAtTime(0.2, t);
+    gain.gain.exponentialRampToValueAtTime(0.001, t + 0.35);
 
     osc.connect(gain);
     gain.connect(this.ctx.destination);
 
-    osc.start();
-    osc.stop(this.ctx.currentTime + 0.36);
+    osc.start(t);
+    osc.stop(t + 0.36);
   }
 
   playDiamondSnap(colorIndex = 1) {
     if (!this.enabled) return;
+    const now = performance.now();
+    if (now - this.lastTapTime < 35) return;
+    this.lastTapTime = now;
     this.ensureContext();
     if (!this.ctx) return;
 
     const t = this.ctx.currentTime;
-    // High-frequency crystal snap + harmonic chime
-    const freq = this.scale[(colorIndex - 1) % this.scale.length] * 2.2;
+    const idx = Math.max(0, (Number(colorIndex) || 1) - 1) % this.scale.length;
+    const freq = this.scale[idx] * 2.2;
     const osc = this.ctx.createOscillator();
     const gain = this.ctx.createGain();
 
@@ -141,22 +154,23 @@ class SoundController {
     this.ensureContext();
     if (!this.ctx) return;
 
+    const base = this.ctx.currentTime;
     const chords = [523.25, 659.25, 783.99, 1046.50]; // C Major
     chords.forEach((freq, idx) => {
-      setTimeout(() => {
-        const osc = this.ctx.createOscillator();
-        const gain = this.ctx.createGain();
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+      const t = base + idx * 0.075;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(freq, t);
 
-        gain.gain.setValueAtTime(0.18, this.ctx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.5);
+      gain.gain.setValueAtTime(0.0001, t);
+      gain.gain.linearRampToValueAtTime(0.18, t + 0.01);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.5);
 
-        osc.connect(gain);
-        gain.connect(this.ctx.destination);
-        osc.start();
-        osc.stop(this.ctx.currentTime + 0.51);
-      }, idx * 75);
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      osc.start(t);
+      osc.stop(t + 0.51);
     });
   }
 
@@ -165,283 +179,34 @@ class SoundController {
     this.ensureContext();
     if (!this.ctx) return;
 
+    const base = this.ctx.currentTime;
     const notes = [392.00, 523.25, 659.25, 783.99, 1046.50];
     notes.forEach((freq, idx) => {
-      setTimeout(() => {
-        const osc = this.ctx.createOscillator();
-        const gain = this.ctx.createGain();
-        osc.type = 'triangle';
-        osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+      const t = base + idx * 0.11;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(freq, t);
 
-        gain.gain.setValueAtTime(0.25, this.ctx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.9);
+      gain.gain.setValueAtTime(0.0001, t);
+      gain.gain.linearRampToValueAtTime(0.25, t + 0.01);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.9);
 
-        osc.connect(gain);
-        gain.connect(this.ctx.destination);
-        osc.start();
-        osc.stop(this.ctx.currentTime + 0.95);
-      }, idx * 110);
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      osc.start(t);
+      osc.stop(t + 0.95);
     });
   }
 }
 
-// Client-side diamond art grid generators for instant thumbnails and JS fallback
-const DIAMOND_PALETTES = {
-  starry_night_diamond: [
-    { num: 1, hex: "#0B1335", name: "Midnight Ultramarine" },
-    { num: 2, hex: "#15224D", name: "Deep Cobalt" },
-    { num: 3, hex: "#233973", name: "Indigo Whirlpool" },
-    { num: 4, hex: "#2E51A2", name: "Azure Swirl" },
-    { num: 5, hex: "#4880D6", name: "Cerulean Wave" },
-    { num: 6, hex: "#6BA8F2", name: "Cyan Starlight" },
-    { num: 7, hex: "#F7DF79", name: "Pale Starlight" },
-    { num: 8, hex: "#F9CA24", name: "Radiant Golden Moon" },
-    { num: 9, hex: "#F0932B", name: "Amber Glow" },
-    { num: 10, hex: "#0D2B22", name: "Dark Cypress Pine" },
-    { num: 11, hex: "#184D3B", name: "Pine Foliage Green" },
-    { num: 12, hex: "#0A1128", name: "Deep River Shadow" },
-  ],
-  peacock_diamond: [
-    { num: 1, hex: "#091B33", name: "Deep Navy Night" },
-    { num: 2, hex: "#10355E", name: "Midnight Sapphire" },
-    { num: 3, hex: "#0A527A", name: "Royal Blue" },
-    { num: 4, hex: "#0D7399", name: "Electric Cerulean" },
-    { num: 5, hex: "#00A896", name: "Emerald Turquoise" },
-    { num: 6, hex: "#02C39A", name: "Vivid Mint Jade" },
-    { num: 7, hex: "#05668D", name: "Deep Teal Plumage" },
-    { num: 8, hex: "#F4A261", name: "Warm Topaz" },
-    { num: 9, hex: "#E76F51", name: "Coral Amber" },
-    { num: 10, hex: "#E63946", name: "Ruby Crown" },
-    { num: 11, hex: "#F1FAEE", name: "Pearl Crest" },
-    { num: 12, hex: "#F72585", name: "Amethyst Magenta" },
-  ],
-  sakura_pagoda_diamond: [
-    { num: 1, hex: "#FF7675", name: "Sunset Coral" },
-    { num: 2, hex: "#FAB1A0", name: "Peach Horizon" },
-    { num: 3, hex: "#FFEAA7", name: "Golden Evening Sun" },
-    { num: 4, hex: "#DFE6E9", name: "Fuji Snow Crest" },
-    { num: 5, hex: "#74B9FF", name: "Alpine Ice Shadow" },
-    { num: 6, hex: "#2C3E50", name: "Pagoda & Mountain Silhouette" },
-    { num: 7, hex: "#D63031", name: "Vermilion Pagoda Accent" },
-    { num: 8, hex: "#FD79A8", name: "Vibrant Sakura Blossom" },
-    { num: 9, hex: "#FFB8B8", name: "Soft Petal Blush" },
-    { num: 10, hex: "#6C5CE7", name: "Twilight Lake Reflection" },
-    { num: 11, hex: "#2D3436", name: "Ancient Pine Trunk" },
-    { num: 12, hex: "#00B894", name: "Spring Moss Jade" },
-  ],
-  cosmic_wolf_diamond: [
-    { num: 1, hex: "#08071A", name: "Void Obsidian" },
-    { num: 2, hex: "#1E113E", name: "Cosmic Violet" },
-    { num: 3, hex: "#3D1C68", name: "Twilight Amethyst" },
-    { num: 4, hex: "#00F5D4", name: "Aurora Neon Cyan" },
-    { num: 5, hex: "#70E000", name: "Aurora Electric Lime" },
-    { num: 6, hex: "#38B000", name: "Deep Emerald Aurora" },
-    { num: 7, hex: "#F72585", name: "Solar Flare Magenta" },
-    { num: 8, hex: "#FFFFFF", name: "Pure Star Sparkle" },
-    { num: 9, hex: "#CAF0F8", name: "Moon Silver" },
-    { num: 10, hex: "#3F37C9", name: "Wolf Fur Shadow" },
-    { num: 11, hex: "#4895EF", name: "Wolf Fur Rimlight" },
-    { num: 12, hex: "#14142B", name: "Cliff Ridge Rock" },
-  ],
-  lotus_koi_diamond: [
-    { num: 1, hex: "#06283D", name: "Abyssal Pond Deep" },
-    { num: 2, hex: "#144272", name: "Sapphire Ripple" },
-    { num: 3, hex: "#205295", name: "Clear Spring Blue" },
-    { num: 4, hex: "#2C74B3", name: "Sunlit Water Highlight" },
-    { num: 5, hex: "#006466", name: "Deep Lotus Pad Green" },
-    { num: 6, hex: "#2A9D8F", name: "Emerald Lily Pad" },
-    { num: 7, hex: "#E76F51", name: "Scarlet Koi Scales" },
-    { num: 8, hex: "#F4A261", name: "Golden Topaz Koi" },
-    { num: 9, hex: "#FFD166", name: "Sunbeam Fin Scales" },
-    { num: 10, hex: "#FFFFFF", name: "Pearl Koi Belly" },
-    { num: 11, hex: "#FF70A6", name: "Sacred Lotus Petal" },
-    { num: 12, hex: "#FFEAA7", name: "Golden Stamen Heart" },
-  ],
-};
-
-function getDiamondArtGrid(id, N = 28) {
-  const grid = Array.from({ length: N }, () => Array(N).fill(1));
-
-  if (id === 'starry_night_diamond') {
-    for (let r = 0; r < N; r++) {
-      for (let c = 0; c < N; c++) {
-        const u = c / (N - 1);
-        const v = r / (N - 1);
-        let col = v < 0.25 ? (c % 3 === 0 ? 2 : 1) : (v < 0.6 ? 2 : (v < 0.72 ? 1 : 12));
-        const w1 = Math.sin(u * Math.PI * 2.2 + 0.5) * 0.15 + 0.38;
-        const dw1 = Math.abs(v - w1);
-        if (dw1 < 0.08 && c > 5 && v < 0.68) col = dw1 < 0.03 ? 5 : (dw1 < 0.055 ? 4 : 3);
-        const w2 = Math.cos(u * Math.PI * 1.8 - 0.2) * 0.12 + 0.22;
-        const dw2 = Math.abs(v - w2);
-        if (dw2 < 0.06 && c > 7 && v < 0.6) col = dw2 < 0.025 ? 4 : 3;
-        const dMoon = Math.hypot(r - 4.5, c - 22.5);
-        if (dMoon <= 3.8) {
-          col = dMoon <= 2.2 ? (Math.hypot(r - 3.8, c - 21.2) < 1.6 ? 7 : 8) : (dMoon <= 3.0 ? 7 : 6);
-        }
-        const dS1 = Math.hypot(r - 6, c - 9);
-        if (dS1 < 3.2) col = dS1 < 0.9 ? 8 : (dS1 < 1.6 ? 7 : (dS1 < 2.3 ? 6 : 5));
-        const dS2 = Math.hypot(r - 11, c - 16);
-        if (dS2 < 2.6) col = dS2 < 0.8 ? 8 : (dS2 < 1.5 ? 7 : 6);
-        const dS3 = Math.hypot(r - 3, c - 14);
-        if (dS3 < 1.8) col = dS3 < 0.8 ? 8 : 6;
-        const dS4 = Math.hypot(r - 8, c - 2);
-        if (dS4 < 1.8) col = dS4 < 0.8 ? 8 : 7;
-        const h1 = 18 + Math.sin(c * 0.4) * 1.5;
-        if (r >= h1 && r < 23) {
-          col = r > 19 ? 3 : 2;
-          if (r === 20 && (c === 11 || c === 12 || c === 18 || c === 21)) col = 9;
-          if (r === 21 && (c === 11 || c === 12 || c === 17 || c === 18 || c === 20 || c === 21)) col = 8;
-          if (c === 14 && r >= 16 && r <= 20) col = 10;
-        }
-        if (r >= 23) {
-          col = (r % 2 === 0) ? 12 : 1;
-          if (Math.abs(c - 9) <= 1 && (r === 23 || r === 25)) col = 9;
-          if (Math.abs(c - 16) <= 1 && (r === 24 || r === 26)) col = 9;
-          if (Math.abs(c - 22) <= 1 && (r === 23 || r === 26)) col = 8;
-          if (c > 24 && r === 25) col = 7;
-        }
-        const cw = (r - 2) * 0.17;
-        const cc = 3.5 + Math.sin(r * 0.3) * 0.5;
-        if (r >= 3 && Math.abs(c - cc) <= cw) col = (r + c) % 3 === 0 ? 11 : 10;
-        grid[r][c] = col;
-      }
-    }
-  } else if (id === 'peacock_diamond') {
-    const ocelli = [
-      { r: 7, c: 5 }, { r: 6, c: 11 }, { r: 6, c: 17 }, { r: 7, c: 23 },
-      { r: 12, c: 3 }, { r: 12, c: 9 }, { r: 12, c: 19 }, { r: 12, c: 25 },
-      { r: 17, c: 2 }, { r: 17, c: 7 }, { r: 18, c: 21 }, { r: 17, c: 26 },
-      { r: 23, c: 4 }, { r: 24, c: 9 }, { r: 24, c: 19 }, { r: 23, c: 24 },
-    ];
-    for (let r = 0; r < N; r++) {
-      for (let c = 0; c < N; c++) {
-        let col = (r + c) % 5 === 0 ? 2 : 1;
-        const angle = Math.atan2(r - 16, c - 14);
-        const dist = Math.hypot(r - 16, c - 14);
-        if (dist > 4 && dist < 15) {
-          col = Math.abs(Math.sin(angle * 8)) > 0.4 ? 5 : 7;
-          if (dist > 9 && (r + c) % 2 === 0) col = 6;
-        }
-        for (const oc of ocelli) {
-          const d = Math.hypot(r - oc.r, c - oc.c);
-          if (d < 2.2) col = d < 0.6 ? 11 : (d < 1.1 ? 10 : (d < 1.6 ? 8 : 6));
-        }
-        const dHead = Math.hypot(r - 6, c - 14);
-        if (dHead <= 1.8) {
-          col = (c === 14 && r === 6) ? 11 : 4;
-          if (c === 15 && r === 6) col = 10;
-        }
-        if ((r === 3 && (c === 13 || c === 14 || c === 15)) || (r === 4 && (c === 13 || c === 14 || c === 15))) {
-          col = r === 3 ? 10 : 6;
-        }
-        const neckC = 14 + Math.sin((r - 8) * 0.4) * 0.8;
-        if (r >= 8 && r <= 13 && Math.abs(c - neckC) <= 1.3) col = c <= neckC ? 4 : 3;
-        const bodyW = 2.2 + (r - 14) * 0.2;
-        if (r >= 14 && r <= 22 && Math.abs(c - 14.5) <= bodyW) {
-          col = (c === 14 || c === 15) ? 4 : 3;
-          if (r > 18) col = (r + c) % 2 === 0 ? 5 : 7;
-        }
-        if (r === 25 && c >= 8 && c <= 21) col = 8;
-        if (r === 26 && c >= 9 && c <= 20) col = 9;
-        grid[r][c] = col;
-      }
-    }
-  } else if (id === 'sakura_pagoda_diamond') {
-    const roofTiers = [{ r: 9, w: 2 }, { r: 12, w: 2.8 }, { r: 15, w: 3.4 }, { r: 18, w: 4.0 }, { r: 21, w: 4.6 }];
-    for (let r = 0; r < N; r++) {
-      for (let c = 0; c < N; c++) {
-        let col = r < 7 ? 3 : (r < 14 ? 2 : (r < 19 ? 1 : 10));
-        const dSun = Math.hypot(r - 8.5, c - 19.5);
-        if (dSun <= 3.8) col = dSun <= 2.4 ? 3 : 2;
-        if (r >= 8 && r <= 19) {
-          const slopeW = (r - 8) * 0.95;
-          if (Math.abs(c - 19.5) <= slopeW) {
-            col = r <= 11 ? (c < 19.5 ? 4 : 5) : (r <= 13 ? ((r + c) % 2 === 0 ? 4 : 6) : 6);
-          }
-        }
-        if (r >= 20) {
-          col = r % 2 === 0 ? 10 : 1;
-          if (c >= 17 && c <= 22) col = r % 2 === 0 ? 2 : 3;
-          if (c >= 4 && c <= 9 && r <= 24) col = 6;
-        }
-        if (r >= 7 && r <= 8 && (c === 6 || c === 7)) col = 7;
-        for (const tier of roofTiers) {
-          if (r === tier.r && Math.abs(c - 6.5) <= tier.w) col = 7;
-          if (r === tier.r + 1 && Math.abs(c - 6.5) <= tier.w - 0.7) col = 6;
-          if (r === tier.r + 2 && Math.abs(c - 6.5) <= tier.w - 1.2) col = (r + c) % 2 === 0 ? 7 : 6;
-        }
-        if (r >= 22 && r <= 24 && Math.abs(c - 6.5) <= 3.8) col = 6;
-        if (r >= 25 && c <= 12) col = r === 27 ? 11 : 12;
-        if (Math.abs(r - (2 + (27 - c) * 0.35)) <= 1.2 && c >= 16) col = 11;
-        if (Math.hypot(r - 3, c - 24) < 2.8 || Math.hypot(r - 5, c - 20) < 2.5 || Math.hypot(r - 2, c - 18) < 2.2) {
-          col = (r + c) % 3 === 0 ? 9 : 8;
-        }
-        if (Math.hypot(r - 24, c - 23) < 3.2 || Math.hypot(r - 26, c - 26) < 2.8) col = (r + c) % 2 === 0 ? 8 : 9;
-        grid[r][c] = col;
-      }
-    }
-  } else if (id === 'cosmic_wolf_diamond') {
-    for (let r = 0; r < N; r++) {
-      for (let c = 0; c < N; c++) {
-        let col = r < 6 ? 2 : (r < 13 ? (c % 2 === 0 ? 2 : 1) : 1);
-        const dMoon = Math.hypot(r - 5, c - 22);
-        if (dMoon <= 3.8) col = dMoon <= 2.2 ? 8 : (dMoon <= 3.0 ? 9 : 3);
-        const a1 = 3 + Math.sin(c * 0.3) * 2.2;
-        if (Math.abs(r - a1) <= 1.8 && (c < 18 || r > 8)) col = Math.abs(r - a1) <= 0.8 ? 5 : (r > a1 ? 6 : 4);
-        const a2 = 7 + Math.sin(c * 0.25 + 1.2) * 2.0;
-        if (Math.abs(r - a2) <= 1.6 && c < 19) col = Math.abs(r - a2) <= 0.7 ? 4 : 7;
-        if ((r === 1 && c === 4) || (r === 2 && c === 12) || (r === 10 && c === 2) || (r === 11 && c === 26) || (r === 8 && c === 14)) col = 8;
-        const cliff = 10 + (27 - r) * 0.6;
-        if (c >= cliff && r >= 19) col = Math.abs(c - cliff) < 1.0 ? 10 : 12;
-        if ((r === 11 && (c === 15 || c === 16)) || (r === 12 && (c === 13 || c === 14 || c === 15))) col = (c === 16 || r === 11) ? 11 : 10;
-        if (r === 13 && c >= 11 && c <= 14) col = (c === 11 || c === 14) ? 11 : 10;
-        if (r >= 14 && r <= 15 && c >= 10 && c <= 14) col = (c === 10 || c === 14) ? 11 : 10;
-        if (r >= 16 && r <= 18 && c >= 9 && c <= 15) col = (c === 9 || c === 15) ? 11 : 10;
-        if (r >= 19 && r <= 21 && c >= 10 && c <= 16) col = c === 10 ? 11 : 10;
-        if (r >= 18 && r <= 22 && (c === 8 || c === 9)) col = c === 8 ? 11 : 10;
-        grid[r][c] = col;
-      }
-    }
-  } else if (id === 'lotus_koi_diamond') {
-    const koi1 = [
-      { r: 8, c: 8, t: 8 }, { r: 9, c: 7, t: 7 }, { r: 10, c: 7, t: 8 },
-      { r: 11, c: 6, t: 10 }, { r: 12, c: 6, t: 7 }, { r: 13, c: 6, t: 8 },
-      { r: 14, c: 6, t: 7 }, { r: 15, c: 6, t: 8 }, { r: 16, c: 7, t: 10 },
-      { r: 17, c: 7, t: 8 }, { r: 18, c: 8, t: 7 }, { r: 19, c: 9, t: 8 },
-      { r: 20, c: 10, t: 9 }, { r: 21, c: 11, t: 9 },
-    ];
-    const koi2 = [
-      { r: 19, c: 20, t: 8 }, { r: 18, c: 21, t: 7 }, { r: 17, c: 21, t: 8 },
-      { r: 16, c: 22, t: 10 }, { r: 15, c: 22, t: 7 }, { r: 14, c: 22, t: 8 },
-      { r: 13, c: 22, t: 7 }, { r: 12, c: 22, t: 8 }, { r: 11, c: 21, t: 10 },
-      { r: 10, c: 21, t: 8 }, { r: 9, c: 20, t: 7 }, { r: 8, c: 19, t: 8 },
-      { r: 7, c: 18, t: 9 }, { r: 6, c: 17, t: 9 },
-    ];
-    for (let r = 0; r < N; r++) {
-      for (let c = 0; c < N; c++) {
-        const dCenter = Math.hypot(r - 14, c - 14);
-        const rip = Math.sin(dCenter * 0.8);
-        let col = rip > 0.4 ? 3 : (rip > -0.2 ? 2 : 1);
-        const dP1 = Math.hypot(r - 4, c - 5);
-        if (dP1 <= 3.8 && !(r === 4 && c <= 5)) col = dP1 <= 2.8 ? 6 : 5;
-        const dP2 = Math.hypot(r - 23, c - 22);
-        if (dP2 <= 3.6 && !(c === 22 && r >= 23)) col = dP2 <= 2.6 ? 6 : 5;
-        for (const pt of koi1) {
-          if (Math.hypot(r - pt.r, c - pt.c) < 1.3) col = pt.t;
-        }
-        if ((r === 10 && c === 5) || (r === 11 && c === 5) || (r === 15 && c === 5) || (r === 16 && c === 5)) col = 9;
-        for (const pt of koi2) {
-          if (Math.hypot(r - pt.r, c - pt.c) < 1.3) col = pt.t;
-        }
-        if ((r === 17 && c === 23) || (r === 18 && c === 23) || (r === 12 && c === 23) || (r === 13 && c === 23)) col = 9;
-        const dLotus = Math.hypot(r - 14, c - 14);
-        if (dLotus <= 3.2) col = dLotus <= 1.0 ? 12 : (dLotus <= 2.2 ? ((r + c) % 2 === 0 ? 11 : 10) : 11);
-        grid[r][c] = col;
-      }
-    }
-  }
-
-  return grid;
+function escapeHtml(str) {
+  return String(str ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
 }
 
 class TapColorApp {
@@ -457,14 +222,24 @@ class TapColorApp {
     this.lastPointerX = 0;
     this.lastPointerY = 0;
     this.dragDistance = 0;
-    this.initialPinchDistance = 0;
     this.toolMode = 'pen'; // 'pen', 'erase', or 'pan'
     this.highlightMatching = false; // Matching tiles are not highlighted by default
     this.currentArtworkId = 'fluffy_cow_pbn';
     this.activeNumber = 1;
-    this.hintCount = 5;
     this.activeCategory = 'classic'; // 'classic', 'diamond', 'saved', 'custom'
     this.pbnMaxPiecesFilter = null;
+
+    // Async generation tokens & timers
+    this.loadGeneration = 0;
+    this.lineArtGeneration = 0;
+    this.victoryTimeout = null;
+    this.dialogFocusTimeout = null;
+    this.savedBlobUrls = [];
+    this.canvasRect = null;
+    this.viewportWidth = 0;
+    this.viewportHeight = 0;
+    this.isConverting = false;
+    this._saveInFlight = null;
 
     // Multi-touch & touchscreen controls
     this.touchPinchDist = 0;
@@ -511,7 +286,7 @@ class TapColorApp {
         desc: 'Gentle fluffy highland cow calf surrounded by meadow wildflowers and rustic wooden pasture',
         defaultVariantId: 'fluffy_cow_diamond_120',
         selectedVariantId: 'fluffy_cow_diamond_120',
-        originalAsset: 'assets/fluffy-cow-3.jpeg',
+        originalAsset: 'assets/paint_by_number/fluffy-cow-3.jpeg',
         thumbnailUrl: 'assets/converted/fluffy_cow_diamond_120_thumb.png',
         variants: [
           { id: 'fluffy_cow_diamond_80', label: '80×80', name: 'Cozy Canvas', pieces: 6400, colors: 18, grid: 80, jsonFile: 'assets/converted/fluffy_cow_diamond_80.json', thumbnailUrl: 'assets/converted/fluffy_cow_diamond_80_thumb.png' },
@@ -528,7 +303,7 @@ class TapColorApp {
         desc: 'Vibrant hummingbird sipping sweet nectar among blooming country garden flora',
         defaultVariantId: 'hummingbird_diamond_120',
         selectedVariantId: 'hummingbird_diamond_120',
-        originalAsset: 'assets/hummingbird.jpeg',
+        originalAsset: 'assets/diamond_art_only/hummingbird.jpeg',
         thumbnailUrl: 'assets/converted/hummingbird_diamond_120_thumb.png',
         variants: [
           { id: 'hummingbird_diamond_80', label: '80×80', name: 'Cozy Canvas', pieces: 6400, colors: 18, grid: 80, jsonFile: 'assets/converted/hummingbird_diamond_80.json', thumbnailUrl: 'assets/converted/hummingbird_diamond_80_thumb.png' },
@@ -545,7 +320,7 @@ class TapColorApp {
         desc: 'Classic red country barn with silo, split-rail fence, and sunflowers under sunny blue sky',
         defaultVariantId: 'country_barn_diamond_120',
         selectedVariantId: 'country_barn_diamond_120',
-        originalAsset: 'assets/country_barn.jpeg',
+        originalAsset: 'assets/diamond_art_only/country_barn.jpeg',
         thumbnailUrl: 'assets/converted/country_barn_diamond_120_thumb.png',
         variants: [
           { id: 'country_barn_diamond_80', label: '80×80', name: 'Cozy Canvas', pieces: 6400, colors: 18, grid: 80, jsonFile: 'assets/converted/country_barn_diamond_80.json', thumbnailUrl: 'assets/converted/country_barn_diamond_80_thumb.png' },
@@ -562,7 +337,7 @@ class TapColorApp {
         desc: 'Colorful country rooster greeting the morning sun from a rustic fence post',
         defaultVariantId: 'country_rooster_diamond_120',
         selectedVariantId: 'country_rooster_diamond_120',
-        originalAsset: 'assets/country_rooster.jpeg',
+        originalAsset: 'assets/diamond_art_only/country_rooster.jpeg',
         thumbnailUrl: 'assets/converted/country_rooster_diamond_120_thumb.png',
         variants: [
           { id: 'country_rooster_diamond_80', label: '80×80', name: 'Cozy Canvas', pieces: 6400, colors: 18, grid: 80, jsonFile: 'assets/converted/country_rooster_diamond_80.json', thumbnailUrl: 'assets/converted/country_rooster_diamond_80_thumb.png' },
@@ -579,7 +354,7 @@ class TapColorApp {
         desc: 'Classic turquoise vintage pickup truck filled with harvest pumpkins and sunflowers',
         defaultVariantId: 'country_truck_diamond_120',
         selectedVariantId: 'country_truck_diamond_120',
-        originalAsset: 'assets/country_truck.jpeg',
+        originalAsset: 'assets/diamond_art_only/country_truck.jpeg',
         thumbnailUrl: 'assets/converted/country_truck_diamond_120_thumb.png',
         variants: [
           { id: 'country_truck_diamond_80', label: '80×80', name: 'Cozy Canvas', pieces: 6400, colors: 18, grid: 80, jsonFile: 'assets/converted/country_truck_diamond_80.json', thumbnailUrl: 'assets/converted/country_truck_diamond_80_thumb.png' },
@@ -596,7 +371,7 @@ class TapColorApp {
         desc: 'Adorable golden retriever puppy in a red bandana enjoying a sunny farm morning',
         defaultVariantId: 'country_puppy_diamond_120',
         selectedVariantId: 'country_puppy_diamond_120',
-        originalAsset: 'assets/country_puppy.jpeg',
+        originalAsset: 'assets/diamond_art_only/country_puppy.jpeg',
         thumbnailUrl: 'assets/converted/country_puppy_diamond_120_thumb.png',
         variants: [
           { id: 'country_puppy_diamond_80', label: '80×80', name: 'Cozy Canvas', pieces: 6400, colors: 18, grid: 80, jsonFile: 'assets/converted/country_puppy_diamond_80.json', thumbnailUrl: 'assets/converted/country_puppy_diamond_80_thumb.png' },
@@ -613,7 +388,7 @@ class TapColorApp {
         desc: 'Adorable teacup Yorkshire Terrier puppy with pink bow nestled in vintage porcelain',
         defaultVariantId: 'yorky_teacup_diamond_120',
         selectedVariantId: 'yorky_teacup_diamond_120',
-        originalAsset: 'assets/yorky_teacup.jpeg',
+        originalAsset: 'assets/diamond_art_only/yorky_teacup.jpeg',
         thumbnailUrl: 'assets/converted/yorky_teacup_diamond_120_thumb.png',
         variants: [
           { id: 'yorky_teacup_diamond_80', label: '80×80', name: 'Cozy Canvas', pieces: 6400, colors: 18, grid: 80, jsonFile: 'assets/converted/yorky_teacup_diamond_80.json', thumbnailUrl: 'assets/converted/yorky_teacup_diamond_80_thumb.png' },
@@ -630,7 +405,7 @@ class TapColorApp {
         desc: 'Cheerful Yorkshire Terrier puppy surrounded by blooming pansies and meadow lavender',
         defaultVariantId: 'yorky_garden_diamond_120',
         selectedVariantId: 'yorky_garden_diamond_120',
-        originalAsset: 'assets/yorky_garden.jpeg',
+        originalAsset: 'assets/diamond_art_only/yorky_garden.jpeg',
         thumbnailUrl: 'assets/converted/yorky_garden_diamond_120_thumb.png',
         variants: [
           { id: 'yorky_garden_diamond_80', label: '80×80', name: 'Cozy Canvas', pieces: 6400, colors: 18, grid: 80, jsonFile: 'assets/converted/yorky_garden_diamond_80.json', thumbnailUrl: 'assets/converted/yorky_garden_diamond_80_thumb.png' },
@@ -647,7 +422,7 @@ class TapColorApp {
         desc: 'Sweet Yorkshire Terrier in a cozy red knit sweater among autumn maple leaves and pumpkins',
         defaultVariantId: 'yorky_autumn_diamond_120',
         selectedVariantId: 'yorky_autumn_diamond_120',
-        originalAsset: 'assets/yorky_autumn.jpeg',
+        originalAsset: 'assets/diamond_art_only/yorky_autumn.jpeg',
         thumbnailUrl: 'assets/converted/yorky_autumn_diamond_120_thumb.png',
         variants: [
           { id: 'yorky_autumn_diamond_80', label: '80×80', name: 'Cozy Canvas', pieces: 6400, colors: 18, grid: 80, jsonFile: 'assets/converted/yorky_autumn_diamond_80.json', thumbnailUrl: 'assets/converted/yorky_autumn_diamond_80_thumb.png' },
@@ -664,7 +439,7 @@ class TapColorApp {
         desc: 'Joyful Yorkshire Terrier puppy in a polka dot bandana playing with a ball in buttercups',
         defaultVariantId: 'yorky_playful_diamond_120',
         selectedVariantId: 'yorky_playful_diamond_120',
-        originalAsset: 'assets/yorky_playful.jpeg',
+        originalAsset: 'assets/diamond_art_only/yorky_playful.jpeg',
         thumbnailUrl: 'assets/converted/yorky_playful_diamond_120_thumb.png',
         variants: [
           { id: 'yorky_playful_diamond_80', label: '80×80', name: 'Cozy Canvas', pieces: 6400, colors: 18, grid: 80, jsonFile: 'assets/converted/yorky_playful_diamond_80.json', thumbnailUrl: 'assets/converted/yorky_playful_diamond_80_thumb.png' },
@@ -681,7 +456,7 @@ class TapColorApp {
         desc: 'Classic American farm windmill standing tall above golden wheat fields and prairie sunflowers',
         defaultVariantId: 'rural_windmill_diamond_120',
         selectedVariantId: 'rural_windmill_diamond_120',
-        originalAsset: 'assets/rural_windmill.jpeg',
+        originalAsset: 'assets/diamond_art_only/rural_windmill.jpeg',
         thumbnailUrl: 'assets/converted/rural_windmill_diamond_120_thumb.png',
         variants: [
           { id: 'rural_windmill_diamond_80', label: '80×80', name: 'Cozy Canvas', pieces: 6400, colors: 18, grid: 80, jsonFile: 'assets/converted/rural_windmill_diamond_80.json', thumbnailUrl: 'assets/converted/rural_windmill_diamond_80_thumb.png' },
@@ -698,7 +473,7 @@ class TapColorApp {
         desc: 'Charming general store with wooden porch, rocking chairs, bushel of apples, and hanging lanterns',
         defaultVariantId: 'country_store_diamond_120',
         selectedVariantId: 'country_store_diamond_120',
-        originalAsset: 'assets/country_store.jpeg',
+        originalAsset: 'assets/diamond_art_only/country_store.jpeg',
         thumbnailUrl: 'assets/converted/country_store_diamond_120_thumb.png',
         variants: [
           { id: 'country_store_diamond_80', label: '80×80', name: 'Cozy Canvas', pieces: 6400, colors: 18, grid: 80, jsonFile: 'assets/converted/country_store_diamond_80.json', thumbnailUrl: 'assets/converted/country_store_diamond_80_thumb.png' },
@@ -715,7 +490,7 @@ class TapColorApp {
         desc: 'Loving chestnut farm mare and playful young foal beside a rustic split-rail pasture fence',
         defaultVariantId: 'pasture_horses_diamond_120',
         selectedVariantId: 'pasture_horses_diamond_120',
-        originalAsset: 'assets/pasture_horses.jpeg',
+        originalAsset: 'assets/diamond_art_only/pasture_horses.jpeg',
         thumbnailUrl: 'assets/converted/pasture_horses_diamond_120_thumb.png',
         variants: [
           { id: 'pasture_horses_diamond_80', label: '80×80', name: 'Cozy Canvas', pieces: 6400, colors: 18, grid: 80, jsonFile: 'assets/converted/pasture_horses_diamond_80.json', thumbnailUrl: 'assets/converted/pasture_horses_diamond_80_thumb.png' },
@@ -732,7 +507,7 @@ class TapColorApp {
         desc: 'Classic vintage farm tractor in vibrant green and yellow beside summer cornfields and harvest crates',
         defaultVariantId: 'vintage_tractor_diamond_120',
         selectedVariantId: 'vintage_tractor_diamond_120',
-        originalAsset: 'assets/vintage_tractor.jpeg',
+        originalAsset: 'assets/diamond_art_only/vintage_tractor.jpeg',
         thumbnailUrl: 'assets/converted/vintage_tractor_diamond_120_thumb.png',
         variants: [
           { id: 'vintage_tractor_diamond_80', label: '80×80', name: 'Cozy Canvas', pieces: 6400, colors: 18, grid: 80, jsonFile: 'assets/converted/vintage_tractor_diamond_80.json', thumbnailUrl: 'assets/converted/vintage_tractor_diamond_80_thumb.png' },
@@ -749,7 +524,7 @@ class TapColorApp {
         desc: 'Historic red wooden covered bridge spanning a peaceful babbling stream surrounded by wildflowers',
         defaultVariantId: 'covered_bridge_diamond_120',
         selectedVariantId: 'covered_bridge_diamond_120',
-        originalAsset: 'assets/covered_bridge.jpeg',
+        originalAsset: 'assets/diamond_art_only/covered_bridge.jpeg',
         thumbnailUrl: 'assets/converted/covered_bridge_diamond_120_thumb.png',
         variants: [
           { id: 'covered_bridge_diamond_80', label: '80×80', name: 'Cozy Canvas', pieces: 6400, colors: 18, grid: 80, jsonFile: 'assets/converted/covered_bridge_diamond_80.json', thumbnailUrl: 'assets/converted/covered_bridge_diamond_80_thumb.png' },
@@ -766,7 +541,7 @@ class TapColorApp {
         desc: 'Cozy red fox curled up among autumn leaves, red-capped mushrooms, and meadow wildflowers',
         defaultVariantId: 'autumn_fox_diamond_120',
         selectedVariantId: 'autumn_fox_diamond_120',
-        originalAsset: 'assets/autumn_fox.jpeg',
+        originalAsset: 'assets/diamond_art_only/autumn_fox.jpeg',
         thumbnailUrl: 'assets/converted/autumn_fox_diamond_120_thumb.png',
         variants: [
           { id: 'autumn_fox_diamond_80', label: '80×80', name: 'Cozy Canvas', pieces: 6400, colors: 18, grid: 80, jsonFile: 'assets/converted/autumn_fox_diamond_80.json', thumbnailUrl: 'assets/converted/autumn_fox_diamond_80_thumb.png' },
@@ -784,7 +559,7 @@ class TapColorApp {
         desc: 'Gentle fluffy highland cow calf surrounded by meadow wildflowers and rustic pasture',
         defaultVariantId: 'fluffy_cow_pbn',
         selectedVariantId: 'fluffy_cow_pbn',
-        originalAsset: 'assets/fluffy-cow-3.jpeg',
+        originalAsset: 'assets/paint_by_number/fluffy-cow-3.jpeg',
         thumbnailUrl: 'assets/converted/fluffy_cow_pbn_thumb.png',
         variants: [
           { id: 'fluffy_cow_pbn', label: 'Original', name: 'Original Lines', pieces: 129, colors: 15, jsonFile: 'assets/converted/fluffy_cow_pbn.json', lineArtUrl: 'assets/converted/fluffy_cow_pbn_lines.png', thumbnailUrl: 'assets/converted/fluffy_cow_pbn_thumb.png' },
@@ -799,7 +574,7 @@ class TapColorApp {
         desc: 'Cozy red fox curled up among autumn leaves, red-capped mushrooms, and meadow wildflowers',
         defaultVariantId: 'autumn_fox_pbn',
         selectedVariantId: 'autumn_fox_pbn',
-        originalAsset: 'assets/autumn_fox_pbn.jpeg',
+        originalAsset: 'assets/paint_by_number/autumn_fox_pbn.jpeg',
         thumbnailUrl: 'assets/converted/autumn_fox_pbn_thumb.png',
         variants: [
           { id: 'autumn_fox_pbn', label: 'Original', name: 'Original Lines', pieces: 49, colors: 15, jsonFile: 'assets/converted/autumn_fox_pbn.json', lineArtUrl: 'assets/converted/autumn_fox_pbn_lines.png', thumbnailUrl: 'assets/converted/autumn_fox_pbn_thumb.png' },
@@ -903,10 +678,17 @@ class TapColorApp {
     if (category !== 'classic' && category !== 'diamond') return;
     this.activeCategory = category;
     document.querySelectorAll('.gallery-tab').forEach(t => {
-      t.classList.toggle('active', t.dataset.tab === category);
+      const isMatch = t.dataset.tab === category;
+      t.classList.toggle('active', isMatch);
+      t.setAttribute('aria-selected', isMatch ? 'true' : 'false');
     });
+    const grid = document.getElementById('artwork-grid');
+    const customPanel = document.getElementById('tab-custom-panel');
+    const savedPanel = document.getElementById('tab-saved-panel');
+    if (customPanel) customPanel.classList.add('hidden');
+    if (savedPanel) savedPanel.classList.add('hidden');
+    if (grid) grid.style.display = 'grid';
     this.populateGalleryModal();
-    this.filterGalleryCards();
   }
 
   persistCurrentArtworkState() {
@@ -1047,6 +829,9 @@ class TapColorApp {
       if (wasmModule) {
         this.controller = new wasmModule.GameController('game-canvas', this.currentArtworkId);
         this.isWasmActive = true;
+        if (typeof this.controller.set_viewport_size === 'function' && this.viewportWidth > 0 && this.viewportHeight > 0) {
+          this.controller.set_viewport_size(this.viewportWidth, this.viewportHeight);
+        }
       } else {
         this.controller = new FallbackJsController(this.canvas, this.currentArtworkId);
       }
@@ -1075,57 +860,88 @@ class TapColorApp {
   }
 
   setupCanvasDpi() {
+    if (!this.viewport || !this.canvas) return;
     const dpr = window.devicePixelRatio || 1;
     const rect = this.viewport.getBoundingClientRect();
-    this.canvas.width = rect.width * dpr;
-    this.canvas.height = rect.height * dpr;
+    if (rect.width <= 0 || rect.height <= 0) return;
+
+    this.viewportWidth = rect.width;
+    this.viewportHeight = rect.height;
+    this.canvas.width = Math.round(rect.width * dpr);
+    this.canvas.height = Math.round(rect.height * dpr);
     this.canvas.style.width = `${rect.width}px`;
     this.canvas.style.height = `${rect.height}px`;
+    this.canvasRect = this.canvas.getBoundingClientRect();
 
     const ctx = this.canvas.getContext('2d');
-    ctx.scale(dpr, dpr);
+    if (ctx) {
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+    if (this.controller && typeof this.controller.set_viewport_size === 'function') {
+      this.controller.set_viewport_size(rect.width, rect.height);
+    }
+  }
+
+  getCanvasRect() {
+    if (!this.canvasRect || this.canvasRect.width === 0) {
+      this.canvasRect = this.canvas.getBoundingClientRect();
+    }
+    return this.canvasRect;
   }
 
   startRenderLoop() {
+    if (this.renderRafId) return;
+    const modalGallery = document.getElementById('modal-gallery');
     const loop = (timestamp) => {
-      if (this.controller) {
-        this.controller.render(timestamp);
+      const galleryOpen = modalGallery && !modalGallery.classList.contains('hidden');
+      if (this.controller && !galleryOpen) {
+        const shouldRender = typeof this.controller.needs_render === 'function'
+          ? this.controller.needs_render()
+          : true;
+        if (shouldRender) {
+          this.controller.render(timestamp);
+        }
       }
-      requestAnimationFrame(loop);
+      this.renderRafId = requestAnimationFrame(loop);
     };
-    requestAnimationFrame(loop);
+    this.renderRafId = requestAnimationFrame(loop);
   }
 
   bindEvents() {
     this.initDialogListeners();
 
     window.addEventListener('resize', () => {
+      const prevW = this.viewportWidth;
       this.setupCanvasDpi();
-      if (this.controller) this.controller.fit_to_screen();
+      if (this.controller && Math.abs(this.viewportWidth - prevW) > 2) {
+        this.controller.fit_to_screen();
+      }
     });
 
-    // Pointer events (Mouse / Pen / Touch)
-    this.canvas.addEventListener('pointerdown', (e) => this.onPointerDown(e));
+    if (this.canvas) {
+      // Pointer events (Mouse / Pen / Touch)
+      this.canvas.addEventListener('pointerdown', (e) => this.onPointerDown(e));
+      this.canvas.addEventListener('contextmenu', (e) => e.preventDefault());
+      // Wheel zoom
+      this.canvas.addEventListener('wheel', (e) => {
+        e.preventDefault();
+        if (!this.controller) return;
+        const zoomFactor = e.deltaY < 0 ? 1.15 : 0.87;
+        const rect = this.getCanvasRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        this.controller.update_pan_zoom(0, 0, zoomFactor, x, y);
+      }, { passive: false });
+
+      // Touch controls: 1-finger touch to place / glide, 2-fingers pan & pinch-to-zoom
+      this.canvas.addEventListener('touchstart', (e) => this.onTouchStart(e), { passive: false });
+      this.canvas.addEventListener('touchmove', (e) => this.onTouchMove(e), { passive: false });
+      this.canvas.addEventListener('touchend', (e) => this.onTouchEnd(e), { passive: false });
+      this.canvas.addEventListener('touchcancel', (e) => this.onTouchCancel(e), { passive: false });
+    }
     window.addEventListener('pointermove', (e) => this.onPointerMove(e));
     window.addEventListener('pointerup', (e) => this.onPointerUp(e));
     window.addEventListener('pointercancel', (e) => this.onPointerCancel(e));
-
-    // Wheel zoom
-    this.canvas.addEventListener('wheel', (e) => {
-      e.preventDefault();
-      if (!this.controller) return;
-      const zoomFactor = e.deltaY < 0 ? 1.15 : 0.87;
-      const rect = this.canvas.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-      this.controller.update_pan_zoom(0, 0, zoomFactor, x, y);
-    }, { passive: false });
-
-    // Touch controls: 1-finger touch to place / glide, 2-fingers pan & pinch-to-zoom
-    this.canvas.addEventListener('touchstart', (e) => this.onTouchStart(e), { passive: false });
-    this.canvas.addEventListener('touchmove', (e) => this.onTouchMove(e), { passive: false });
-    this.canvas.addEventListener('touchend', (e) => this.onTouchEnd(e), { passive: false });
-    this.canvas.addEventListener('touchcancel', (e) => this.onTouchCancel(e), { passive: false });
 
     // Simplified Tool Mode (Color vs One-Finger Move) & Undo
     const morePopover = document.getElementById('more-menu-popover');
@@ -1181,7 +997,7 @@ class TapColorApp {
     }
 
     // Sound toggle
-    document.getElementById('btn-sound').addEventListener('click', () => {
+    document.getElementById('btn-sound')?.addEventListener('click', () => {
       this.sound.enabled = !this.sound.enabled;
       const btnSound = document.getElementById('btn-sound');
       const labelSound = document.getElementById('label-sound-state');
@@ -1191,7 +1007,7 @@ class TapColorApp {
     });
 
     // Outline toggle
-    document.getElementById('btn-outline').addEventListener('click', () => {
+    document.getElementById('btn-outline')?.addEventListener('click', () => {
       if (!this.controller) return;
       const visible = this.controller.toggle_outlines();
       const btnOutline = document.getElementById('btn-outline');
@@ -1202,24 +1018,24 @@ class TapColorApp {
     });
 
     // Magic wand fill current
-    document.getElementById('btn-wand').addEventListener('click', () => {
+    document.getElementById('btn-wand')?.addEventListener('click', () => {
       closeMoreMenu();
       if (!this.controller) return;
-      const resJson = this.controller.fill_all_of_current();
-      const res = JSON.parse(resJson);
-      if (res.success) {
-        this.sound.playColorComplete();
-        this.onTapFeedback(res);
-      }
+      try {
+        const res = JSON.parse(this.controller.fill_all_of_current());
+        if (res.success) {
+          this.onTapFeedback(res);
+        }
+      } catch (_) {}
     });
 
     // Hint / Find button: toggles matching tile highlights on/off
-    document.getElementById('btn-hint').addEventListener('click', () => this.toggleHintHighlights());
+    document.getElementById('btn-hint')?.addEventListener('click', () => this.toggleHintHighlights());
 
     // Zoom buttons
-    document.getElementById('btn-zoom-in').addEventListener('click', () => {
+    document.getElementById('btn-zoom-in')?.addEventListener('click', () => {
       if (!this.controller) return;
-      const rect = this.canvas.getBoundingClientRect();
+      const rect = this.getCanvasRect();
       this.controller.update_pan_zoom(0, 0, 1.35, rect.width / 2, rect.height / 2);
     });
 
@@ -1227,28 +1043,28 @@ class TapColorApp {
     if (btnZoomDrill) {
       btnZoomDrill.addEventListener('click', () => {
         if (!this.controller) return;
-        const rect = this.canvas.getBoundingClientRect();
+        const rect = this.getCanvasRect();
         const currentScale = this.controller.target_scale || (this.controller.engine ? this.controller.engine.target_scale : 1.0);
         const factor = 2.2 / Math.max(0.2, currentScale);
         this.controller.update_pan_zoom(0, 0, factor, rect.width / 2, rect.height / 2);
       });
     }
 
-    document.getElementById('btn-zoom-out').addEventListener('click', () => {
+    document.getElementById('btn-zoom-out')?.addEventListener('click', () => {
       if (!this.controller) return;
-      const rect = this.canvas.getBoundingClientRect();
+      const rect = this.getCanvasRect();
       this.controller.update_pan_zoom(0, 0, 0.75, rect.width / 2, rect.height / 2);
     });
 
-    document.getElementById('btn-zoom-reset').addEventListener('click', () => {
+    document.getElementById('btn-zoom-reset')?.addEventListener('click', () => {
       if (this.controller) this.controller.fit_to_screen();
     });
 
     // Gallery Modal open/close
     const modalGallery = document.getElementById('modal-gallery');
-    document.getElementById('btn-gallery').addEventListener('click', async () => {
+    document.getElementById('btn-gallery')?.addEventListener('click', async () => {
       await this.flushAutosave();
-      modalGallery.classList.remove('hidden');
+      if (modalGallery) modalGallery.classList.remove('hidden');
       if (this.activeCategory === 'saved') {
         await this.renderSavedGallery();
       } else if (!this.galleryPopulated && (this.activeCategory === 'classic' || this.activeCategory === 'diamond')) {
@@ -1256,12 +1072,15 @@ class TapColorApp {
       }
     });
 
-    document.getElementById('btn-close-gallery').addEventListener('click', () => {
-      modalGallery.classList.add('hidden');
+    document.getElementById('btn-close-gallery')?.addEventListener('click', () => {
+      if (modalGallery) modalGallery.classList.add('hidden');
       this.persistCurrentArtworkState();
     });
 
     // Flush autosave when window loses focus or unloads
+    window.addEventListener('pagehide', () => {
+      this.flushAutosave();
+    });
     window.addEventListener('beforeunload', () => {
       this.flushAutosave();
     });
@@ -1320,7 +1139,7 @@ class TapColorApp {
       }
 
       document.addEventListener('click', (e) => {
-        if (!dropdownQuick.classList.contains('hidden') && !dropdownQuick.contains(e.target) && e.target !== btnResSwitcher) {
+        if (!dropdownQuick.classList.contains('hidden') && !dropdownQuick.contains(e.target) && !btnResSwitcher.contains(e.target)) {
           closeQuickDropdown();
         }
       });
@@ -1349,8 +1168,12 @@ class TapColorApp {
     // Gallery Tabs
     document.querySelectorAll('.gallery-tab').forEach(tab => {
       tab.addEventListener('click', async () => {
-        document.querySelectorAll('.gallery-tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.gallery-tab').forEach(t => {
+          t.classList.remove('active');
+          t.setAttribute('aria-selected', 'false');
+        });
         tab.classList.add('active');
+        tab.setAttribute('aria-selected', 'true');
         this.activeCategory = tab.dataset.tab;
 
         const grid = document.getElementById('artwork-grid');
@@ -1359,23 +1182,22 @@ class TapColorApp {
         const pbnFilter = document.getElementById('pbn-pieces-filter');
 
         if (this.activeCategory === 'custom') {
-          grid.style.display = 'none';
+          if (grid) grid.style.display = 'none';
           if (pbnFilter) pbnFilter.classList.add('hidden');
           if (savedPanel) savedPanel.classList.add('hidden');
-          customPanel.classList.remove('hidden');
+          if (customPanel) customPanel.classList.remove('hidden');
           if (this.updateStudioPreview) this.updateStudioPreview();
         } else if (this.activeCategory === 'saved') {
-          grid.style.display = 'none';
+          if (grid) grid.style.display = 'none';
           if (pbnFilter) pbnFilter.classList.add('hidden');
-          customPanel.classList.add('hidden');
+          if (customPanel) customPanel.classList.add('hidden');
           if (savedPanel) savedPanel.classList.remove('hidden');
           await this.renderSavedGallery();
         } else {
-          customPanel.classList.add('hidden');
+          if (customPanel) customPanel.classList.add('hidden');
           if (savedPanel) savedPanel.classList.add('hidden');
-          grid.style.display = 'grid';
+          if (grid) grid.style.display = 'grid';
           this.populateGalleryModal();
-          this.filterGalleryCards();
         }
       });
     });
@@ -1417,14 +1239,31 @@ class TapColorApp {
     }
 
     // Procedural Mosaic button
-    document.getElementById('btn-generate-mosaic').addEventListener('click', () => {
-      const palette = document.getElementById('select-mosaic-palette').value;
+    document.getElementById('btn-generate-mosaic')?.addEventListener('click', async () => {
+      await this.flushAutosave();
+      const palette = document.getElementById('select-mosaic-palette')?.value || 'sunset';
       const seed = Math.floor(Math.random() * 100000);
       if (this.controller) {
+        if (this.victoryTimeout) {
+          clearTimeout(this.victoryTimeout);
+          this.victoryTimeout = null;
+        }
+        this.activeImportedRecord = null;
+        this.currentArtworkMeta = null;
+        this.currentArtworkVariant = null;
+        this.lastCustomImage = null;
+        this.lastCustomMode = 'classic';
+        this.currentArtworkId = `mosaic_${seed}_${palette}`;
+        this.syncLineArtOverlay(null);
         this.controller.load_procedural_mosaic(seed, palette);
-        modalGallery.classList.add('hidden');
+        if (modalGallery) modalGallery.classList.add('hidden');
+        this.startTime = Date.now();
+        this.totalTaps = 0;
+        this.successfulTaps = 0;
         this.updateArtworkUI();
         this.refreshPaletteUI();
+        this.updateResolutionBarUI();
+        this.persistCurrentArtworkState();
       }
     });
 
@@ -1450,13 +1289,15 @@ class TapColorApp {
       btnViewPicture.addEventListener('click', closeVictoryModal);
     }
 
-    modalVictory.addEventListener('click', (e) => {
-      if (e.target === modalVictory) {
-        closeVictoryModal();
-      }
-    });
+    if (modalVictory) {
+      modalVictory.addEventListener('click', (e) => {
+        if (e.target === modalVictory) {
+          closeVictoryModal();
+        }
+      });
+    }
 
-    document.getElementById('btn-export-png').addEventListener('click', () => {
+    document.getElementById('btn-export-png')?.addEventListener('click', () => {
       this.exportArtworkPng();
     });
 
@@ -1487,11 +1328,16 @@ class TapColorApp {
       });
     }
 
-    document.getElementById('btn-next-artwork').addEventListener('click', () => {
-      modalVictory.classList.add('hidden');
-      const curIdx = this.artworksMeta.findIndex(a => a.id === this.currentArtworkId);
-      const nextIdx = (curIdx + 1) % this.artworksMeta.length;
-      this.selectArtwork(this.artworksMeta[nextIdx].id);
+    document.getElementById('btn-next-artwork')?.addEventListener('click', () => {
+      if (modalVictory) modalVictory.classList.add('hidden');
+      if (!this.artworksMeta || this.artworksMeta.length === 0) return;
+      const curMode = this.getCurrentArtMode();
+      const targetCat = curMode === 'diamond' ? 'diamond' : 'classic';
+      const pool = this.artworksMeta.filter(a => a.category === targetCat);
+      const list = pool.length > 0 ? pool : this.artworksMeta;
+      const curIdx = list.findIndex(a => a.id === this.currentArtworkId);
+      const nextIdx = (curIdx + 1) % list.length;
+      this.selectArtwork(list[nextIdx].id);
     });
 
     // Keyboard navigation
@@ -1503,31 +1349,44 @@ class TapColorApp {
           this.closeDialog(false);
           return;
         }
-        if (!modalVictory.classList.contains('hidden')) {
+        if (modalVictory && !modalVictory.classList.contains('hidden')) {
           closeVictoryModal();
           return;
         }
-        const modalGallery = document.getElementById('modal-gallery');
         if (modalGallery && !modalGallery.classList.contains('hidden')) {
           modalGallery.classList.add('hidden');
-          return;
-        }
-        const modalRes = document.getElementById('modal-resolution-picker');
-        if (modalRes && !modalRes.classList.contains('hidden')) {
-          modalRes.classList.add('hidden');
+          this.persistCurrentArtworkState();
           return;
         }
       }
 
+      // Do not intercept typing in form controls or when a modal/dialog is open
+      const tag = e.target && e.target.tagName;
+      if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || (e.target && e.target.isContentEditable)) {
+        return;
+      }
+      const modalDialog = document.getElementById('modal-dialog');
+      if ((modalDialog && !modalDialog.classList.contains('hidden')) ||
+          (modalVictory && !modalVictory.classList.contains('hidden')) ||
+          (modalGallery && !modalGallery.classList.contains('hidden'))) {
+        return;
+      }
+
       // Arrow keys to pan
       if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
-        if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.isContentEditable)) {
-          return;
-        }
         e.preventDefault();
         this.onArrowKeyDown(e);
         return;
       }
+
+      if ((e.metaKey || e.ctrlKey) && !e.altKey && (e.key === 'z' || e.key === 'Z')) {
+        e.preventDefault();
+        this.undoLastAction();
+        return;
+      }
+
+      // Ignore remaining single-key shortcuts when modifier keys are held
+      if (e.ctrlKey || e.metaKey || e.altKey) return;
 
       if (e.key === ' ' || e.code === 'Space') {
         e.preventDefault();
@@ -1539,18 +1398,13 @@ class TapColorApp {
       } else if (e.key === 'h' || e.key === 'H') {
         setToolMode('pan');
       } else if (e.key === 'd' || e.key === 'D') {
-        const drillBtn = document.getElementById('btn-zoom-drill');
-        if (drillBtn) drillBtn.click();
-      } else if ((e.metaKey || e.ctrlKey) && (e.key === 'z' || e.key === 'Z')) {
-        e.preventDefault();
-        this.undoLastAction();
+        document.getElementById('btn-zoom-drill')?.click();
       } else if (e.key === 'f' || e.key === 'F') {
         if (this.controller) this.controller.fit_to_screen();
       } else if (e.key === 'o' || e.key === 'O') {
-        document.getElementById('btn-outline').click();
+        document.getElementById('btn-outline')?.click();
       } else if (/^[1-9]$/.test(e.key)) {
-        const num = parseInt(e.key, 10);
-        this.selectNumber(num);
+        this.selectNumber(parseInt(e.key, 10));
       }
     });
 
@@ -1564,6 +1418,14 @@ class TapColorApp {
       if (this.arrowKeys) {
         this.arrowKeys.clear();
       }
+      if (this.stylusHoldTimeout) {
+        clearTimeout(this.stylusHoldTimeout);
+        this.stylusHoldTimeout = null;
+      }
+      this.isDragging = false;
+      this.isStylusPanning = false;
+      this.isStylusActive = false;
+      this.pendingStylusAction = null;
     });
   }
 
@@ -1600,7 +1462,7 @@ class TapColorApp {
       }
 
       // Stylus primary tip (button 0): schedule hold-to-scroll gesture (~260ms)
-      const rect = this.canvas.getBoundingClientRect();
+      const rect = this.getCanvasRect();
       const x = e.clientX - rect.left;
       const y = e.clientY - rect.top;
       this.pendingStylusAction = {
@@ -1627,12 +1489,12 @@ class TapColorApp {
 
     // Mouse interaction: Pen or Erase mode left click immediately interacts
     if (this.toolMode === 'pen' && e.button === 0) {
-      const rect = this.canvas.getBoundingClientRect();
+      const rect = this.getCanvasRect();
       const x = e.clientX - rect.left;
       const y = e.clientY - rect.top;
-      this.tryPlaceDrill(x, y);
+      this.tryPlaceDrill(x, y, true);
     } else if (this.toolMode === 'erase' && e.button === 0) {
-      const rect = this.canvas.getBoundingClientRect();
+      const rect = this.getCanvasRect();
       const x = e.clientX - rect.left;
       const y = e.clientY - rect.top;
       this.tryEraseDrill(x, y);
@@ -1642,6 +1504,10 @@ class TapColorApp {
   onPointerMove(e) {
     if (e.pointerType === 'touch') return;
     if (!this.isDragging || !this.controller) return;
+    if (e.buttons === 0 && !this.isStylusPanning) {
+      this.isDragging = false;
+      return;
+    }
 
     const dx = e.clientX - this.lastPointerX;
     const dy = e.clientY - this.lastPointerY;
@@ -1651,14 +1517,14 @@ class TapColorApp {
 
     // Middle click, right click, or stylus barrel button always pans
     if (this.pointerButton === 1 || this.pointerButton === 2) {
-      const rect = this.canvas.getBoundingClientRect();
+      const rect = this.getCanvasRect();
       this.controller.update_pan_zoom(dx, dy, 1.0, rect.width / 2, rect.height / 2);
       return;
     }
 
     // Stylus hold-to-scroll active: pan canvas freely
     if (this.isStylusPanning) {
-      const rect = this.canvas.getBoundingClientRect();
+      const rect = this.getCanvasRect();
       this.controller.update_pan_zoom(dx, dy, 1.0, rect.width / 2, rect.height / 2);
       return;
     }
@@ -1685,19 +1551,19 @@ class TapColorApp {
 
     if (this.toolMode === 'pen' && e.buttons === 1) {
       // Applicator pen glide: color drills continuously
-      const rect = this.canvas.getBoundingClientRect();
+      const rect = this.getCanvasRect();
       const x = e.clientX - rect.left;
       const y = e.clientY - rect.top;
       this.tryPlaceDrill(x, y);
     } else if (this.toolMode === 'erase' && e.buttons === 1) {
       // Eraser glide: clear drills continuously
-      const rect = this.canvas.getBoundingClientRect();
+      const rect = this.getCanvasRect();
       const x = e.clientX - rect.left;
       const y = e.clientY - rect.top;
       this.tryEraseDrill(x, y);
-    } else {
+    } else if (this.toolMode === 'pan' && e.buttons === 1) {
       // Pan canvas
-      const rect = this.canvas.getBoundingClientRect();
+      const rect = this.getCanvasRect();
       this.controller.update_pan_zoom(dx, dy, 1.0, rect.width / 2, rect.height / 2);
     }
   }
@@ -1727,7 +1593,7 @@ class TapColorApp {
       if (this.pendingStylusAction) {
         const act = this.pendingStylusAction;
         this.pendingStylusAction = null;
-        if (this.dragDistance < 7 && this.controller && this.pointerButton === 0) {
+        if (this.dragDistance <= 7 && this.controller && this.pointerButton === 0) {
           if (act.mode === 'pen') {
             this.tryPlaceDrill(act.x, act.y, true);
           } else if (act.mode === 'erase') {
@@ -1738,21 +1604,17 @@ class TapColorApp {
       }
     }
 
-    // Small movement (< 6px) tap interaction
+    // Small movement (< 6px) tap interaction in pan mode
     if (this.toolMode === 'pan' && this.dragDistance < 6 && this.controller && this.pointerButton === 0) {
-      const rect = this.canvas.getBoundingClientRect();
+      const rect = this.getCanvasRect();
       const x = e.clientX - rect.left;
       const y = e.clientY - rect.top;
       this.tryPlaceDrill(x, y, true);
-    } else if (this.toolMode === 'erase' && this.dragDistance < 6 && this.controller && this.pointerButton === 0) {
-      const rect = this.canvas.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-      this.tryEraseDrill(x, y);
     }
   }
 
   onPointerCancel(e) {
+    if (e.pointerType === 'touch') return;
     if (this.stylusHoldTimeout) {
       clearTimeout(this.stylusHoldTimeout);
       this.stylusHoldTimeout = null;
@@ -1789,7 +1651,7 @@ class TapColorApp {
       this.isTwoFingerGesture = false;
 
       const touch = e.touches[0];
-      const rect = this.canvas.getBoundingClientRect();
+      const rect = this.getCanvasRect();
       const x = touch.clientX - rect.left;
       const y = touch.clientY - rect.top;
 
@@ -1803,13 +1665,15 @@ class TapColorApp {
 
       // Micro-buffer (35ms) to cleanly distinguish almost-simultaneous 2-finger pan gestures
       this.pendingTouch = { x, y };
-      this.touchPlaceTimeout = setTimeout(() => {
-        if (this.pendingTouch && !this.isTwoFingerGesture) {
-          const pt = this.pendingTouch;
-          this.pendingTouch = null;
-          this.executeTouchPlace(pt.x, pt.y, true);
-        }
-      }, 35);
+      if (this.toolMode !== 'pan') {
+        this.touchPlaceTimeout = setTimeout(() => {
+          if (this.pendingTouch && !this.isTwoFingerGesture) {
+            const pt = this.pendingTouch;
+            this.pendingTouch = null;
+            this.executeTouchPlace(pt.x, pt.y, true);
+          }
+        }, 35);
+      }
 
     } else if (e.touches.length >= 2) {
       // 2 fingers (or more): cancel any pending single-finger placement and activate pan/zoom
@@ -1830,6 +1694,9 @@ class TapColorApp {
 
   onTouchMove(e) {
     e.preventDefault();
+    if (this.isStylusActive || (e.touches.length === 1 && e.touches[0].touchType === 'stylus')) {
+      return;
+    }
 
     if (e.touches.length === 1) {
       if (this.isTwoFingerGesture || Date.now() < this.suppressSingleTouchUntil) return;
@@ -1839,6 +1706,22 @@ class TapColorApp {
         touch.clientX - (this.singleTouchStartPos ? this.singleTouchStartPos.x : touch.clientX),
         touch.clientY - (this.singleTouchStartPos ? this.singleTouchStartPos.y : touch.clientY)
       );
+
+      // In One-Finger Move mode, dragging pans the canvas instead of placing drills
+      if (this.toolMode === 'pan') {
+        if (moveDist >= 6) {
+          this.pendingTouch = null;
+        }
+        const dx = touch.clientX - this.lastTouchPlaceX;
+        const dy = touch.clientY - this.lastTouchPlaceY;
+        this.lastTouchPlaceX = touch.clientX;
+        this.lastTouchPlaceY = touch.clientY;
+        if (this.controller && (dx !== 0 || dy !== 0)) {
+          const rect = this.getCanvasRect();
+          this.controller.update_pan_zoom(dx, dy, 1.0, rect.width / 2, rect.height / 2);
+        }
+        return;
+      }
 
       // If finger glides before the 35ms timeout fires, trigger placement immediately
       if (this.pendingTouch && moveDist >= 6) {
@@ -1854,7 +1737,7 @@ class TapColorApp {
       if (Math.hypot(dx, dy) >= 8) {
         this.lastTouchPlaceX = touch.clientX;
         this.lastTouchPlaceY = touch.clientY;
-        const rect = this.canvas.getBoundingClientRect();
+        const rect = this.getCanvasRect();
         const x = touch.clientX - rect.left;
         const y = touch.clientY - rect.top;
         this.executeTouchPlace(x, y, false);
@@ -1866,13 +1749,20 @@ class TapColorApp {
         this.touchPlaceTimeout = null;
       }
       this.pendingTouch = null;
-      this.isTwoFingerGesture = true;
 
       const t0 = e.touches[0];
       const t1 = e.touches[1];
       const currentMidX = (t0.clientX + t1.clientX) / 2;
       const currentMidY = (t0.clientY + t1.clientY) / 2;
       const currentDist = Math.hypot(t0.clientX - t1.clientX, t0.clientY - t1.clientY);
+
+      if (!this.isTwoFingerGesture) {
+        this.isTwoFingerGesture = true;
+        this.touchMidX = currentMidX;
+        this.touchMidY = currentMidY;
+        this.touchPinchDist = currentDist;
+        return;
+      }
 
       // Pan delta between touch midpoints
       const dx = currentMidX - this.touchMidX;
@@ -1884,7 +1774,7 @@ class TapColorApp {
         factor = currentDist / this.touchPinchDist;
       }
 
-      const rect = this.canvas.getBoundingClientRect();
+      const rect = this.getCanvasRect();
       const anchorX = currentMidX - rect.left;
       const anchorY = currentMidY - rect.top;
 
@@ -1898,6 +1788,7 @@ class TapColorApp {
 
   onTouchEnd(e) {
     e.preventDefault();
+    if (this.isStylusActive) return;
 
     if (this.isTwoFingerGesture) {
       // Cooldown buffer so lifting fingers does not trigger stray single-touch placement
@@ -1933,6 +1824,8 @@ class TapColorApp {
   executeTouchPlace(x, y, playWrongOnFail = false) {
     if (this.toolMode === 'erase') {
       this.tryEraseDrill(x, y);
+    } else if (this.toolMode === 'pan') {
+      if (playWrongOnFail) this.tryPlaceDrill(x, y, true);
     } else {
       this.tryPlaceDrill(x, y, playWrongOnFail);
     }
@@ -1952,7 +1845,7 @@ class TapColorApp {
       if (e.key === 'ArrowDown') dy -= nudge;
       if (e.key === 'ArrowLeft') dx += nudge;
       if (e.key === 'ArrowRight') dx -= nudge;
-      const rect = this.canvas.getBoundingClientRect();
+      const rect = this.getCanvasRect();
       this.controller.update_pan_zoom(dx, dy, 1.0, rect.width / 2, rect.height / 2);
     }
 
@@ -1987,7 +1880,7 @@ class TapColorApp {
       if (this.arrowKeys.has('ArrowRight')) dx -= speed;
 
       if ((dx !== 0 || dy !== 0) && this.controller) {
-        const rect = this.canvas.getBoundingClientRect();
+        const rect = this.getCanvasRect();
         this.controller.update_pan_zoom(dx, dy, 1.0, rect.width / 2, rect.height / 2);
       }
 
@@ -1999,20 +1892,27 @@ class TapColorApp {
 
   tryPlaceDrill(x, y, playWrongOnFail = false) {
     if (!this.controller) return;
-    const resJson = this.controller.handle_tap(x, y);
-    const res = JSON.parse(resJson);
+    let res;
+    try {
+      res = JSON.parse(this.controller.handle_tap(x, y));
+    } catch (_) {
+      return;
+    }
 
     if (res.success) {
       this.totalTaps++;
       this.successfulTaps++;
-      if (this.currentArtworkId.includes('diamond')) {
+      if (this.getCurrentArtMode() === 'diamond') {
         this.sound.playDiamondSnap(res.number || 1);
       } else {
         this.sound.playTap(res.number || 1);
       }
-      if (navigator.vibrate) navigator.vibrate(12);
+      if (navigator.vibrate) {
+        try { navigator.vibrate(12); } catch (_) {}
+      }
       this.onTapFeedback(res);
     } else if (playWrongOnFail && res.region_id !== undefined && res.region_id !== null) {
+      this.totalTaps++;
       this.sound.playWrong();
       if (res.number) {
         const item = document.querySelector(`.palette-item[data-number="${res.number}"]`);
@@ -2026,8 +1926,10 @@ class TapColorApp {
 
   onTapFeedback(res) {
     const percent = Math.round(res.percent || 0);
-    document.getElementById('progress-fill').style.width = `${percent}%`;
-    document.getElementById('progress-text').textContent = `${percent}%`;
+    const progressFill = document.getElementById('progress-fill');
+    const progressText = document.getElementById('progress-text');
+    if (progressFill) progressFill.style.width = `${percent}%`;
+    if (progressText) progressText.textContent = `${percent}%`;
 
     this.refreshPaletteUI();
 
@@ -2051,11 +1953,12 @@ class TapColorApp {
 
     if (res.artwork_completed) {
       this.flushAutosave();
-      // Smoothly zoom out so the user can see the entire completed artwork
       if (this.controller && this.controller.fit_to_screen) {
         this.controller.fit_to_screen();
       }
-      setTimeout(() => {
+      if (this.victoryTimeout) clearTimeout(this.victoryTimeout);
+      this.victoryTimeout = setTimeout(() => {
+        this.victoryTimeout = null;
         this.sound.playVictory();
         this.showVictoryModal(res.total_regions);
       }, 500);
@@ -2064,22 +1967,42 @@ class TapColorApp {
 
   tryEraseDrill(x, y) {
     if (!this.controller) return;
-    const resJson = this.controller.handle_erase(x, y);
-    const res = JSON.parse(resJson);
+    let res;
+    try {
+      res = JSON.parse(this.controller.handle_erase(x, y));
+    } catch (_) {
+      return;
+    }
     if (res.success) {
+      if (this.victoryTimeout) {
+        clearTimeout(this.victoryTimeout);
+        this.victoryTimeout = null;
+      }
       this.sound.playErase();
-      if (navigator.vibrate) navigator.vibrate(8);
+      if (navigator.vibrate) {
+        try { navigator.vibrate(8); } catch (_) {}
+      }
       this.onTapFeedback(res);
     }
   }
 
   clearCanvasTiles() {
     if (!this.controller) return;
-    const resJson = this.controller.clear_all_tiles();
-    const res = JSON.parse(resJson);
+    if (this.victoryTimeout) {
+      clearTimeout(this.victoryTimeout);
+      this.victoryTimeout = null;
+    }
+    let res;
+    try {
+      res = JSON.parse(this.controller.clear_all_tiles());
+    } catch (_) {
+      return;
+    }
+    this.startTime = Date.now();
+    this.totalTaps = 0;
+    this.successfulTaps = 0;
     this.sound.playErase();
     this.onTapFeedback(res);
-    this.triggerAutosave();
   }
 
   triggerHint() {
@@ -2110,29 +2033,63 @@ class TapColorApp {
       this.controller.select_number(num);
     }
     document.querySelectorAll('.palette-item').forEach(el => {
-      el.classList.toggle('active', parseInt(el.dataset.number, 10) === num);
+      const isMatch = parseInt(el.dataset.number, 10) === num;
+      el.classList.toggle('active', isMatch);
+      el.setAttribute('aria-pressed', isMatch ? 'true' : 'false');
     });
   }
 
   refreshPaletteUI() {
     if (!this.controller) return;
-    const palette = JSON.parse(this.controller.get_palette_json());
-    const info = JSON.parse(this.controller.get_artwork_info_json());
+    let palette, info;
+    try {
+      palette = JSON.parse(this.controller.get_palette_json());
+      info = JSON.parse(this.controller.get_artwork_info_json());
+    } catch (_) {
+      return;
+    }
     if (info.active_number) this.activeNumber = info.active_number;
 
     const track = document.getElementById('palette-track');
+    if (!track) return;
+
+    const sig = `${info.id || ''}:${palette.map(p => p.number).join(',')}`;
+    if (this._paletteSig === sig && track.children.length === palette.length) {
+      for (let i = 0; i < palette.length; i++) {
+        const item = palette[i];
+        const el = track.children[i];
+        const isActive = item.number === this.activeNumber;
+        el.classList.toggle('active', isActive);
+        el.classList.toggle('completed', !!item.is_completed);
+        el.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+        const countEl = el.querySelector('.swatch-count');
+        if (countEl) {
+          const remaining = Math.max(0, item.total_count - item.filled_count);
+          countEl.textContent = item.is_completed ? '✓' : String(remaining);
+        }
+      }
+      return;
+    }
+
+    this._paletteSig = sig;
     track.innerHTML = '';
 
     palette.forEach(item => {
       const el = document.createElement('div');
-      el.className = `palette-item ${item.number === this.activeNumber ? 'active' : ''} ${item.is_completed ? 'completed' : ''}`;
+      const isActive = item.number === this.activeNumber;
+      el.className = `palette-item ${isActive ? 'active' : ''} ${item.is_completed ? 'completed' : ''}`;
       el.dataset.number = item.number;
+      el.setAttribute('role', 'button');
+      el.setAttribute('tabindex', '0');
+      el.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+      el.setAttribute('aria-label', `Color ${item.number}${item.name ? `, ${item.name}` : ''}`);
 
-      const remaining = item.total_count - item.filled_count;
+      const remaining = Math.max(0, item.total_count - item.filled_count);
+      const safeHex = /^#[0-9a-f]{3,8}$/i.test(item.hex) ? item.hex : '#CCCCCC';
 
       el.innerHTML = `
-        <div class="swatch-circle" style="background-color: ${item.hex}">
-          <span class="swatch-number" style="color: ${this.getContrastTextColor(item.hex)}">${item.number}</span>
+        <div class="swatch-circle" style="background-color: ${safeHex}">
+          <span class="swatch-number" style="color: ${this.getContrastTextColor(safeHex)}">${item.number}</span>
           <svg class="swatch-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
             <polyline points="20 6 9 17 4 12"/>
           </svg>
@@ -2140,8 +2097,12 @@ class TapColorApp {
         <span class="swatch-count">${item.is_completed ? '✓' : remaining}</span>
       `;
 
-      el.addEventListener('click', () => {
-        this.selectNumber(item.number);
+      el.addEventListener('click', () => this.selectNumber(item.number));
+      el.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          this.selectNumber(item.number);
+        }
       });
 
       track.appendChild(el);
@@ -2149,16 +2110,23 @@ class TapColorApp {
   }
 
   getContrastTextColor(hex) {
-    const c = hex.replace('#', '');
-    const r = parseInt(c.substr(0, 2), 16);
-    const g = parseInt(c.substr(2, 2), 16);
-    const b = parseInt(c.substr(4, 2), 16);
+    if (!hex || typeof hex !== 'string') return '#111827';
+    let c = hex.replace('#', '').trim();
+    if (c.length === 3) {
+      c = c[0] + c[0] + c[1] + c[1] + c[2] + c[2];
+    }
+    if (c.length < 6) return '#111827';
+    const r = parseInt(c.slice(0, 2), 16);
+    const g = parseInt(c.slice(2, 4), 16);
+    const b = parseInt(c.slice(4, 6), 16);
+    if (Number.isNaN(r) || Number.isNaN(g) || Number.isNaN(b)) return '#111827';
     const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
     return luminance > 0.55 ? '#111827' : '#FFFFFF';
   }
 
   populateGalleryModal() {
     const grid = document.getElementById('artwork-grid');
+    if (!grid) return;
     grid.innerHTML = '';
     this.galleryPopulated = true;
 
@@ -2172,6 +2140,9 @@ class TapColorApp {
       const card = document.createElement('div');
       card.className = 'artwork-card';
       card.dataset.category = meta.category;
+      card.setAttribute('role', 'button');
+      card.setAttribute('tabindex', '0');
+      card.setAttribute('aria-label', `${meta.title} by ${meta.artist}`);
 
       const isDiamond = meta.category === 'diamond';
       const activeVariant = meta.variants
@@ -2188,8 +2159,8 @@ class TapColorApp {
             <span class="resolution-title">Resolution / Difficulty:</span>
             <div class="resolution-pills">
               ${meta.variants.map(v => `
-                <button type="button" class="res-pill ${v.id === (activeVariant ? activeVariant.id : '') ? 'active' : ''}" data-variant-id="${v.id}" title="${v.name}: ${v.pieces} pieces, ${v.colors} colors">
-                  ${v.label} <span class="res-pill-count">(${v.pieces})</span>
+                <button type="button" class="res-pill ${v.id === (activeVariant ? activeVariant.id : '') ? 'active' : ''}" data-variant-id="${escapeHtml(v.id)}" title="${escapeHtml(v.name)}: ${v.pieces} pieces, ${v.colors} colors">
+                  ${escapeHtml(v.label)} <span class="res-pill-count">(${v.pieces})</span>
                 </button>
               `).join('')}
             </div>
@@ -2205,9 +2176,9 @@ class TapColorApp {
           </span>
         </div>
         <div class="artwork-info">
-          <h4>${meta.title}</h4>
-          <span class="artwork-artist-tag">${meta.artist}</span>
-          <p>${meta.desc}</p>
+          <h4>${escapeHtml(meta.title)}</h4>
+          <span class="artwork-artist-tag">${escapeHtml(meta.artist)}</span>
+          <p>${escapeHtml(meta.desc)}</p>
           ${resolutionSelectorHtml}
           <div class="artwork-footer">
             <span class="artwork-pieces-count">
@@ -2229,6 +2200,7 @@ class TapColorApp {
             card.querySelectorAll('.res-pill').forEach(p => p.classList.remove('active'));
             pill.classList.add('active');
             if (chosen) {
+              card.dataset.pieces = String(chosen.pieces);
               const numEl = card.querySelector('.card-pieces-count');
               if (numEl) numEl.textContent = chosen.pieces;
               const thumbCanvas = card.querySelector('.artwork-thumb-canvas');
@@ -2238,10 +2210,17 @@ class TapColorApp {
         });
       }
 
-      card.addEventListener('click', () => {
+      const openCard = () => {
         const chosenVarId = meta.selectedVariantId || meta.defaultVariantId || meta.id;
         this.selectArtwork(meta.id, chosenVarId);
-        document.getElementById('modal-gallery').classList.add('hidden');
+        document.getElementById('modal-gallery')?.classList.add('hidden');
+      };
+      card.addEventListener('click', openCard);
+      card.addEventListener('keydown', (e) => {
+        if ((e.key === 'Enter' || e.key === ' ') && e.target === card) {
+          e.preventDefault();
+          openCard();
+        }
       });
 
       grid.appendChild(card);
@@ -2302,9 +2281,8 @@ class TapColorApp {
     const max = Number(slider.max || 100);
     const val = Number(slider.value || max);
 
-    slider.style.setProperty('--attr-min', String(min));
-    slider.style.setProperty('--attr-max', String(max));
-    slider.style.setProperty('--control-value', String(val));
+    const pct = max > min ? ((val - min) / (max - min)) * 100 : 100;
+    slider.style.setProperty('--slider-progress', `${Math.max(0, Math.min(100, pct))}%`);
 
     const isAll = val >= max;
     const text = isAll ? `All (up to ${max})` : `Up to ${val}`;
@@ -2348,9 +2326,8 @@ class TapColorApp {
     }
   }
 
-  async updateSavedBadge() {
-    try {
-      const artworks = await storage.getAllArtworks();
+  updateSavedBadge(prefetchedArtworks = null) {
+    const apply = (artworks) => {
       const badge = document.getElementById('saved-badge');
       if (badge) {
         const inProgress = artworks.filter(a => (a.filledCount || 0) > 0 && !a.completed);
@@ -2358,9 +2335,14 @@ class TapColorApp {
         badge.textContent = count;
         badge.title = inProgress.length > 0 ? `${inProgress.length} In Progress` : `${artworks.length} Saved Artworks`;
       }
-    } catch (e) {
-      console.warn('Could not update saved badge:', e);
+    };
+    if (Array.isArray(prefetchedArtworks)) {
+      apply(prefetchedArtworks);
+      return Promise.resolve();
     }
+    return storage.getAllArtworks()
+      .then(apply)
+      .catch(e => console.warn('Could not update saved badge:', e));
   }
 
   triggerAutosave() {
@@ -2368,8 +2350,9 @@ class TapColorApp {
       clearTimeout(this.autosaveTimer);
     }
     this.autosaveTimer = setTimeout(() => {
+      this.autosaveTimer = null;
       this.saveCurrentProgress();
-    }, 400);
+    }, 1200);
   }
 
   async flushAutosave() {
@@ -2377,103 +2360,120 @@ class TapColorApp {
       clearTimeout(this.autosaveTimer);
       this.autosaveTimer = null;
     }
+    if (this._saveInFlight) {
+      await this._saveInFlight;
+    }
     await this.saveCurrentProgress();
   }
 
   async saveCurrentProgress() {
     if (!this.controller) return;
+    if (this._saveInFlight) {
+      return this._saveInFlight;
+    }
 
-    let artwork = null;
-    if (typeof this.controller.get_artwork_json === 'function') {
-      try {
-        artwork = JSON.parse(this.controller.get_artwork_json());
-      } catch (e) {
+    const genAtStart = this.loadGeneration;
+    this._saveInFlight = (async () => {
+      let artwork = null;
+      if (typeof this.controller.get_artwork_json === 'function') {
+        try {
+          artwork = JSON.parse(this.controller.get_artwork_json());
+        } catch (e) {
+          artwork = this.controller.artwork;
+        }
+      } else {
         artwork = this.controller.artwork;
       }
-    } else {
-      artwork = this.controller.artwork;
-    }
 
-    if (!artwork || !artwork.regions) return;
+      if (!artwork || !artwork.regions) return;
 
-    const pieces = artwork.regions.length;
-    const filledCount = artwork.regions.filter(r => r.is_filled).length;
+      const pieces = artwork.regions.length;
+      const filledCount = artwork.regions.filter(r => r.is_filled).length;
 
-    // Do not save clean 0% catalog templates unless it was already an imported/saved record
-    if (filledCount === 0 && !this.activeImportedRecord) {
-      return;
-    }
+      // Do not save clean 0% catalog templates unless it was already an imported/saved record
+      if (filledCount === 0 && !this.activeImportedRecord) {
+        return;
+      }
 
-    let id;
-    let title;
-    let artist;
-    let category = this.getCurrentArtMode();
-    let parentArtworkId = null;
-    let variantId = null;
+      let id;
+      let title;
+      let artist;
+      let category = this.getCurrentArtMode();
+      let parentArtworkId = null;
+      let variantId = null;
 
-    if (this.activeImportedRecord) {
-      id = this.activeImportedRecord.id;
-      title = this.activeImportedRecord.title || artwork.title;
-      artist = this.activeImportedRecord.artist || artwork.artist;
-      category = this.activeImportedRecord.category || category;
-      parentArtworkId = this.activeImportedRecord.parentArtworkId;
-      variantId = this.activeImportedRecord.variantId;
-    } else {
-      parentArtworkId = this.currentArtworkMeta ? this.currentArtworkMeta.id : this.currentArtworkId;
-      variantId = this.currentArtworkVariant ? this.currentArtworkVariant.id : this.currentArtworkId;
-      id = variantId || parentArtworkId;
-      title = (this.currentArtworkMeta ? this.currentArtworkMeta.title : null) || artwork.title || 'Artwork';
-      artist = (this.currentArtworkMeta ? this.currentArtworkMeta.artist : null) || artwork.artist || 'Tap Color Studio';
-    }
-
-    // Render snapshot thumbnail showing colored progress
-    let thumbnailBlob = null;
-    try {
-      const thumbCanvas = document.createElement('canvas');
-      thumbCanvas.width = 280;
-      thumbCanvas.height = 200;
-      const thumbCtx = thumbCanvas.getContext('2d');
-      if (this.isWasmActive && typeof this.controller.render_export === 'function') {
-        this.controller.render_export(thumbCtx, 280, 200, false);
+      if (this.activeImportedRecord) {
+        id = this.activeImportedRecord.id;
+        title = this.activeImportedRecord.title || artwork.title;
+        artist = this.activeImportedRecord.artist || artwork.artist;
+        category = this.activeImportedRecord.category || category;
+        parentArtworkId = this.activeImportedRecord.parentArtworkId;
+        variantId = this.activeImportedRecord.variantId;
       } else {
-        this.renderExportFallback(thumbCtx, 280, 200, false);
+        parentArtworkId = this.currentArtworkMeta ? this.currentArtworkMeta.id : this.currentArtworkId;
+        variantId = this.currentArtworkVariant ? this.currentArtworkVariant.id : this.currentArtworkId;
+        id = variantId || parentArtworkId;
+        title = (this.currentArtworkMeta ? this.currentArtworkMeta.title : null) || artwork.title || 'Artwork';
+        artist = (this.currentArtworkMeta ? this.currentArtworkMeta.artist : null) || artwork.artist || 'Tap Color Studio';
       }
-      thumbnailBlob = await new Promise(resolve => thumbCanvas.toBlob(resolve, 'image/jpeg', 0.85));
-    } catch (err) {
-      console.warn('Could not generate progress thumbnail:', err);
-    }
 
-    const completed = pieces > 0 && filledCount >= pieces;
+      // Render snapshot thumbnail showing colored progress
+      let thumbnailBlob = null;
+      try {
+        const thumbCanvas = document.createElement('canvas');
+        thumbCanvas.width = 280;
+        thumbCanvas.height = 200;
+        const thumbCtx = thumbCanvas.getContext('2d');
+        if (this.isWasmActive && typeof this.controller.render_export === 'function') {
+          this.controller.render_export(thumbCtx, 280, 200, false);
+        } else {
+          this.renderExportFallback(thumbCtx, 280, 200, false);
+        }
+        thumbnailBlob = await new Promise(resolve => thumbCanvas.toBlob(resolve, 'image/jpeg', 0.85));
+      } catch (err) {
+        console.warn('Could not generate progress thumbnail:', err);
+      }
 
-    const record = {
-      id,
-      title,
-      artist,
-      category,
-      parentArtworkId,
-      variantId,
-      thumbnailBlob: thumbnailBlob || (this.activeImportedRecord ? this.activeImportedRecord.thumbnailBlob : null),
-      artworkData: artwork,
-      pieces,
-      colors: artwork.palette ? artwork.palette.length : 0,
-      filledCount,
-      completed,
-      isAutosave: true,
-      lastModified: Date.now(),
-    };
+      if (genAtStart !== this.loadGeneration) return;
+
+      const completed = pieces > 0 && filledCount >= pieces;
+      const record = {
+        id,
+        title,
+        artist,
+        category,
+        parentArtworkId,
+        variantId,
+        thumbnailBlob: thumbnailBlob || (this.activeImportedRecord ? this.activeImportedRecord.thumbnailBlob : null),
+        artworkData: artwork,
+        pieces,
+        colors: artwork.palette ? artwork.palette.length : 0,
+        filledCount,
+        completed,
+        isAutosave: true,
+        lastModified: Date.now(),
+      };
+
+      try {
+        await storage.saveArtworkRecord(record);
+        if (genAtStart !== this.loadGeneration) return;
+        this.activeImportedRecord = record;
+        await this.updateSavedBadge();
+
+        // If the gallery modal is currently open and viewing saved tab, refresh it live
+        const modalGallery = document.getElementById('modal-gallery');
+        if (modalGallery && !modalGallery.classList.contains('hidden') && this.activeCategory === 'saved') {
+          await this.renderSavedGallery();
+        }
+      } catch (e) {
+        console.warn('Could not persist autosave to IndexedDB:', e);
+      }
+    })();
 
     try {
-      await storage.saveArtworkRecord(record);
-      this.activeImportedRecord = record;
-      await this.updateSavedBadge();
-
-      // If the gallery modal is currently open and viewing saved tab, refresh it live
-      const modalGallery = document.getElementById('modal-gallery');
-      if (modalGallery && !modalGallery.classList.contains('hidden') && this.activeCategory === 'saved') {
-        await this.renderSavedGallery();
-      }
-    } catch (e) {
-      console.warn('Could not persist autosave to IndexedDB:', e);
+      await this._saveInFlight;
+    } finally {
+      this._saveInFlight = null;
     }
   }
 
@@ -2517,7 +2517,14 @@ class TapColorApp {
 
       try {
         const allSaved = await storage.getAllArtworks();
-        await this.updateSavedBadge();
+        this.updateSavedBadge(allSaved);
+
+        if (this.savedBlobUrls.length > 0) {
+          for (const url of this.savedBlobUrls) {
+            try { URL.revokeObjectURL(url); } catch (_) {}
+          }
+          this.savedBlobUrls.length = 0;
+        }
 
         if (inProgressGrid) inProgressGrid.innerHTML = '';
         if (completedGrid) completedGrid.innerHTML = '';
@@ -2533,10 +2540,10 @@ class TapColorApp {
 
         if (emptyPanel) emptyPanel.classList.add('hidden');
 
-        // Separate into in-progress, completed, and creations (0% progress)
+        // Separate into in-progress, completed, and unstarted custom creations
         const inProgressList = allSaved.filter(r => (r.filledCount || 0) > 0 && !r.completed);
         const completedList = allSaved.filter(r => r.completed);
-        const creationsList = allSaved.filter(r => (r.filledCount || 0) === 0 && !r.completed);
+        const creationsList = allSaved.filter(r => (r.filledCount || 0) === 0 && !r.completed && !r.parentArtworkId && r.category === 'imported');
 
         // 1. IN PROGRESS SUBSECTION (At the top of My Pictures)
         if (inProgressSection && inProgressGrid) {
@@ -2618,14 +2625,22 @@ class TapColorApp {
     const card = document.createElement('div');
     card.className = 'artwork-card';
     card.dataset.category = 'saved';
+    card.setAttribute('role', 'button');
+    card.setAttribute('tabindex', '0');
+    card.setAttribute('aria-label', `${record.title || 'Saved Artwork'}`);
 
     const isDiamond = (record.category === 'diamond') || (record.artworkData && record.artworkData.id && record.artworkData.id.includes('diamond'));
     const modeBadgeText = isDiamond ? '💎 Diamond Painting' : '🎨 Paint by Number';
     const thumbUrl = record.thumbnailBlob ? URL.createObjectURL(record.thumbnailBlob) : '';
+    if (thumbUrl) {
+      this.savedBlobUrls.push(thumbUrl);
+    }
     const timeStr = this.formatRelativeTime(record.lastModified || record.createdAt);
     const totalPieces = record.pieces || (record.artworkData && record.artworkData.regions ? record.artworkData.regions.length : 0);
     const filled = record.filledCount || 0;
     const percent = Math.min(100, Math.round((filled / Math.max(1, totalPieces)) * 100));
+    const safeTitle = escapeHtml(record.title || 'Untitled');
+    const safeArtist = escapeHtml(record.artist || 'Tap Color Studio');
 
     let overlayBadgeHtml = '';
     let actionBtnHtml = '';
@@ -2634,32 +2649,32 @@ class TapColorApp {
       overlayBadgeHtml = `<span class="progress-pill-badge">⚡ ${percent}%</span>`;
       actionBtnHtml = `
         <button class="btn-resume-card" type="button">▶ Continue</button>
-        <button class="btn-reset-card" title="Reset Progress" type="button">↺</button>
-        <button class="btn-delete-saved" title="Remove" type="button">🗑️</button>
+        <button class="btn-reset-card" title="Reset Progress" aria-label="Reset progress for ${safeTitle}" type="button">↺</button>
+        <button class="btn-delete-saved" title="Remove" aria-label="Remove ${safeTitle}" type="button">🗑️</button>
       `;
     } else if (sectionType === 'completed') {
       overlayBadgeHtml = `<span class="progress-pill-badge completed">🎉 100%</span>`;
       actionBtnHtml = `
         <button class="btn-resume-card completed" type="button">👀 View</button>
-        <button class="btn-export-card" title="Export High-Res PNG" type="button">💾 Export</button>
-        <button class="btn-delete-saved" title="Remove" type="button">🗑️</button>
+        <button class="btn-export-card" title="Export High-Res PNG" aria-label="Export ${safeTitle} as PNG" type="button">💾 Export</button>
+        <button class="btn-delete-saved" title="Remove" aria-label="Remove ${safeTitle}" type="button">🗑️</button>
       `;
     } else {
       actionBtnHtml = `
         <button class="btn-resume-card" type="button">🎨 Color</button>
-        <button class="btn-delete-saved" title="Remove" type="button">🗑️</button>
+        <button class="btn-delete-saved" title="Remove" aria-label="Remove ${safeTitle}" type="button">🗑️</button>
       `;
     }
 
     card.innerHTML = `
       <div class="artwork-thumb-wrap">
-        ${thumbUrl ? `<img class="artwork-thumb-img" src="${thumbUrl}" alt="${record.title}">` : '<canvas class="artwork-thumb-canvas" width="280" height="200"></canvas>'}
+        ${thumbUrl ? `<img class="artwork-thumb-img" src="${thumbUrl}" alt="${safeTitle}">` : '<canvas class="artwork-thumb-canvas" width="280" height="200"></canvas>'}
         <span class="artwork-badge ${isDiamond ? 'diamond' : 'classic'}">${modeBadgeText}</span>
         ${overlayBadgeHtml}
       </div>
       <div class="artwork-info">
-        <h4>${record.title}</h4>
-        <span class="artwork-artist-tag">${record.artist || 'Tap Color Studio'} • ${timeStr}</span>
+        <h4>${safeTitle}</h4>
+        <span class="artwork-artist-tag">${safeArtist} • ${timeStr}</span>
         
         <div class="card-progress-bar-wrap">
           <div class="card-progress-bar">
@@ -2682,13 +2697,45 @@ class TapColorApp {
       </div>
     `;
 
-    // Click on card to load
+    if (!thumbUrl) {
+      const fbCanvas = card.querySelector('.artwork-thumb-canvas');
+      if (fbCanvas) {
+        const fctx = fbCanvas.getContext('2d');
+        fctx.fillStyle = '#F1F5F9';
+        fctx.fillRect(0, 0, fbCanvas.width, fbCanvas.height);
+        fctx.fillStyle = '#94A3B8';
+        fctx.font = '600 14px sans-serif';
+        fctx.textAlign = 'center';
+        fctx.textBaseline = 'middle';
+        fctx.fillText(isDiamond ? '💎 Diamond Art' : '🎨 Paint by Number', fbCanvas.width / 2, fbCanvas.height / 2);
+      }
+    }
+
+    const openSaved = async () => {
+      try {
+        await this.flushAutosave();
+        const fullRecord = record.artworkData ? record : await storage.getArtworkById(record.id);
+        if (fullRecord && fullRecord.artworkData) {
+          this.loadSavedArtwork(fullRecord);
+          document.getElementById('modal-gallery')?.classList.add('hidden');
+        }
+      } catch (err) {
+        console.error('Could not load saved artwork:', err);
+      }
+    };
+
+    // Click or keyboard on card to load
     card.addEventListener('click', (e) => {
       if (e.target.closest('.btn-delete-saved') || e.target.closest('.btn-reset-card') || e.target.closest('.btn-export-card')) {
         return;
       }
-      this.loadSavedArtwork(record);
-      document.getElementById('modal-gallery').classList.add('hidden');
+      openSaved();
+    });
+    card.addEventListener('keydown', (e) => {
+      if ((e.key === 'Enter' || e.key === ' ') && e.target === card) {
+        e.preventDefault();
+        openSaved();
+      }
     });
 
     // Reset progress button
@@ -2696,22 +2743,28 @@ class TapColorApp {
     if (resetBtn) {
       resetBtn.addEventListener('click', async (e) => {
         e.stopPropagation();
-        const ok = await this.showConfirm({
-          title: 'Reset Progress?',
-          message: `Reset your progress on "${record.title}" back to 0%? All completed pieces will be cleared.`,
-          confirmText: 'Reset to 0%',
-          cancelText: 'Cancel',
-          variant: 'warning',
-          icon: 'warning'
-        });
-        if (ok) {
-          await storage.resetArtworkProgress(record.id);
-          // If this artwork is currently loaded on canvas, reload it
-          if (this.currentArtworkId === record.id || (this.activeImportedRecord && this.activeImportedRecord.id === record.id)) {
-            const fresh = await storage.getArtworkById(record.id);
-            if (fresh) this.loadSavedArtwork(fresh);
+        try {
+          const ok = await this.showConfirm({
+            title: 'Reset Progress?',
+            message: `Reset your progress on "${record.title}" back to 0%? All completed pieces will be cleared.`,
+            confirmText: 'Reset to 0%',
+            cancelText: 'Cancel',
+            variant: 'warning',
+            icon: 'warning'
+          });
+          if (ok) {
+            await storage.resetArtworkProgress(record.id);
+            const isLoaded = this.currentArtworkId === record.id ||
+              (this.currentArtworkVariant && this.currentArtworkVariant.id === record.id) ||
+              (this.activeImportedRecord && this.activeImportedRecord.id === record.id);
+            if (isLoaded) {
+              const fresh = await storage.getArtworkById(record.id);
+              if (fresh) this.loadSavedArtwork(fresh);
+            }
+            await this.renderSavedGallery();
           }
-          await this.renderSavedGallery();
+        } catch (err) {
+          console.error('Failed to reset artwork progress:', err);
         }
       });
     }
@@ -2719,11 +2772,20 @@ class TapColorApp {
     // Export button (for completed)
     const exportBtn = card.querySelector('.btn-export-card');
     if (exportBtn) {
-      exportBtn.addEventListener('click', (e) => {
+      exportBtn.addEventListener('click', async (e) => {
         e.stopPropagation();
-        this.loadSavedArtwork(record);
-        document.getElementById('modal-gallery').classList.add('hidden');
-        setTimeout(() => this.exportArtworkPng(), 200);
+        try {
+          await this.flushAutosave();
+          const fullRecord = record.artworkData ? record : await storage.getArtworkById(record.id);
+          if (fullRecord && fullRecord.artworkData) {
+            const lineArtPromise = this.loadSavedArtwork(fullRecord);
+            document.getElementById('modal-gallery')?.classList.add('hidden');
+            await lineArtPromise;
+            this.exportArtworkPng();
+          }
+        } catch (err) {
+          console.error('Failed to export saved artwork:', err);
+        }
       });
     }
 
@@ -2732,20 +2794,24 @@ class TapColorApp {
     if (deleteBtn) {
       deleteBtn.addEventListener('click', async (e) => {
         e.stopPropagation();
-        const ok = await this.showConfirm({
-          title: 'Remove Picture?',
-          message: `Are you sure you want to remove "${record.title}" from your saved pictures? This cannot be undone.`,
-          confirmText: 'Remove Picture',
-          cancelText: 'Keep Picture',
-          variant: 'danger',
-          icon: 'trash'
-        });
-        if (ok) {
-          if (this.activeImportedRecord && this.activeImportedRecord.id === record.id) {
-            this.activeImportedRecord = null;
+        try {
+          const ok = await this.showConfirm({
+            title: 'Remove Picture?',
+            message: `Are you sure you want to remove "${record.title}" from your saved pictures? This cannot be undone.`,
+            confirmText: 'Remove Picture',
+            cancelText: 'Keep Picture',
+            variant: 'danger',
+            icon: 'trash'
+          });
+          if (ok) {
+            if (this.activeImportedRecord && this.activeImportedRecord.id === record.id) {
+              this.activeImportedRecord = null;
+            }
+            await storage.deleteArtwork(record.id);
+            await this.renderSavedGallery();
           }
-          await storage.deleteArtwork(record.id);
-          await this.renderSavedGallery();
+        } catch (err) {
+          console.error('Failed to delete saved artwork:', err);
         }
       });
     }
@@ -2753,17 +2819,24 @@ class TapColorApp {
     return card;
   }
 
-  loadSavedArtwork(record) {
-    const artwork = record.artworkData;
-    if (!artwork) return;
+  loadSavedArtwork(record, options = {}) {
+    const artwork = record && record.artworkData;
+    if (!artwork) return Promise.resolve();
+
+    this.loadGeneration++;
+    if (this.victoryTimeout) {
+      clearTimeout(this.victoryTimeout);
+      this.victoryTimeout = null;
+    }
+    if (!options.preserveCustomImage) {
+      this.lastCustomImage = null;
+    }
 
     this.currentArtworkId = record.parentArtworkId || artwork.id;
     this.activeImportedRecord = record;
     this.highlightMatching = false;
     const btnHint = document.getElementById('btn-hint');
-    const badge = document.getElementById('hint-badge');
     if (btnHint) btnHint.classList.remove('active');
-    if (badge) badge.textContent = 'OFF';
 
     // Find meta if it's a catalog artwork
     let meta = this.artworksMeta.find(a => a.id === this.currentArtworkId);
@@ -2777,12 +2850,15 @@ class TapColorApp {
 
     // Load artwork into controller
     if (this.controller && this.controller.load_artwork_json) {
-      this.controller.load_artwork_json(JSON.stringify(artwork));
+      const ok = this.controller.load_artwork_json(JSON.stringify(artwork));
+      if (!ok) {
+        console.warn('Failed to parse saved artwork JSON into controller');
+      }
     } else if (this.controller) {
       this.controller.artwork = artwork;
       this.controller.fit_to_screen();
     }
-    this.syncLineArtOverlay(artwork);
+    const lineArtPromise = this.syncLineArtOverlay(artwork);
 
     this.startTime = Date.now();
     this.totalTaps = 0;
@@ -2791,10 +2867,11 @@ class TapColorApp {
     this.refreshPaletteUI();
     this.updateResolutionBarUI();
     this.persistCurrentArtworkState();
+    return lineArtPromise;
   }
 
   loadImportedArtwork(record) {
-    this.loadSavedArtwork(record);
+    return this.loadSavedArtwork(record, { preserveCustomImage: true });
   }
 
   renderThumbnail(canvas, meta) {
@@ -2802,7 +2879,7 @@ class TapColorApp {
     const w = canvas.width;
     const h = canvas.height;
 
-    ctx.fillStyle = '#0f172a';
+    ctx.fillStyle = '#F8FAFC';
     ctx.fillRect(0, 0, w, h);
 
     const activeVar = meta.variants
@@ -2823,69 +2900,18 @@ class TapColorApp {
         const dy = (h - dh) / 2;
         ctx.drawImage(img, dx, dy, dw, dh);
       };
+      img.onerror = () => {
+        ctx.fillStyle = '#E2E8F0';
+        ctx.fillRect(0, 0, w, h);
+      };
       img.src = thumbUrl;
-      return;
-    }
-
-    if (meta.category === 'diamond') {
-      const N = 28;
-      const grid = getDiamondArtGrid(meta.id, N);
-      const palette = DIAMOND_PALETTES[meta.id] || [];
-      const colorMap = Object.fromEntries(palette.map(p => [p.num, p.hex]));
-
-      const margin = 12;
-      const size = Math.min(w - margin * 2, h - margin * 2);
-      const cellSize = size / N;
-      const ox = (w - size) / 2;
-      const oy = (h - size) / 2;
-
-      for (let r = 0; r < N; r++) {
-        for (let c = 0; c < N; c++) {
-          const num = grid[r][c];
-          const hex = colorMap[num] || '#FFFFFF';
-          const x = ox + c * cellSize;
-          const y = oy + r * cellSize;
-
-          ctx.fillStyle = hex;
-          ctx.fillRect(x, y, cellSize - 0.5, cellSize - 0.5);
-
-          // Subtle diamond bevel shine on thumbnail
-          ctx.fillStyle = 'rgba(255,255,255,0.2)';
-          ctx.fillRect(x, y, (cellSize - 0.5) * 0.5, (cellSize - 0.5) * 0.5);
-        }
-      }
-    } else {
-      // Classic vector thumbnail
-      const s = 0.22;
-      const ox = (w - 800 * s) / 2;
-      const oy = (h - 800 * s) / 2;
-
-      ctx.save();
-      ctx.translate(ox, oy);
-      ctx.scale(s, s);
-
-      // Simple representative preview colors
-      const fallbackEngine = new FallbackJsController(canvas, meta.id);
-      fallbackEngine.artwork.regions.forEach(reg => {
-        ctx.beginPath();
-        ctx.moveTo(reg.polygon[0].x, reg.polygon[0].y);
-        for (let i = 1; i < reg.polygon.length; i++) {
-          ctx.lineTo(reg.polygon[i].x, reg.polygon[i].y);
-        }
-        ctx.closePath();
-        ctx.fillStyle = reg.color_hex;
-        ctx.fill();
-        ctx.strokeStyle = 'rgba(255,255,255,0.3)';
-        ctx.lineWidth = 1.5;
-        ctx.stroke();
-      });
-      ctx.restore();
     }
   }
 
   setupCustomStudio() {
     let customImg = null;
-    let selectedPreset = 'fluffy_cow';
+    let cachedBounds = null;
+    let studioImgGen = 0;
     let currentStudioMode = 'diamond';
 
     const previewCanvas = document.getElementById('studio-preview-canvas');
@@ -2901,7 +2927,7 @@ class TapColorApp {
       if (customImg) {
         pCtx.fillStyle = '#0f172a';
         pCtx.fillRect(0, 0, previewCanvas.width, previewCanvas.height);
-        const bounds = detectContentBounds(customImg);
+        const bounds = cachedBounds || (cachedBounds = detectContentBounds(customImg));
         const scale = Math.min(previewCanvas.width / bounds.sw, previewCanvas.height / bounds.sh);
         const dw = bounds.sw * scale;
         const dh = bounds.sh * scale;
@@ -2910,22 +2936,19 @@ class TapColorApp {
         pCtx.drawImage(customImg, bounds.sx, bounds.sy, bounds.sw, bounds.sh, dx, dy, dw, dh);
 
         if (currentStudioMode === 'diamond') {
-          // Draw subtle diamond gemstone grid preview mesh with sparkle highlights
           pCtx.strokeStyle = 'rgba(255, 255, 255, 0.22)';
           pCtx.lineWidth = 0.5;
           const step = 8;
+          pCtx.beginPath();
           for (let gx = dx; gx <= dx + dw; gx += step) {
-            pCtx.beginPath();
             pCtx.moveTo(gx, dy);
             pCtx.lineTo(gx, dy + dh);
-            pCtx.stroke();
           }
           for (let gy = dy; gy <= dy + dh; gy += step) {
-            pCtx.beginPath();
             pCtx.moveTo(dx, gy);
             pCtx.lineTo(dx + dw, gy);
-            pCtx.stroke();
           }
+          pCtx.stroke();
         }
 
         const activeBtn = document.querySelector('.btn-preset.active');
@@ -2936,29 +2959,39 @@ class TapColorApp {
       }
     };
     this.updateStudioPreview = updateStudioPreview;
-    setTimeout(() => updateStudioPreview(), 50);
+
+    const loadPreviewImage = (src) => {
+      const gen = ++studioImgGen;
+      const img = new Image();
+      img.onload = () => {
+        if (gen !== studioImgGen) return;
+        customImg = img;
+        cachedBounds = null;
+        updateStudioPreview();
+      };
+      img.onerror = () => {
+        if (gen !== studioImgGen) return;
+        console.warn('Could not load studio preview image:', src);
+      };
+      img.src = src;
+    };
 
     const presetButtons = document.querySelectorAll('.btn-preset');
     presetButtons.forEach(btn => {
       btn.addEventListener('click', () => {
         presetButtons.forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
-        selectedPreset = btn.dataset.key || btn.dataset.preset;
         const assetUrl = btn.dataset.asset;
         const assetTitle = btn.dataset.title;
 
         if (assetUrl) {
-          document.getElementById('upload-filename').textContent = btn.textContent.trim();
+          const uploadName = document.getElementById('upload-filename');
+          if (uploadName) uploadName.textContent = btn.textContent.trim();
           if (assetTitle) {
             const titleInp = document.getElementById('input-custom-title');
             if (titleInp) titleInp.value = assetTitle;
           }
-          const img = new Image();
-          img.onload = () => {
-            customImg = img;
-            updateStudioPreview();
-          };
-          img.src = assetUrl;
+          loadPreviewImage(assetUrl);
         }
       });
     });
@@ -2972,12 +3005,7 @@ class TapColorApp {
         const titleInp = document.getElementById('input-custom-title');
         if (titleInp) titleInp.value = assetTitle;
       }
-      const img = new Image();
-      img.onload = () => {
-        customImg = img;
-        updateStudioPreview();
-      };
-      img.src = assetUrl;
+      loadPreviewImage(assetUrl);
     }
 
     const fileInput = document.getElementById('input-custom-photo');
@@ -2985,17 +3013,24 @@ class TapColorApp {
       fileInput.addEventListener('change', (e) => {
         const file = e.target.files[0];
         if (file) {
-          document.getElementById('upload-filename').textContent = file.name;
+          const uploadName = document.getElementById('upload-filename');
+          if (uploadName) uploadName.textContent = file.name;
           presetButtons.forEach(b => b.classList.remove('active'));
+          const gen = ++studioImgGen;
           const reader = new FileReader();
           reader.onload = (event) => {
+            if (gen !== studioImgGen) return;
             const img = new Image();
             img.onload = () => {
+              if (gen !== studioImgGen) return;
               customImg = img;
+              cachedBounds = null;
               updateStudioPreview();
             };
+            img.onerror = () => console.warn('Could not decode uploaded photo');
             img.src = event.target.result;
           };
+          reader.onerror = () => console.warn('Could not read uploaded file');
           reader.readAsDataURL(file);
         }
       });
@@ -3071,7 +3106,7 @@ class TapColorApp {
     const getActiveSourceImage = async () => {
       if (customImg) return customImg;
       const activeBtn = document.querySelector('.btn-preset.active[data-asset]');
-      const assetUrl = (activeBtn && activeBtn.dataset.asset) || 'assets/fluffy-cow-3.jpeg';
+      const assetUrl = (activeBtn && activeBtn.dataset.asset) || 'assets/paint_by_number/fluffy-cow-3.jpeg';
       return new Promise((resolve, reject) => {
         const img = new Image();
         img.onload = () => resolve(img);
@@ -3084,20 +3119,23 @@ class TapColorApp {
     const btnConvertVector = document.getElementById('btn-convert-vector');
     if (btnConvertVector) {
       btnConvertVector.addEventListener('click', async () => {
+        if (this.isConverting) return;
+        this.isConverting = true;
         const modalConv = document.getElementById('modal-conversion');
         const statusEl = document.getElementById('conversion-status');
         const fillEl = document.getElementById('conversion-progress-fill');
         const titleInput = document.getElementById('input-custom-title');
         const customTitle = (titleInput && titleInput.value.trim()) || 'My Painting';
 
-        const complexity = document.getElementById('select-vector-complexity').value || 'balanced';
-        const customPaletteSize = parseInt(document.getElementById('select-vector-colors').value, 10) || 26;
+        const complexity = document.getElementById('select-vector-complexity')?.value || 'balanced';
+        const customPaletteSize = parseInt(document.getElementById('select-vector-colors')?.value, 10) || 26;
 
-        modalConv.classList.remove('hidden');
-        fillEl.style.width = '10%';
-        statusEl.textContent = 'Preparing your picture...';
+        if (modalConv) modalConv.classList.remove('hidden');
+        if (fillEl) fillEl.style.width = '10%';
+        if (statusEl) statusEl.textContent = 'Preparing your picture...';
 
         try {
+          await this.flushAutosave();
           const source = await getActiveSourceImage();
           this.lastCustomImage = source;
           this.lastCustomTitle = customTitle;
@@ -3108,8 +3146,8 @@ class TapColorApp {
           this.currentArtworkVariant = null;
 
           const onProgress = (msg, pct) => {
-            statusEl.textContent = msg;
-            fillEl.style.width = `${pct}%`;
+            if (statusEl) statusEl.textContent = msg;
+            if (fillEl) fillEl.style.width = `${pct}%`;
           };
 
           const { artwork, thumbnailBlob } = await vectorizeImage(source, {
@@ -3123,8 +3161,8 @@ class TapColorApp {
           const savedId = await storage.saveArtwork(artwork, thumbnailBlob, customTitle);
           await this.updateSavedBadge();
 
-          modalConv.classList.add('hidden');
-          document.getElementById('modal-gallery').classList.add('hidden');
+          if (modalConv) modalConv.classList.add('hidden');
+          document.getElementById('modal-gallery')?.classList.add('hidden');
 
           this.loadImportedArtwork({
             id: savedId,
@@ -3141,13 +3179,15 @@ class TapColorApp {
           });
         } catch (err) {
           console.error('Art creation failed:', err);
-          modalConv.classList.add('hidden');
+          if (modalConv) modalConv.classList.add('hidden');
           await this.showAlert({
             title: 'Creation Failed',
             message: 'Could not create coloring page: ' + err.message,
             variant: 'error',
             icon: 'error'
           });
+        } finally {
+          this.isConverting = false;
         }
       });
     }
@@ -3155,27 +3195,52 @@ class TapColorApp {
     const btnConvertDiamond = document.getElementById('btn-convert-diamond');
     if (btnConvertDiamond) {
       btnConvertDiamond.addEventListener('click', async () => {
-        const N = parseInt(document.getElementById('select-custom-grid').value, 10) || 120;
-        const K = parseInt(document.getElementById('select-custom-colors').value, 10) || 26;
-        const titleInput = document.getElementById('input-custom-title');
-        const customTitle = (titleInput && titleInput.value.trim()) || 'Diamond Masterpiece';
+        if (this.isConverting) return;
+        this.isConverting = true;
+        try {
+          const N = parseInt(document.getElementById('select-custom-grid')?.value, 10) || 120;
+          const K = parseInt(document.getElementById('select-custom-colors')?.value, 10) || 26;
+          const titleInput = document.getElementById('input-custom-title');
+          const customTitle = (titleInput && titleInput.value.trim()) || 'Diamond Masterpiece';
 
-        const source = await getActiveSourceImage();
-        this.lastCustomImage = source;
-        this.lastCustomTitle = customTitle;
-        this.lastCustomMode = 'diamond';
-        this.lastCustomGrid = N;
-        this.lastCustomColors = K;
-        this.currentArtworkMeta = null;
-        this.currentArtworkVariant = null;
+          await this.flushAutosave();
+          const source = await getActiveSourceImage();
+          this.lastCustomImage = source;
+          this.lastCustomTitle = customTitle;
+          this.lastCustomMode = 'diamond';
+          this.lastCustomGrid = N;
+          this.lastCustomColors = K;
+          this.currentArtworkMeta = null;
+          this.currentArtworkVariant = null;
 
-        this.convertImageToDiamondArt(source, selectedPreset, N, K, customTitle);
-        document.getElementById('modal-gallery').classList.add('hidden');
+          this.convertImageToDiamondArt(source, N, K, customTitle);
+          document.getElementById('modal-gallery')?.classList.add('hidden');
+        } catch (err) {
+          console.error('Diamond art creation failed:', err);
+          await this.showAlert({
+            title: 'Creation Failed',
+            message: 'Could not load image for Diamond Painting.',
+            variant: 'error',
+            icon: 'error'
+          });
+        } finally {
+          this.isConverting = false;
+        }
       });
     }
   }
 
-  convertImageToDiamondArt(img, presetName, N, K, customTitle = '') {
+  convertImageToDiamondArt(img, N, K, customTitle = '') {
+    const gen = ++this.loadGeneration;
+    if (this.victoryTimeout) {
+      clearTimeout(this.victoryTimeout);
+      this.victoryTimeout = null;
+    }
+    this.activeImportedRecord = null;
+    this.highlightMatching = false;
+    const btnHint = document.getElementById('btn-hint');
+    if (btnHint) btnHint.classList.remove('active');
+
     const offCanvas = document.createElement('canvas');
     offCanvas.width = N;
     offCanvas.height = N;
@@ -3203,11 +3268,12 @@ class TapColorApp {
       samples.push([pixels[pIdx], pixels[pIdx + 1], pixels[pIdx + 2]]);
     }
 
-    const km = kmeans(samples, K, { initialization: 'kmeans++', maxIterations: 12 });
+    const effectiveK = Math.max(1, Math.min(K, samples.length));
+    const km = kmeans(samples, effectiveK, { initialization: 'kmeans++', maxIterations: 12 });
     const centers = km.centroids.map(c => [
-      Math.min(255, Math.max(0, Math.round(c[0]))),
-      Math.min(255, Math.max(0, Math.round(c[1]))),
-      Math.min(255, Math.max(0, Math.round(c[2]))),
+      Math.min(255, Math.max(0, Math.round(c[0] || 0))),
+      Math.min(255, Math.max(0, Math.round(c[1] || 0))),
+      Math.min(255, Math.max(0, Math.round(c[2] || 0))),
     ]);
 
     centers.sort((a, b) => {
@@ -3256,7 +3322,7 @@ class TapColorApp {
 
         let bestDist = Infinity;
         let bestK = 0;
-        for (let k = 0; k < K; k++) {
+        for (let k = 0; k < effectiveK; k++) {
           const dr = pr - cR[k];
           const dg = pg - cG[k];
           const db = pb - cB[k];
@@ -3287,18 +3353,22 @@ class TapColorApp {
       }
     }
 
+    const activePalette = palette.filter(p => p.total_count > 0);
+
     const artwork = {
       id: 'custom_diamond_' + Date.now(),
       title: customTitle || 'Custom Photo Diamond Art',
       artist: 'Custom Studio Creation',
       width,
       height,
-      palette,
+      palette: activePalette,
       regions,
     };
 
-    generateThumbnailBlob(artwork).then(blob => {
-      storage.saveArtwork(artwork, blob, artwork.title).then(savedId => {
+    generateThumbnailBlob(artwork)
+      .then(blob => storage.saveArtwork(artwork, blob, artwork.title).then(savedId => ({ savedId, blob })))
+      .then(({ savedId, blob }) => {
+        if (gen !== this.loadGeneration) return;
         this.activeImportedRecord = {
           id: savedId,
           title: artwork.title,
@@ -3314,10 +3384,11 @@ class TapColorApp {
         };
         this.updateSavedBadge();
         this.persistCurrentArtworkState();
-      });
-    }).catch(e => console.warn('Could not save diamond artwork to IndexedDB:', e));
+      })
+      .catch(e => console.warn('Could not save diamond artwork to IndexedDB:', e));
 
     this.currentArtworkId = artwork.id;
+    this.lastCustomMode = 'diamond';
     if (this.controller && this.controller.load_artwork_json) {
       this.controller.load_artwork_json(JSON.stringify(artwork));
     } else if (this.controller) {
@@ -3336,32 +3407,47 @@ class TapColorApp {
   }
 
   syncLineArtOverlay(artworkData) {
-    if (!this.controller || typeof this.controller.set_line_art_image !== 'function') return;
+    if (!this.controller || typeof this.controller.set_line_art_image !== 'function') {
+      return Promise.resolve();
+    }
+    const gen = ++this.lineArtGeneration;
     const url = artworkData && artworkData.line_art_url;
     if (!url) {
       this.controller.set_line_art_image(null);
-      return;
+      return Promise.resolve();
     }
     this.controller.set_line_art_image(null);
-    const img = new Image();
-    img.onload = () => {
-      if (this.controller && typeof this.controller.set_line_art_image === 'function') {
-        this.controller.set_line_art_image(img);
-      }
-    };
-    img.src = url;
+    return new Promise((resolve) => {
+      const img = new Image();
+      img.onload = () => {
+        if (gen === this.lineArtGeneration && this.controller && typeof this.controller.set_line_art_image === 'function') {
+          this.controller.set_line_art_image(img);
+        }
+        resolve();
+      };
+      img.onerror = () => {
+        console.warn('Could not load line art overlay:', url);
+        resolve();
+      };
+      img.src = url;
+    });
   }
 
   async selectArtwork(id, variantId = null) {
+    const gen = ++this.loadGeneration;
     await this.flushAutosave();
+    if (gen !== this.loadGeneration) return;
+
+    if (this.victoryTimeout) {
+      clearTimeout(this.victoryTimeout);
+      this.victoryTimeout = null;
+    }
 
     this.currentArtworkId = id;
     this.activeImportedRecord = null;
     this.highlightMatching = false;
     const btnHint = document.getElementById('btn-hint');
-    const badge = document.getElementById('hint-badge');
     if (btnHint) btnHint.classList.remove('active');
-    if (badge) badge.textContent = 'OFF';
 
     // Find meta
     let meta = this.artworksMeta.find(a => a.id === id);
@@ -3396,6 +3482,7 @@ class TapColorApp {
     const targetId = targetVariant ? targetVariant.id : (variantId || id);
     try {
       const savedRecord = await storage.getArtworkById(targetId);
+      if (gen !== this.loadGeneration) return;
       if (savedRecord && savedRecord.artworkData && (savedRecord.filledCount || 0) > 0) {
         this.loadSavedArtwork(savedRecord);
         return;
@@ -3409,7 +3496,9 @@ class TapColorApp {
     if (jsonPath) {
       try {
         const res = await fetch(jsonPath);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const rawArtworkData = await res.json();
+        if (gen !== this.loadGeneration) return;
         const artworkData = this.expandCompactArtwork(rawArtworkData);
         if (this.controller && this.controller.load_artwork_json) {
           this.controller.load_artwork_json(JSON.stringify(artworkData));
@@ -3419,6 +3508,7 @@ class TapColorApp {
         }
         this.syncLineArtOverlay(artworkData);
       } catch (err) {
+        if (gen !== this.loadGeneration) return;
         console.error('Failed to load artwork JSON from ' + jsonPath, err);
         if (this.controller) {
           this.controller.load_artwork(id);
@@ -3447,6 +3537,7 @@ class TapColorApp {
     }
 
     const N = data.grid || Math.round(Math.sqrt(data.cells.length));
+    if (!N) return { ...data, regions: [] };
     const width = data.width || 800;
     const height = data.height || 800;
     const margin = data.margin ?? 28;
@@ -3470,7 +3561,7 @@ class TapColorApp {
 
       for (let c = 0; c < N; c++) {
         const idx = r * N + c;
-        const num = data.cells[idx];
+        const num = data.cells[idx] ?? 1;
         const x0Raw = margin + c * cellSize;
         const x1Raw = x0Raw + cellSize;
         const x0 = round2(x0Raw);
@@ -3538,6 +3629,7 @@ class TapColorApp {
       labelRes.textContent = isDiamond ? 'Diamond Art' : 'Paint by Number';
       btnRes.classList.remove('hidden');
     } else {
+      labelRes.textContent = isDiamond ? 'Diamond Art' : 'Classic';
       btnRes.classList.remove('hidden');
     }
   }
@@ -3585,7 +3677,9 @@ class TapColorApp {
         const isActive = this.currentArtworkVariant && this.currentArtworkVariant.id === v.id;
         const item = document.createElement('div');
         item.className = `quick-dropdown-item ${isMetaDiamond ? 'diamond-item' : ''} ${isActive ? 'active' : ''}`;
-        
+        item.setAttribute('role', 'menuitem');
+        item.setAttribute('tabindex', '0');
+
         let icon = '🟡';
         if (v.id.includes('80') || v.id.includes('detailed')) icon = '🟢';
         if (v.id.includes('160') || v.id.includes('masterpiece')) icon = '🟣';
@@ -3596,21 +3690,33 @@ class TapColorApp {
         else if (v.grid === 160 || friendlyName === 'Masterpiece Ultra') friendlyName = 'Detailed';
         else if (friendlyName === 'Original Lines') friendlyName = 'Classic';
 
+        const safeName = escapeHtml(friendlyName);
+        const subtitle = isMetaDiamond
+          ? `${v.grid ? `${v.grid}×${v.grid} drills • ` : ''}${v.colors} colors`
+          : `Crisp hand-drawn outlines • ${v.colors} colors`;
+
         item.innerHTML = `
           <div class="quick-item-left">
             <span class="quick-item-icon">${isMetaDiamond ? icon : '🎨'}</span>
             <div class="quick-item-info">
-              <span class="quick-item-title">${friendlyName} ${isActive ? '✓' : ''}</span>
-              <span class="quick-item-subtitle">${isMetaDiamond ? `${v.colors} colors` : 'Crisp hand-drawn outlines'} • ${v.colors} colors</span>
+              <span class="quick-item-title">${safeName} ${isActive ? '✓' : ''}</span>
+              <span class="quick-item-subtitle">${subtitle}</span>
             </div>
           </div>
           <span class="quick-item-badge">${isActive ? 'Selected' : 'Choose'}</span>
         `;
 
-        item.addEventListener('click', () => {
+        const activate = () => {
           closeDropdown();
           if (!isActive) {
             this.selectArtwork(meta.id, v.id);
+          }
+        };
+        item.addEventListener('click', activate);
+        item.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            activate();
           }
         });
 
@@ -3620,6 +3726,13 @@ class TapColorApp {
     }
 
     // Case 2: Custom Photo
+    if (!this.lastCustomImage) {
+      const note = document.createElement('div');
+      note.className = 'quick-dropdown-empty';
+      note.textContent = 'Custom photo detail levels are available right after creating from a photo.';
+      optionsContainer.appendChild(note);
+      return;
+    }
     if (isDiamond) {
       const diamondPresets = [
         { grid: 80, colors: 18, name: 'Easy', icon: '🟢', drills: 6400 },
@@ -3677,7 +3790,9 @@ class TapColorApp {
 
         item.addEventListener('click', async () => {
           closeDropdown();
-          if (this.lastCustomImage) {
+          if (this.lastCustomImage && !this.isConverting) {
+            this.isConverting = true;
+            this.lastCustomMode = 'classic';
             this.lastCustomComplexity = preset.complexity;
             this.lastCustomPaletteSize = preset.colors;
             const modalConv = document.getElementById('modal-conversion');
@@ -3688,6 +3803,7 @@ class TapColorApp {
             if (statusEl) statusEl.textContent = 'Generating Paint by Number...';
 
             try {
+              await this.flushAutosave();
               const title = this.lastCustomTitle || 'Custom Painting';
               const { artwork, thumbnailBlob } = await vectorizeImage(this.lastCustomImage, {
                 title,
@@ -3725,6 +3841,8 @@ class TapColorApp {
                 variant: 'error',
                 icon: 'error'
               });
+            } finally {
+              this.isConverting = false;
             }
           }
         });
@@ -3740,6 +3858,12 @@ class TapColorApp {
 
     const dropdownQuick = document.getElementById('quick-style-dropdown');
     const btnResSwitcher = document.getElementById('btn-resolution-switcher');
+    const backdropQuick = document.getElementById('quick-dropdown-backdrop');
+    const closeQuick = () => {
+      if (dropdownQuick) dropdownQuick.classList.add('hidden');
+      if (btnResSwitcher) btnResSwitcher.classList.remove('active');
+      if (backdropQuick) backdropQuick.classList.add('hidden');
+    };
 
     // 1. Gallery Artwork: find counterpart or convert originalAsset on the fly
     if (this.currentArtworkMeta) {
@@ -3748,97 +3872,119 @@ class TapColorApp {
       const counterpartId = baseKey + (targetMode === 'diamond' ? '_diamond' : '_pbn');
       const counterpartMeta = this.artworksMeta.find(a => a.id === counterpartId);
       if (counterpartMeta) {
-        if (dropdownQuick) dropdownQuick.classList.add('hidden');
-        if (btnResSwitcher) btnResSwitcher.classList.remove('active');
-        const backdropQuick = document.getElementById('quick-dropdown-backdrop');
-        if (backdropQuick) backdropQuick.classList.add('hidden');
+        closeQuick();
         await this.selectArtwork(counterpartMeta.id);
         return;
       } else if (this.currentArtworkMeta.originalAsset) {
         const assetUrl = this.currentArtworkMeta.originalAsset;
         this.lastCustomTitle = this.currentArtworkMeta.title;
-        this.lastCustomImage = await new Promise((resolve, reject) => {
-          const img = new Image();
-          img.onload = () => resolve(img);
-          img.onerror = reject;
-          img.src = assetUrl;
-        });
+        try {
+          this.lastCustomImage = await new Promise((resolve, reject) => {
+            const img = new Image();
+            img.onload = () => resolve(img);
+            img.onerror = () => reject(new Error('Could not load source image'));
+            img.src = assetUrl;
+          });
+        } catch (err) {
+          closeQuick();
+          console.error('Could not load originalAsset:', err);
+          return;
+        }
       }
     }
 
     // 2. Custom Photo or Active Imported Artwork
-    if (this.lastCustomImage) {
-      if (dropdownQuick) dropdownQuick.classList.add('hidden');
-      if (btnResSwitcher) btnResSwitcher.classList.remove('active');
+    if (this.lastCustomImage && !this.isConverting) {
+      closeQuick();
+      this.isConverting = true;
+      try {
+        await this.flushAutosave();
+        this.currentArtworkMeta = null;
+        this.currentArtworkVariant = null;
+        this.lastCustomMode = targetMode;
 
-      if (targetMode === 'diamond') {
-        const N = this.lastCustomGrid || 120;
-        const K = this.lastCustomColors || 26;
-        const title = this.lastCustomTitle || 'Custom Diamond Art';
-        this.convertImageToDiamondArt(this.lastCustomImage, 'custom', N, K, title);
-      } else {
-        const modalConv = document.getElementById('modal-conversion');
-        const statusEl = document.getElementById('conversion-status');
-        const fillEl = document.getElementById('conversion-progress-fill');
-        if (modalConv) modalConv.classList.remove('hidden');
-        if (fillEl) fillEl.style.width = '20%';
-        if (statusEl) statusEl.textContent = 'Generating Paint by Number...';
+        if (targetMode === 'diamond') {
+          const N = this.lastCustomGrid || 120;
+          const K = this.lastCustomColors || 26;
+          const title = this.lastCustomTitle || 'Custom Diamond Art';
+          this.convertImageToDiamondArt(this.lastCustomImage, N, K, title);
+        } else {
+          const modalConv = document.getElementById('modal-conversion');
+          const statusEl = document.getElementById('conversion-status');
+          const fillEl = document.getElementById('conversion-progress-fill');
+          if (modalConv) modalConv.classList.remove('hidden');
+          if (fillEl) fillEl.style.width = '20%';
+          if (statusEl) statusEl.textContent = 'Generating Paint by Number...';
 
-        try {
-          const comp = this.lastCustomComplexity || 'balanced';
-          const colors = this.lastCustomPaletteSize || 26;
-          const title = this.lastCustomTitle || 'Custom Painting';
+          try {
+            const comp = this.lastCustomComplexity || 'balanced';
+            const colors = this.lastCustomPaletteSize || 26;
+            const title = this.lastCustomTitle || 'Custom Painting';
 
-          const { artwork, thumbnailBlob } = await vectorizeImage(this.lastCustomImage, {
-            title,
-            complexity: comp,
-            customPaletteSize: colors,
-            onProgress: (msg, pct) => {
-              if (statusEl) statusEl.textContent = msg;
-              if (fillEl) fillEl.style.width = `${pct}%`;
-            }
-          });
+            const { artwork, thumbnailBlob } = await vectorizeImage(this.lastCustomImage, {
+              title,
+              complexity: comp,
+              customPaletteSize: colors,
+              onProgress: (msg, pct) => {
+                if (statusEl) statusEl.textContent = msg;
+                if (fillEl) fillEl.style.width = `${pct}%`;
+              }
+            });
 
-          const savedId = await storage.saveArtwork(artwork, thumbnailBlob, title);
-          await this.updateSavedBadge();
-          if (modalConv) modalConv.classList.add('hidden');
+            const savedId = await storage.saveArtwork(artwork, thumbnailBlob, title);
+            await this.updateSavedBadge();
+            if (modalConv) modalConv.classList.add('hidden');
 
-          this.loadImportedArtwork({
-            id: savedId,
-            title,
-            artist: 'My Custom Art',
-            category: 'imported',
-            createdAt: Date.now(),
-            thumbnailBlob,
-            artworkData: artwork,
-            pieces: artwork.regions.length,
-            colors: artwork.palette.length,
-            filledCount: 0,
-            completed: false,
-          });
-        } catch (err) {
-          console.error('Failed to convert to PBN:', err);
-          if (modalConv) modalConv.classList.add('hidden');
-          await this.showAlert({
-            title: 'Conversion Failed',
-            message: 'Could not convert to Paint by Number: ' + err.message,
-            variant: 'error',
-            icon: 'error'
-          });
+            this.loadImportedArtwork({
+              id: savedId,
+              title,
+              artist: 'My Custom Art',
+              category: 'imported',
+              createdAt: Date.now(),
+              thumbnailBlob,
+              artworkData: artwork,
+              pieces: artwork.regions.length,
+              colors: artwork.palette.length,
+              filledCount: 0,
+              completed: false,
+            });
+          } catch (err) {
+            console.error('Failed to convert to PBN:', err);
+            if (modalConv) modalConv.classList.add('hidden');
+            await this.showAlert({
+              title: 'Conversion Failed',
+              message: 'Could not convert to Paint by Number: ' + err.message,
+              variant: 'error',
+              icon: 'error'
+            });
+          }
         }
+      } finally {
+        this.isConverting = false;
       }
+    } else {
+      closeQuick();
     }
   }
 
   updateArtworkUI() {
     if (!this.controller) return;
-    const info = JSON.parse(this.controller.get_artwork_info_json());
+    let info = {};
+    try {
+      info = JSON.parse(this.controller.get_artwork_info_json());
+    } catch (_) {
+      return;
+    }
     const cleanTitle = (this.currentArtworkMeta && this.currentArtworkMeta.title) || info.title || 'Tap Color';
-    document.getElementById('artwork-title').textContent = cleanTitle;
-    document.getElementById('artwork-artist').textContent = (this.currentArtworkMeta && this.currentArtworkMeta.artist) || info.artist || 'Art Studio';
-    const percent = Math.round((info.filled_regions / Math.max(1, info.total_regions)) * 100);
-    document.getElementById('progress-fill').style.width = `${percent}%`;
-    document.getElementById('progress-text').textContent = `${percent}%`;
+    const titleEl = document.getElementById('artwork-title');
+    const artistEl = document.getElementById('artwork-artist');
+    const fillEl = document.getElementById('progress-fill');
+    const textEl = document.getElementById('progress-text');
+    if (titleEl) titleEl.textContent = cleanTitle;
+    if (artistEl) artistEl.textContent = (this.currentArtworkMeta && this.currentArtworkMeta.artist) || info.artist || 'Art Studio';
+    const percent = Math.round(((info.filled_regions || 0) / Math.max(1, info.total_regions || 1)) * 100);
+    if (fillEl) fillEl.style.width = `${percent}%`;
+    if (textEl) textEl.textContent = `${percent}%`;
   }
 
   undoLastAction() {
@@ -3926,11 +4072,19 @@ class TapColorApp {
 
     const rawTitle = info.title || this.currentArtworkId || 'artwork';
     const cleanTitle = rawTitle.replace(/[^\w\s-]/g, '').trim().replace(/\s+/g, '_') || 'tap_color';
+    const filename = `${cleanTitle}_masterpiece.png`;
 
-    const link = document.createElement('a');
-    link.download = `${cleanTitle}_masterpiece.png`;
-    link.href = exportCanvas.toDataURL('image/png');
-    link.click();
+    exportCanvas.toBlob((blob) => {
+      if (!blob) return;
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.download = filename;
+      link.href = url;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      setTimeout(() => URL.revokeObjectURL(url), 5000);
+    }, 'image/png');
   }
 
   renderExportFallback(ctx, width, height, forceAllFilled = false) {
@@ -3956,7 +4110,10 @@ class TapColorApp {
     ctx.translate(ox, oy);
     ctx.scale(s, s);
 
-    const isDiamond = (artwork.id && artwork.id.includes('diamond')) || artwork.regions.length > 200;
+    const isDiamond = Boolean(
+      (artwork.id && artwork.id.includes('diamond')) ||
+      (artwork.regions.length > 300 && artwork.regions[0] && artwork.regions[0].polygon && artwork.regions[0].polygon.length === 4)
+    );
 
     for (const region of artwork.regions) {
       if (!region.polygon || region.polygon.length < 3) continue;
@@ -3969,18 +4126,33 @@ class TapColorApp {
       const cellW = p1.x - p0.x;
       const cellH = p2.y - p1.y;
 
+      const tracePoly = () => {
+        ctx.beginPath();
+        ctx.moveTo(region.polygon[0].x, region.polygon[0].y);
+        for (let i = 1; i < region.polygon.length; i++) {
+          ctx.lineTo(region.polygon[i].x, region.polygon[i].y);
+        }
+        ctx.closePath();
+        if (region.holes) {
+          for (const hole of region.holes) {
+            if (hole.length >= 3) {
+              ctx.moveTo(hole[0].x, hole[0].y);
+              for (let i = 1; i < hole.length; i++) {
+                ctx.lineTo(hole[i].x, hole[i].y);
+              }
+              ctx.closePath();
+            }
+          }
+        }
+      };
+
       if (isFilled) {
         ctx.fillStyle = region.color_hex;
         if (isQuad) {
           ctx.fillRect(p0.x, p0.y, cellW, cellH);
         } else {
-          ctx.beginPath();
-          ctx.moveTo(region.polygon[0].x, region.polygon[0].y);
-          for (let i = 1; i < region.polygon.length; i++) {
-            ctx.lineTo(region.polygon[i].x, region.polygon[i].y);
-          }
-          ctx.closePath();
-          ctx.fill();
+          tracePoly();
+          ctx.fill('evenodd');
 
           // Seam-seal stroke prevents white hairline cracks between adjacent pieces
           ctx.strokeStyle = region.color_hex;
@@ -4010,19 +4182,19 @@ class TapColorApp {
         if (isQuad) {
           ctx.fillRect(p0.x, p0.y, cellW, cellH);
         } else {
-          ctx.beginPath();
-          ctx.moveTo(region.polygon[0].x, region.polygon[0].y);
-          for (let i = 1; i < region.polygon.length; i++) {
-            ctx.lineTo(region.polygon[i].x, region.polygon[i].y);
-          }
-          ctx.closePath();
-          ctx.fill();
+          tracePoly();
+          ctx.fill('evenodd');
 
           ctx.strokeStyle = '#F8FAFC';
           ctx.lineWidth = 1.4;
           ctx.stroke();
         }
       }
+    }
+
+    const lineArtImg = this.controller && this.controller.lineArtImage;
+    if (lineArtImg && lineArtImg.complete && lineArtImg.naturalWidth > 0) {
+      ctx.drawImage(lineArtImg, 0, 0, artW, artH);
     }
     ctx.restore();
   }
@@ -4055,14 +4227,15 @@ class TapColorApp {
 
       modalDialog.addEventListener('keydown', (e) => {
         if (e.key === 'Enter') {
-          if (document.activeElement === btnCancel) {
+          if (document.activeElement === btnCancel || document.activeElement === btnClose) {
             this.closeDialog(false);
           } else {
             this.closeDialog(true);
           }
           e.preventDefault();
         } else if (e.key === 'Tab') {
-          const focusables = Array.from(modalDialog.querySelectorAll('button:not([style*="display: none"]):not([disabled])'));
+          const focusables = Array.from(modalDialog.querySelectorAll('button:not([disabled])'))
+            .filter(el => el.offsetParent !== null);
           if (focusables.length === 0) return;
           const first = focusables[0];
           const last = focusables[focusables.length - 1];
@@ -4083,6 +4256,7 @@ class TapColorApp {
     }
 
     // Expose helpers globally for seamless access throughout the app
+    this._nativeAlert = window.alert ? window.alert.bind(window) : null;
     window.showConfirm = (opts) => this.showConfirm(opts);
     window.showAlert = (opts) => this.showAlert(opts);
     window.alert = (msg) => this.showAlert(msg);
@@ -4097,7 +4271,7 @@ class TapColorApp {
       else iconName = 'info';
     }
 
-    if (typeof iconName === 'string' && (iconName.trim().startsWith('<svg') || !/^[a-z0-9_-]+$/i.test(iconName))) {
+    if (typeof iconName === 'string' && iconName.trim().startsWith('<svg')) {
       return iconName;
     }
 
@@ -4126,7 +4300,7 @@ class TapColorApp {
         return `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <circle cx="12" cy="12" r="10"></circle>
           <line x1="15" y1="9" x2="9" y2="15"></line>
-          <line x1="9" y1="15" x2="15" y2="15"></line>
+          <line x1="9" y1="9" x2="15" y2="15"></line>
         </svg>`;
       case 'success':
         return `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -4202,8 +4376,13 @@ class TapColorApp {
       const btnCancel = document.getElementById('btn-dialog-cancel');
       const btnConfirm = document.getElementById('btn-dialog-confirm');
 
-      if (!modalDialog || !titleEl || !msgEl || !iconWrapper || !btnConfirm) {
-        resolve(config.mode === 'confirm' ? window.confirm(config.message) : (window.alert(config.message), true));
+      if (!modalDialog || !titleEl || !msgEl || !iconWrapper || !btnConfirm || !btnCancel) {
+        if (config.mode === 'confirm') {
+          resolve(window.confirm(config.message));
+        } else {
+          if (this._nativeAlert) this._nativeAlert(config.message);
+          resolve(true);
+        }
         return;
       }
 
@@ -4232,7 +4411,9 @@ class TapColorApp {
 
       modalDialog.classList.remove('hidden');
 
-      setTimeout(() => {
+      if (this.dialogFocusTimeout) clearTimeout(this.dialogFocusTimeout);
+      this.dialogFocusTimeout = setTimeout(() => {
+        this.dialogFocusTimeout = null;
         if (config.mode === 'confirm' && config.variant === 'danger') {
           btnCancel.focus();
         } else {
@@ -4243,6 +4424,10 @@ class TapColorApp {
   }
 
   closeDialog(result) {
+    if (this.dialogFocusTimeout) {
+      clearTimeout(this.dialogFocusTimeout);
+      this.dialogFocusTimeout = null;
+    }
     const modalDialog = document.getElementById('modal-dialog');
     if (modalDialog && !modalDialog.classList.contains('hidden')) {
       modalDialog.classList.add('hidden');
@@ -4281,116 +4466,176 @@ class FallbackJsController {
     this.pulsePhase = 0;
     this.lastTime = 0;
     this.highlightMatchingTiles = false;
+    this.undoStack = [];
+    this.dirty = true;
+    this.viewportW = canvas ? (canvas.width / (window.devicePixelRatio || 1)) : 800;
+    this.viewportH = canvas ? (canvas.height / (window.devicePixelRatio || 1)) : 600;
     this.load_artwork(artworkId);
   }
 
+  set_viewport_size(w, h) {
+    this.viewportW = Math.max(1, w);
+    this.viewportH = Math.max(1, h);
+    this.dirty = true;
+  }
+
+  needs_render() {
+    return this.dirty ||
+      Math.abs(this.targetPanX - this.panX) > 0.05 ||
+      Math.abs(this.targetPanY - this.panY) > 0.05 ||
+      Math.abs(this.targetScale - this.scale) > 0.0005 ||
+      this.particles.length > 0 ||
+      this.highlightMatchingTiles;
+  }
+
   get is_diamond_mode() {
-    return (this.artwork && this.artwork.id && this.artwork.id.includes('diamond')) || false;
+    return Boolean(
+      this.artwork && (
+        (this.artwork.id && this.artwork.id.includes('diamond')) ||
+        (this.artwork.regions && this.artwork.regions.length > 300 && this.artwork.regions[0]?.polygon?.length === 4)
+      )
+    );
+  }
+
+  precomputeBboxes(artwork) {
+    if (!artwork || !artwork.regions) return;
+    for (const r of artwork.regions) {
+      if (!r.polygon || r.polygon.length === 0) {
+        r._bbox = [0, 0, 0, 0];
+        continue;
+      }
+      let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+      for (const pt of r.polygon) {
+        if (pt.x < minX) minX = pt.x;
+        if (pt.y < minY) minY = pt.y;
+        if (pt.x > maxX) maxX = pt.x;
+        if (pt.y > maxY) maxY = pt.y;
+      }
+      r._bbox = [minX, minY, maxX, maxY];
+    }
   }
 
   load_artwork(id) {
     this.highlightMatchingTiles = false;
-    if (DIAMOND_PALETTES[id]) {
-      const N = 28;
-      const grid = getDiamondArtGrid(id, N);
-      const paletteDef = DIAMOND_PALETTES[id];
-      const width = 800;
-      const height = 800;
-      const margin = 28;
-      const avail = width - margin * 2;
-      const cellSize = avail / N;
-      const regions = [];
-      let regId = 0;
-
-      for (let r = 0; r < N; r++) {
-        for (let c = 0; c < N; c++) {
-          const num = grid[r][c];
-          const pal = paletteDef.find(p => p.num === num) || paletteDef[0];
-          const x0 = margin + c * cellSize;
-          const y0 = margin + r * cellSize;
-          const x1 = x0 + cellSize;
-          const y1 = y0 + cellSize;
-
-          regions.push({
-            id: regId++,
-            number: num,
-            polygon: [{ x: x0, y: y0 }, { x: x1, y: y0 }, { x: x1, y: y1 }, { x: x0, y: y1 }],
-            centroid: { x: (x0 + x1) * 0.5, y: (y0 + y1) * 0.5 },
-            color_hex: pal.hex,
-            is_filled: false,
-            fill_anim: 0.0,
-          });
-        }
-      }
-
-      this.artwork = {
-        id,
-        title: id === 'starry_night_diamond' ? 'Van Gogh: Starry Night' : (id === 'peacock_diamond' ? 'Royal Crystal Peacock' : 'Diamond Art Masterpiece'),
-        artist: 'Diamond Art Studio',
-        width,
-        height,
-        palette: paletteDef.map(p => ({
-          number: p.num,
-          hex: p.hex,
-          name: p.name,
-          total_count: regions.filter(r => r.number === p.num).length,
-          filled_count: 0,
-          is_completed: false,
-        })),
-        regions,
-      };
-    } else {
-      // Classic Paint by Number artwork representation
-      this.artwork = {
-        id,
-        title: id === 'cosmic_whale' ? 'Cosmic Whale & Stars' : (id === 'stained_butterfly' ? 'Monarch Butterfly' : 'Origami Hummingbird'),
-        artist: 'Geometric Fauna',
-        width: 800,
-        height: 800,
-        palette: [
-          { number: 1, hex: '#E63946', name: 'Ruby Crimson', total_count: 3, filled_count: 0, is_completed: false },
-          { number: 2, hex: '#F4A261', name: 'Warm Apricot', total_count: 3, filled_count: 0, is_completed: false },
-          { number: 3, hex: '#E76F51', name: 'Coral Rust', total_count: 2, filled_count: 0, is_completed: false },
-          { number: 4, hex: '#2A9D8F', name: 'Emerald Teal', total_count: 6, filled_count: 0, is_completed: false },
-          { number: 5, hex: '#48CAE4', name: 'Sky Blue', total_count: 4, filled_count: 0, is_completed: false },
-          { number: 6, hex: '#0077B6', name: 'Deep Cerulean', total_count: 4, filled_count: 0, is_completed: false },
-          { number: 7, hex: '#90BE6D', name: 'Fresh Lime', total_count: 3, filled_count: 0, is_completed: false },
-          { number: 8, hex: '#43AA8B', name: 'Jade Green', total_count: 3, filled_count: 0, is_completed: false },
-          { number: 9, hex: '#577590', name: 'Slate Feather', total_count: 3, filled_count: 0, is_completed: false },
-          { number: 10, hex: '#F72585', name: 'Sakura Pink', total_count: 4, filled_count: 0, is_completed: false },
-        ],
-        regions: [
-          { id: 0, number: 9, color_hex: '#577590', is_filled: false, polygon: [{x:180,y:310},{x:330,y:335},{x:325,y:342}], centroid: {x:278,y:329} },
-          { id: 1, number: 9, color_hex: '#577590', is_filled: false, polygon: [{x:180,y:310},{x:325,y:342},{x:310,y:350}], centroid: {x:271,y:334} },
-          { id: 2, number: 4, color_hex: '#2A9D8F', is_filled: false, polygon: [{x:330,y:335},{x:380,y:300},{x:395,y:330},{x:335,y:345}], centroid: {x:360,y:327} },
-          { id: 3, number: 4, color_hex: '#2A9D8F', is_filled: false, polygon: [{x:380,y:300},{x:430,y:315},{x:420,y:345},{x:395,y:330}], centroid: {x:406,y:322} },
-          { id: 4, number: 5, color_hex: '#48CAE4', is_filled: false, polygon: [{x:335,y:345},{x:395,y:330},{x:385,y:370}], centroid: {x:371,y:348} },
-          { id: 5, number: 9, color_hex: '#577590', is_filled: false, polygon: [{x:365,y:330},{x:375,y:325},{x:380,y:335},{x:370,y:340}], centroid: {x:372,y:332} },
-          { id: 6, number: 1, color_hex: '#E63946', is_filled: false, polygon: [{x:335,y:345},{x:385,y:370},{x:355,y:400}], centroid: {x:358,y:371} },
-          { id: 7, number: 1, color_hex: '#E63946', is_filled: false, polygon: [{x:385,y:370},{x:415,y:390},{x:375,y:420},{x:355,y:400}], centroid: {x:382,y:395} },
-          { id: 8, number: 2, color_hex: '#F4A261', is_filled: false, polygon: [{x:415,y:390},{x:455,y:400},{x:420,y:435},{x:375,y:420}], centroid: {x:416,y:411} },
-          { id: 9, number: 3, color_hex: '#E76F51', is_filled: false, polygon: [{x:355,y:400},{x:375,y:420},{x:350,y:460}], centroid: {x:360,y:426} },
-          { id: 10, number: 6, color_hex: '#0077B6', is_filled: false, polygon: [{x:420,y:345},{x:490,y:240},{x:460,y:340}], centroid: {x:456,y:308} },
-          { id: 11, number: 5, color_hex: '#48CAE4', is_filled: false, polygon: [{x:490,y:240},{x:560,y:160},{x:515,y:255},{x:460,y:340}], centroid: {x:506,y:248} },
-          { id: 12, number: 6, color_hex: '#0077B6', is_filled: false, polygon: [{x:560,y:160},{x:630,y:100},{x:585,y:185},{x:515,y:255}], centroid: {x:572,y:175} },
-          { id: 13, number: 4, color_hex: '#2A9D8F', is_filled: false, polygon: [{x:630,y:100},{x:700,y:50},{x:650,y:130},{x:585,y:185}], centroid: {x:641,y:116} },
-          { id: 14, number: 7, color_hex: '#90BE6D', is_filled: false, polygon: [{x:700,y:50},{x:720,y:40},{x:675,y:120},{x:650,y:130}], centroid: {x:686,y:85} },
-          { id: 15, number: 4, color_hex: '#2A9D8F', is_filled: false, polygon: [{x:460,y:340},{x:515,y:255},{x:550,y:290},{x:485,y:375}], centroid: {x:502,y:315} },
-          { id: 16, number: 8, color_hex: '#43AA8B', is_filled: false, polygon: [{x:515,y:255},{x:585,y:185},{x:615,y:230},{x:550,y:290}], centroid: {x:566,y:240} },
-          { id: 17, number: 7, color_hex: '#90BE6D', is_filled: false, polygon: [{x:585,y:185},{x:650,y:130},{x:670,y:180},{x:615,y:230}], centroid: {x:630,y:181} },
-        ]
-      };
-    }
-    this.activeNumber = 1;
+    this.undoStack = [];
+    this.lineArtImage = null;
+    const regions = [
+      { id: 0, number: 9, color_hex: '#577590', is_filled: false, polygon: [{x:180,y:310},{x:330,y:335},{x:325,y:342}], centroid: {x:278,y:329} },
+      { id: 1, number: 9, color_hex: '#577590', is_filled: false, polygon: [{x:180,y:310},{x:325,y:342},{x:310,y:350}], centroid: {x:271,y:334} },
+      { id: 2, number: 4, color_hex: '#2A9D8F', is_filled: false, polygon: [{x:330,y:335},{x:380,y:300},{x:395,y:330},{x:335,y:345}], centroid: {x:360,y:327} },
+      { id: 3, number: 4, color_hex: '#2A9D8F', is_filled: false, polygon: [{x:380,y:300},{x:430,y:315},{x:420,y:345},{x:395,y:330}], centroid: {x:406,y:322} },
+      { id: 4, number: 5, color_hex: '#48CAE4', is_filled: false, polygon: [{x:335,y:345},{x:395,y:330},{x:385,y:370}], centroid: {x:371,y:348} },
+      { id: 5, number: 9, color_hex: '#577590', is_filled: false, polygon: [{x:365,y:330},{x:375,y:325},{x:380,y:335},{x:370,y:340}], centroid: {x:372,y:332} },
+      { id: 6, number: 1, color_hex: '#E63946', is_filled: false, polygon: [{x:335,y:345},{x:385,y:370},{x:355,y:400}], centroid: {x:358,y:371} },
+      { id: 7, number: 1, color_hex: '#E63946', is_filled: false, polygon: [{x:385,y:370},{x:415,y:390},{x:375,y:420},{x:355,y:400}], centroid: {x:382,y:395} },
+      { id: 8, number: 2, color_hex: '#F4A261', is_filled: false, polygon: [{x:415,y:390},{x:455,y:400},{x:420,y:435},{x:375,y:420}], centroid: {x:416,y:411} },
+      { id: 9, number: 3, color_hex: '#E76F51', is_filled: false, polygon: [{x:355,y:400},{x:375,y:420},{x:350,y:460}], centroid: {x:360,y:426} },
+      { id: 10, number: 6, color_hex: '#0077B6', is_filled: false, polygon: [{x:420,y:345},{x:490,y:240},{x:460,y:340}], centroid: {x:456,y:308} },
+      { id: 11, number: 5, color_hex: '#48CAE4', is_filled: false, polygon: [{x:490,y:240},{x:560,y:160},{x:515,y:255},{x:460,y:340}], centroid: {x:506,y:248} },
+      { id: 12, number: 6, color_hex: '#0077B6', is_filled: false, polygon: [{x:560,y:160},{x:630,y:100},{x:585,y:185},{x:515,y:255}], centroid: {x:572,y:175} },
+      { id: 13, number: 4, color_hex: '#2A9D8F', is_filled: false, polygon: [{x:630,y:100},{x:700,y:50},{x:650,y:130},{x:585,y:185}], centroid: {x:641,y:116} },
+      { id: 14, number: 7, color_hex: '#90BE6D', is_filled: false, polygon: [{x:700,y:50},{x:720,y:40},{x:675,y:120},{x:650,y:130}], centroid: {x:686,y:85} },
+      { id: 15, number: 4, color_hex: '#2A9D8F', is_filled: false, polygon: [{x:460,y:340},{x:515,y:255},{x:550,y:290},{x:485,y:375}], centroid: {x:502,y:315} },
+      { id: 16, number: 8, color_hex: '#43AA8B', is_filled: false, polygon: [{x:515,y:255},{x:585,y:185},{x:615,y:230},{x:550,y:290}], centroid: {x:566,y:240} },
+      { id: 17, number: 7, color_hex: '#90BE6D', is_filled: false, polygon: [{x:585,y:185},{x:650,y:130},{x:670,y:180},{x:615,y:230}], centroid: {x:630,y:181} },
+    ];
+    const basePalette = [
+      { number: 1, hex: '#E63946', name: 'Ruby Crimson' },
+      { number: 2, hex: '#F4A261', name: 'Warm Apricot' },
+      { number: 3, hex: '#E76F51', name: 'Coral Rust' },
+      { number: 4, hex: '#2A9D8F', name: 'Emerald Teal' },
+      { number: 5, hex: '#48CAE4', name: 'Sky Blue' },
+      { number: 6, hex: '#0077B6', name: 'Deep Cerulean' },
+      { number: 7, hex: '#90BE6D', name: 'Fresh Lime' },
+      { number: 8, hex: '#43AA8B', name: 'Jade Green' },
+      { number: 9, hex: '#577590', name: 'Slate Feather' },
+    ];
+    this.artwork = {
+      id: id || 'hummingbird',
+      title: 'Origami Hummingbird',
+      artist: 'Geometric Fauna',
+      width: 800,
+      height: 800,
+      palette: basePalette.map(p => ({
+        ...p,
+        total_count: regions.filter(r => r.number === p.number).length,
+        filled_count: 0,
+        is_completed: false,
+      })),
+      regions,
+    };
+    this.precomputeBboxes(this.artwork);
+    this.activeNumber = this.artwork.palette[0]?.number || 1;
     this.fit_to_screen();
+    this.dirty = true;
   }
 
   load_procedural_mosaic(seed, paletteType) {
-    this.load_artwork('starry_night_diamond');
+    const palettes = {
+      sunset: ['#FF5964', '#F48668', '#F7D070', '#E2847A', '#805E73', '#4D4861', '#352D39'],
+      emerald: ['#2EC4B6', '#0E9594', '#006466', '#212F45', '#70C1B3', '#B2DBBF', '#F3FFBD'],
+      neon: ['#FF6B6B', '#4ECDC4', '#FFE66D', '#1A535C', '#FF9F1C', '#9D4EDD', '#F72585'],
+    };
+    const colors = palettes[paletteType] || palettes.neon;
+    let state = Math.max(1, seed | 0);
+    const rand = () => {
+      state = (state * 1664525 + 1013904223) >>> 0;
+      return state / 4294967296;
+    };
+    const cols = 8, rows = 8, w = 800, h = 800, cw = w / cols, ch = h / rows;
+    const pts = [];
+    for (let r = 0; r <= rows; r++) {
+      for (let c = 0; c <= cols; c++) {
+        pts.push({
+          x: c * cw + (c === 0 || c === cols ? 0 : (rand() - 0.5) * cw * 0.6),
+          y: r * ch + (r === 0 || r === rows ? 0 : (rand() - 0.5) * ch * 0.6),
+        });
+      }
+    }
+    const regions = [];
+    let regId = 0;
+    for (let r = 0; r < rows; r++) {
+      for (let c = 0; c < cols; c++) {
+        const p00 = pts[r * (cols + 1) + c];
+        const p10 = pts[r * (cols + 1) + c + 1];
+        const p01 = pts[(r + 1) * (cols + 1) + c];
+        const p11 = pts[(r + 1) * (cols + 1) + c + 1];
+        for (const poly of [[p00, p10, p11], [p00, p11, p01]]) {
+          const ci = Math.floor(rand() * colors.length);
+          regions.push({
+            id: regId++,
+            number: ci + 1,
+            polygon: poly,
+            centroid: { x: (poly[0].x + poly[1].x + poly[2].x) / 3, y: (poly[0].y + poly[1].y + poly[2].y) / 3 },
+            color_hex: colors[ci],
+            is_filled: false,
+            fill_anim: 0,
+          });
+        }
+      }
+    }
+    const palette = colors
+      .map((hex, i) => ({
+        number: i + 1,
+        hex,
+        name: `Color #${i + 1}`,
+        total_count: regions.filter(r => r.number === i + 1).length,
+        filled_count: 0,
+        is_completed: false,
+      }))
+      .filter(p => p.total_count > 0);
+    this.artwork = { id: `mosaic_${seed}_${paletteType}`, title: `Surprise Mosaic #${seed % 1000}`, artist: 'Surprise Pattern', width: w, height: h, palette, regions };
+    this.precomputeBboxes(this.artwork);
+    this.undoStack = [];
+    this.lineArtImage = null;
+    this.activeNumber = palette[0]?.number || 1;
+    this.fit_to_screen();
+    this.dirty = true;
   }
 
   set_line_art_image(img) {
     this.lineArtImage = img || null;
+    this.dirty = true;
   }
 
   ensureHatchPattern() {
@@ -4416,6 +4661,7 @@ class FallbackJsController {
   }
 
   traceRegionPath(ctx, region) {
+    if (!region.polygon || region.polygon.length === 0) return;
     ctx.beginPath();
     ctx.moveTo(region.polygon[0].x, region.polygon[0].y);
     for (let i = 1; i < region.polygon.length; i++) {
@@ -4438,8 +4684,11 @@ class FallbackJsController {
   load_artwork_json(jsonStr) {
     try {
       this.artwork = JSON.parse(jsonStr);
-      this.activeNumber = 1;
+      this.precomputeBboxes(this.artwork);
+      this.undoStack = [];
+      this.activeNumber = (this.artwork.palette && this.artwork.palette[0]?.number) || 1;
       this.fit_to_screen();
+      this.dirty = true;
       return true;
     } catch (e) {
       return false;
@@ -4448,12 +4697,13 @@ class FallbackJsController {
 
   fit_to_screen() {
     const margin = 40;
-    const availW = Math.max(100, this.canvas.width / (window.devicePixelRatio || 1) - margin * 2);
-    const availH = Math.max(100, this.canvas.height / (window.devicePixelRatio || 1) - margin * 2);
+    const availW = Math.max(100, this.viewportW - margin * 2);
+    const availH = Math.max(100, this.viewportH - margin * 2);
     const s = Math.min(availW / this.artwork.width, availH / this.artwork.height, 1.2);
     this.targetScale = s;
-    this.targetPanX = (this.canvas.width / (window.devicePixelRatio || 1) - this.artwork.width * s) / 2;
-    this.targetPanY = (this.canvas.height / (window.devicePixelRatio || 1) - this.artwork.height * s) / 2;
+    this.targetPanX = (this.viewportW - this.artwork.width * s) / 2;
+    this.targetPanY = (this.viewportH - this.artwork.height * s) / 2;
+    this.dirty = true;
   }
 
   update_pan_zoom(dx, dy, factor, ax, ay) {
@@ -4464,25 +4714,30 @@ class FallbackJsController {
     this.targetScale = newS;
     this.targetPanX = ax - wx * newS + dx;
     this.targetPanY = ay - wy * newS + dy;
+    this.dirty = true;
   }
 
   select_number(num) {
     this.activeNumber = num;
     this.hintRegionId = null;
+    this.dirty = true;
   }
 
   toggle_outlines() {
     this.showOutlines = !this.showOutlines;
+    this.dirty = true;
     return this.showOutlines;
   }
 
   toggle_matching_hints() {
     this.highlightMatchingTiles = !this.highlightMatchingTiles;
+    this.dirty = true;
     return this.highlightMatchingTiles;
   }
 
   set_matching_hints(val) {
     this.highlightMatchingTiles = val;
+    this.dirty = true;
   }
 
   get_matching_hints() {
@@ -4494,14 +4749,18 @@ class FallbackJsController {
     const wy = (sy - this.panY) / this.scale;
 
     const idx = this.artwork.regions.findLastIndex(r => {
-      const p0 = r.polygon[0];
-      const p2 = r.polygon[2] || p0;
-      const minX = Math.min(p0.x, p2.x) - 1;
-      const maxX = Math.max(p0.x, p2.x) + 1;
-      const minY = Math.min(p0.y, p2.y) - 1;
-      const maxY = Math.max(p0.y, p2.y) + 1;
-      if (wx < minX || wx > maxX || wy < minY || wy > maxY) return false;
-      return this.pointInPoly(wx, wy, r.polygon);
+      if (!r.polygon || r.polygon.length < 3) return false;
+      const bbox = r._bbox;
+      if (bbox && (wx < bbox[0] - 1 || wx > bbox[2] + 1 || wy < bbox[1] - 1 || wy > bbox[3] + 1)) {
+        return false;
+      }
+      if (!this.pointInPoly(wx, wy, r.polygon)) return false;
+      if (r.holes) {
+        for (const hole of r.holes) {
+          if (this.pointInPoly(wx, wy, hole)) return false;
+        }
+      }
+      return true;
     });
 
     if (idx !== -1) {
@@ -4514,19 +4773,52 @@ class FallbackJsController {
           pal.is_completed = false;
         }
         this.spawnBurst(reg.centroid.x, reg.centroid.y, '#94A3B8');
+        this.dirty = true;
         const filled = this.artwork.regions.filter(r => r.is_filled).length;
-        const total = this.artwork.regions.length;
+        const total = Math.max(1, this.artwork.regions.length);
         return JSON.stringify({
           success: true,
           region_id: reg.id,
           number: reg.number,
           total_filled: filled,
-          total_regions: total,
+          total_regions: this.artwork.regions.length,
           percent: (filled / total) * 100,
         });
       }
     }
     return JSON.stringify({ success: false });
+  }
+
+  undo_last() {
+    const indices = this.undoStack.pop();
+    if (!indices || indices.length === 0) return JSON.stringify({ success: false });
+    let undoneNum = null;
+    for (const idx of indices) {
+      const r = this.artwork.regions[idx];
+      if (r && r.is_filled) {
+        r.is_filled = false;
+        undoneNum = r.number;
+        const pal = this.artwork.palette.find(p => p.number === r.number);
+        if (pal) {
+          pal.filled_count = Math.max(0, pal.filled_count - 1);
+          pal.is_completed = pal.filled_count >= pal.total_count;
+        }
+      }
+    }
+    if (undoneNum !== null) {
+      this.activeNumber = undoneNum;
+      this.dirty = true;
+    }
+    const filled = this.artwork.regions.filter(r => r.is_filled).length;
+    const total = Math.max(1, this.artwork.regions.length);
+    return JSON.stringify({
+      success: undoneNum !== null,
+      number: undoneNum,
+      correct_number: this.activeNumber,
+      total_filled: filled,
+      total_regions: this.artwork.regions.length,
+      percent: (filled / total) * 100,
+    });
   }
 
   clear_all_tiles() {
@@ -4537,6 +4829,8 @@ class FallbackJsController {
       p.filled_count = 0;
       p.is_completed = false;
     });
+    this.undoStack = [];
+    this.dirty = true;
     const total = this.artwork.regions.length;
     return JSON.stringify({
       success: true,
@@ -4590,13 +4884,19 @@ class FallbackJsController {
   }
 
   fill_all_of_current() {
-    let count = 0;
-    this.artwork.regions.forEach(r => {
+    const filledIndices = [];
+    this.artwork.regions.forEach((r, idx) => {
       if (!r.is_filled && r.number === this.activeNumber) {
         r.is_filled = true;
-        count++;
+        filledIndices.push(idx);
       }
     });
+    const count = filledIndices.length;
+    if (count > 0) {
+      this.undoStack.push(filledIndices);
+      if (this.undoStack.length > 100) this.undoStack.shift();
+      this.dirty = true;
+    }
     const pal = this.artwork.palette.find(p => p.number === this.activeNumber);
     if (pal) {
       pal.filled_count = pal.total_count;
@@ -4609,11 +4909,11 @@ class FallbackJsController {
 
     return JSON.stringify({
       success: count > 0,
-      color_completed: true,
-      artwork_completed: filled === total,
+      color_completed: count > 0,
+      artwork_completed: total > 0 && filled === total,
       total_filled: filled,
       total_regions: total,
-      percent: (filled / total) * 100,
+      percent: (filled / Math.max(1, total)) * 100,
       number: this.activeNumber,
     });
   }
@@ -4669,6 +4969,9 @@ class FallbackJsController {
       if (!reg.is_filled) {
         if (reg.number === this.activeNumber) {
           reg.is_filled = true;
+          this.undoStack.push([idx]);
+          if (this.undoStack.length > 100) this.undoStack.shift();
+          this.dirty = true;
 
           const pal = this.artwork.palette.find(p => p.number === this.activeNumber);
           let colComp = false;
@@ -4690,10 +4993,10 @@ class FallbackJsController {
             region_id: reg.id,
             number: reg.number,
             color_completed: colComp,
-            artwork_completed: filled === total,
+            artwork_completed: total > 0 && filled === total,
             total_filled: filled,
             total_regions: total,
-            percent: (filled / total) * 100,
+            percent: (filled / Math.max(1, total)) * 100,
           });
         } else {
           return JSON.stringify({
@@ -4743,25 +5046,28 @@ class FallbackJsController {
     this.panY += (this.targetPanY - this.panY) * Math.min(dt * 10, 1);
     this.scale += (this.targetScale - this.scale) * Math.min(dt * 10, 1);
 
-    const w = this.canvas.width / (window.devicePixelRatio || 1);
-    const h = this.canvas.height / (window.devicePixelRatio || 1);
+    const w = this.viewportW;
+    const h = this.viewportH;
 
     this.ctx.clearRect(0, 0, w, h);
     this.ctx.save();
     this.ctx.translate(this.panX, this.panY);
     this.ctx.scale(this.scale, this.scale);
 
-    this.ctx.shadowColor = 'rgba(0,0,0,0.3)';
-    this.ctx.shadowBlur = 30;
     this.ctx.fillStyle = '#FFFFFF';
     this.ctx.fillRect(0, 0, this.artwork.width, this.artwork.height);
-    this.ctx.shadowBlur = 0;
-    this.ctx.shadowOffsetX = 0;
-    this.ctx.shadowOffsetY = 0;
-    this.ctx.shadowColor = 'transparent';
+    this.ctx.strokeStyle = 'rgba(148, 163, 184, 0.35)';
+    this.ctx.lineWidth = 1.5 / Math.max(0.25, this.scale);
+    this.ctx.strokeRect(0, 0, this.artwork.width, this.artwork.height);
 
     const pulse = Math.sin(this.pulsePhase) * 0.5 + 0.5;
-    const isDiamond = this.artwork.id.includes('diamond') || (this.artwork.regions.length > 300 && this.artwork.regions[0] && this.artwork.regions[0].polygon.length === 4);
+    const isDiamond = this.is_diamond_mode;
+
+    const pad = 24 / Math.max(0.1, this.scale);
+    const viewMinX = -this.panX / this.scale - pad;
+    const viewMaxX = (w - this.panX) / this.scale + pad;
+    const viewMinY = -this.panY / this.scale - pad;
+    const viewMaxY = (h - this.panY) / this.scale + pad;
 
     // Calculate drill world size and screen size for diamond art
     let drillWorldSize = 16.0;
@@ -4773,35 +5079,49 @@ class FallbackJsController {
       }
     }
     const drillScreenSize = drillWorldSize * this.scale;
+    const canDrawOutlines = this.showOutlines && (!isDiamond || drillScreenSize >= 3.5);
 
     const hasLineArt = !!(this.lineArtImage && this.lineArtImage.complete && this.lineArtImage.naturalWidth > 0);
     const hatchPat = !isDiamond ? this.ensureHatchPattern() : null;
 
-    // Render regions
-    this.artwork.regions.forEach(region => {
-      this.traceRegionPath(this.ctx, region);
+    // Render regions with frustum culling and fillRect fast-path
+    for (const region of this.artwork.regions) {
+      if (!region.polygon || region.polygon.length < 3) continue;
+      const cx = region.centroid.x, cy = region.centroid.y;
+      if (isDiamond) {
+        if (cx < viewMinX || cx > viewMaxX || cy < viewMinY || cy > viewMaxY) continue;
+      } else if (region._bbox) {
+        const b = region._bbox;
+        if (b[2] < viewMinX || b[0] > viewMaxX || b[3] < viewMinY || b[1] > viewMaxY) continue;
+      }
 
       const isHinted = region.id === this.hintRegionId;
       const isActiveNumber = region.number === this.activeNumber;
       const isActiveTarget = this.highlightMatchingTiles && isActiveNumber;
+      const isQuad = isDiamond && region.polygon.length === 4;
+      const p0 = region.polygon[0];
+      const p1 = region.polygon[1];
+      const p2 = region.polygon[2];
+      const p3 = region.polygon[3];
+      const cellW = p1.x - p0.x;
+      const cellH = p2.y - p1.y;
+
+      if (!isQuad) {
+        this.traceRegionPath(this.ctx, region);
+      }
 
       if (region.is_filled) {
         this.ctx.fillStyle = region.color_hex;
-        this.ctx.fill('evenodd');
+        if (isQuad) {
+          this.ctx.fillRect(p0.x, p0.y, cellW, cellH);
+        } else {
+          this.ctx.fill('evenodd');
+          this.ctx.strokeStyle = region.color_hex;
+          this.ctx.lineWidth = hasLineArt ? 0.8 : (1.4 / Math.max(0.5, this.scale));
+          this.ctx.stroke();
+        }
 
-        // Seam-seal stroke prevents white hairline cracks between adjacent pieces
-        this.ctx.strokeStyle = region.color_hex;
-        this.ctx.lineWidth = hasLineArt ? 0.8 : (1.4 / Math.max(0.5, this.scale));
-        this.ctx.stroke();
-
-        // 3D diamond facet luster when zoomed in
-        if (isDiamond && region.polygon.length === 4 && drillScreenSize >= 10.0) {
-          const p0 = region.polygon[0];
-          const p1 = region.polygon[1];
-          const p2 = region.polygon[2];
-          const p3 = region.polygon[3];
-
-          // Top highlight facet
+        if (isQuad && drillScreenSize >= 10.0) {
           this.ctx.beginPath();
           this.ctx.moveTo(p0.x, p0.y);
           this.ctx.lineTo(p1.x, p1.y);
@@ -4810,7 +5130,6 @@ class FallbackJsController {
           this.ctx.fillStyle = 'rgba(255, 255, 255, 0.18)';
           this.ctx.fill();
 
-          // Bottom shadow facet
           this.ctx.beginPath();
           this.ctx.moveTo(p1.x, p1.y);
           this.ctx.lineTo(p2.x, p2.y);
@@ -4822,30 +5141,31 @@ class FallbackJsController {
       } else {
         if (isHinted) {
           this.ctx.fillStyle = `rgba(255, 215, 0, ${0.45 + pulse * 0.35})`;
-          this.ctx.fill('evenodd');
         } else if (!isDiamond && isActiveNumber) {
           this.ctx.fillStyle = hatchPat || '#E2E8F0';
+        } else {
+          this.ctx.fillStyle = isActiveTarget ? `rgba(99, 102, 241, ${0.16 + pulse * 0.12})` : '#F8FAFC';
+        }
+        if (isQuad) {
+          this.ctx.fillRect(p0.x, p0.y, cellW, cellH);
+        } else {
           this.ctx.fill('evenodd');
-          if (isActiveTarget) {
+          if (!isHinted && isActiveNumber && isActiveTarget) {
             this.ctx.fillStyle = `rgba(99, 102, 241, ${0.14 + pulse * 0.12})`;
             this.ctx.fill('evenodd');
           }
-        } else {
-          const unfillColor = isActiveTarget ? `rgba(99, 102, 241, ${0.16 + pulse * 0.12})` : '#F8FAFC';
-          this.ctx.fillStyle = unfillColor;
-          this.ctx.fill('evenodd');
         }
       }
 
-      if (this.showOutlines) {
+      if (canDrawOutlines) {
         if (isHinted) {
           this.ctx.strokeStyle = '#F59E0B';
           this.ctx.lineWidth = 2.5 / Math.max(0.5, this.scale);
-          this.ctx.stroke();
+          if (isQuad) this.ctx.strokeRect(p0.x, p0.y, cellW, cellH); else this.ctx.stroke();
         } else if (isDiamond) {
           this.ctx.strokeStyle = isActiveTarget ? 'rgba(99, 102, 241, 0.6)' : 'rgba(148, 163, 184, 0.35)';
           this.ctx.lineWidth = (isActiveTarget ? 1.2 : 0.7) / Math.max(0.5, this.scale);
-          this.ctx.stroke();
+          if (isQuad) this.ctx.strokeRect(p0.x, p0.y, cellW, cellH); else this.ctx.stroke();
         } else if (!hasLineArt) {
           this.ctx.strokeStyle = isActiveTarget ? 'rgba(99, 102, 241, 0.6)' : 'rgba(30, 41, 59, 0.72)';
           this.ctx.lineWidth = (isActiveTarget ? 1.2 : 1.6) / Math.max(0.5, this.scale);
@@ -4856,7 +5176,7 @@ class FallbackJsController {
           this.ctx.stroke();
         }
       }
-    });
+    }
 
     // Composite crisp ink line-art overlay directly above fills and below numbers
     if (hasLineArt) {
@@ -4864,15 +5184,18 @@ class FallbackJsController {
     }
 
     // Render numbers
-    const fontBaseSize = Math.max(8, Math.min(24, 14 / this.scale));
     this.ctx.textAlign = 'center';
     this.ctx.textBaseline = 'middle';
+    let lastFont = '';
+    let lastFill = '';
 
-    this.artwork.regions.forEach(region => {
-      if (region.is_filled) return;
+    for (const region of this.artwork.regions) {
+      if (region.is_filled) continue;
+      const cx = region.centroid.x, cy = region.centroid.y;
+      if (cx < viewMinX || cx > viewMaxX || cy < viewMinY || cy > viewMaxY) continue;
+
       const isHinted = region.id === this.hintRegionId;
       const isActiveTarget = this.highlightMatchingTiles && (region.number === this.activeNumber);
-      const cx = region.centroid.x, cy = region.centroid.y;
 
       let regionWorldSize = drillWorldSize;
       let regionScreenSize = drillScreenSize;
@@ -4880,20 +5203,9 @@ class FallbackJsController {
         if (region.label_radius && region.label_radius > 0.5) {
           regionWorldSize = region.label_radius * 2.0;
           regionScreenSize = regionWorldSize * this.scale;
-        } else {
-          let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
-          if (region.polygon) {
-            for (let i = 0; i < region.polygon.length; i++) {
-              const pt = region.polygon[i];
-              if (pt.x < minX) minX = pt.x;
-              if (pt.x > maxX) maxX = pt.x;
-              if (pt.y < minY) minY = pt.y;
-              if (pt.y > maxY) maxY = pt.y;
-            }
-          }
-          const spanW = Math.max(1, maxX - minX);
-          const spanH = Math.max(1, maxY - minY);
-          regionWorldSize = Math.min(spanW, spanH);
+        } else if (region._bbox) {
+          const b = region._bbox;
+          regionWorldSize = Math.min(Math.max(1, b[2] - b[0]), Math.max(1, b[3] - b[1]));
           regionScreenSize = regionWorldSize * this.scale;
         }
       }
@@ -4912,14 +5224,14 @@ class FallbackJsController {
         this.ctx.stroke();
       }
 
-      // Level of Detail: when zoomed out on high-res artworks, only draw indicator dots
       const minScreenForText = isDiamond ? 13.0 : 7.5;
       if (regionScreenSize < minScreenForText) {
         if (isHinted || isActiveTarget) {
           const dotR = Math.max(1.2 / this.scale, Math.min(3.5 / this.scale, regionWorldSize * 0.35));
           this.ctx.beginPath();
           this.ctx.arc(cx, cy, dotR, 0, Math.PI * 2);
-          this.ctx.fillStyle = isHinted ? '#F59E0B' : 'rgba(99, 102, 241, 0.85)';
+          const fc = isHinted ? '#F59E0B' : 'rgba(99, 102, 241, 0.85)';
+          if (fc !== lastFill) { this.ctx.fillStyle = fc; lastFill = fc; }
           this.ctx.fill();
         }
       } else {
@@ -4930,19 +5242,23 @@ class FallbackJsController {
         const fontSize = isDiamond
           ? (isHinted ? Math.min(drillWorldSize * 0.68, drillWorldSize * fontScale * 1.15) : drillWorldSize * fontScale)
           : (isHinted ? Math.min(regionWorldSize * 0.56, baseFont * 1.12) : baseFont);
-        this.ctx.font = `${isHinted || isActiveTarget ? 'bold' : '600'} ${fontSize.toFixed(2)}px 'Outfit', sans-serif`;
-        this.ctx.fillStyle = isHinted ? '#B45309' : (isActiveTarget ? '#3730A3' : (isDiamond ? 'rgba(71, 85, 105, 0.78)' : 'rgba(30, 41, 59, 0.88)'));
+        const fontStr = `${isHinted || isActiveTarget ? 'bold' : '600'} ${fontSize.toFixed(2)}px 'Outfit', sans-serif`;
+        if (fontStr !== lastFont) { this.ctx.font = fontStr; lastFont = fontStr; }
+        const fc = isHinted ? '#B45309' : (isActiveTarget ? '#3730A3' : (isDiamond ? 'rgba(71, 85, 105, 0.78)' : 'rgba(30, 41, 59, 0.88)'));
+        if (fc !== lastFill) { this.ctx.fillStyle = fc; lastFill = fc; }
         this.ctx.fillText(String(region.number), cx, cy);
       }
-    });
+    }
 
-    // Particles
+    // Frame-rate independent particles
+    const dtScale = dt * 60;
+    const drag = Math.pow(0.96, dtScale);
     for (let i = this.particles.length - 1; i >= 0; i--) {
       const p = this.particles[i];
-      p.x += p.vx;
-      p.y += p.vy;
-      p.vy += 0.08;
-      p.vx *= 0.96;
+      p.x += p.vx * dtScale;
+      p.y += p.vy * dtScale;
+      p.vy += 0.08 * dtScale;
+      p.vx *= drag;
       p.life -= dt * 1.5;
 
       if (p.life <= 0) {
@@ -4958,6 +5274,7 @@ class FallbackJsController {
     this.ctx.globalAlpha = 1.0;
 
     this.ctx.restore();
+    this.dirty = false;
   }
 
   get_palette_json() {
@@ -4996,7 +5313,8 @@ class FallbackJsController {
     ctx.translate(ox, oy);
     ctx.scale(s, s);
 
-    const isDiamond = (this.artwork.id && this.artwork.id.includes('diamond')) || (this.artwork.regions && this.artwork.regions.length > 200);
+    const isDiamond = this.is_diamond_mode;
+    const hasLineArt = !!(this.lineArtImage && this.lineArtImage.complete && this.lineArtImage.naturalWidth > 0);
 
     for (const region of this.artwork.regions) {
       if (!region.polygon || region.polygon.length < 3) continue;
@@ -5015,13 +5333,11 @@ class FallbackJsController {
         if (isQuad) {
           ctx.fillRect(p0.x, p0.y, cellW, cellH);
         } else {
-          ctx.beginPath();
-          ctx.moveTo(region.polygon[0].x, region.polygon[0].y);
-          for (let i = 1; i < region.polygon.length; i++) {
-            ctx.lineTo(region.polygon[i].x, region.polygon[i].y);
-          }
-          ctx.closePath();
-          ctx.fill();
+          this.traceRegionPath(ctx, region);
+          ctx.fill('evenodd');
+          ctx.strokeStyle = region.color_hex;
+          ctx.lineWidth = hasLineArt ? 0.8 : Math.max(0.8, 1.5 / s);
+          ctx.stroke();
         }
 
         // 3D Diamond facet highlights
@@ -5047,13 +5363,8 @@ class FallbackJsController {
         if (isQuad) {
           ctx.fillRect(p0.x, p0.y, cellW, cellH);
         } else {
-          ctx.beginPath();
-          ctx.moveTo(region.polygon[0].x, region.polygon[0].y);
-          for (let i = 1; i < region.polygon.length; i++) {
-            ctx.lineTo(region.polygon[i].x, region.polygon[i].y);
-          }
-          ctx.closePath();
-          ctx.fill();
+          this.traceRegionPath(ctx, region);
+          ctx.fill('evenodd');
         }
       }
 
@@ -5064,17 +5375,24 @@ class FallbackJsController {
           if (isQuad) {
             ctx.strokeRect(p0.x, p0.y, cellW, cellH);
           } else {
+            this.traceRegionPath(ctx, region);
             ctx.stroke();
           }
-        } else if (!this.lineArtImage) {
-          ctx.strokeStyle = 'rgba(30, 41, 59, 0.35)';
-          ctx.lineWidth = Math.max(0.6, 1.0 / s);
+        } else if (!hasLineArt) {
+          ctx.strokeStyle = 'rgba(30, 41, 59, 0.72)';
+          ctx.lineWidth = Math.max(1.0, 1.8 / s);
+          this.traceRegionPath(ctx, region);
+          ctx.stroke();
+        } else if (!isFilled) {
+          ctx.strokeStyle = 'rgba(148, 163, 184, 0.35)';
+          ctx.lineWidth = Math.max(0.4, 0.7 / s);
+          this.traceRegionPath(ctx, region);
           ctx.stroke();
         }
       }
     }
 
-    if (this.lineArtImage && this.lineArtImage.complete && this.lineArtImage.naturalWidth > 0) {
+    if (hasLineArt) {
       ctx.drawImage(this.lineArtImage, 0, 0, artW, artH);
     }
 

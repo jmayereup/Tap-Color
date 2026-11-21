@@ -24,11 +24,13 @@ pub struct GameEngine {
     pub line_art_image: Option<HtmlImageElement>,
     pub hatch_pattern: Option<CanvasPattern>,
     pub undo_stack: Vec<Vec<usize>>,
+    pub dirty: bool,
 }
 
 impl GameEngine {
     pub fn new(artwork_id: &str) -> Self {
-        let artwork = load_artwork(artwork_id);
+        let mut artwork = load_artwork(artwork_id);
+        artwork.precompute_bboxes();
         let first_active = artwork.palette.first().map(|p| p.number).unwrap_or(1);
 
         GameEngine {
@@ -50,11 +52,30 @@ impl GameEngine {
             line_art_image: None,
             hatch_pattern: None,
             undo_stack: Vec::new(),
+            dirty: true,
         }
+    }
+
+    pub fn is_diamond_art(&self) -> bool {
+        self.artwork.id.contains("diamond")
+            || (self.artwork.regions.len() > 300
+                && self.artwork.regions.first().map_or(false, |r| r.polygon.len() == 4))
+    }
+
+    pub fn needs_render(&self) -> bool {
+        self.dirty
+            || (self.target_pan_x - self.pan_x).abs() > 0.05
+            || (self.target_pan_y - self.pan_y).abs() > 0.05
+            || (self.target_scale - self.scale).abs() > 0.0005
+            || !self.particles.is_empty()
+            || self.hint_timer > 0.0
+            || self.highlight_matching_tiles
+            || self.artwork.regions.iter().any(|r| r.is_filled && r.fill_anim < 1.0)
     }
 
     pub fn set_line_art_image(&mut self, img: Option<HtmlImageElement>) {
         self.line_art_image = img;
+        self.dirty = true;
     }
 
     fn ensure_hatch_pattern(&mut self, ctx: &CanvasRenderingContext2d) {
@@ -112,11 +133,13 @@ impl GameEngine {
 
     pub fn load_artwork_by_id(&mut self, id: &str) {
         self.artwork = load_artwork(id);
+        self.artwork.precompute_bboxes();
         self.reset_state();
     }
 
     pub fn load_custom_mosaic(&mut self, seed: u32, palette_type: &str) {
         self.artwork = generate_procedural_mosaic(seed, palette_type);
+        self.artwork.precompute_bboxes();
         self.reset_state();
     }
 
@@ -126,6 +149,7 @@ impl GameEngine {
         self.hint_region_id = None;
         self.hint_timer = 0.0;
         self.highlight_matching_tiles = false;
+        self.line_art_image = None;
         self.pan_x = 0.0;
         self.pan_y = 0.0;
         self.scale = 1.0;
@@ -133,6 +157,7 @@ impl GameEngine {
         self.target_pan_y = 0.0;
         self.target_scale = 1.0;
         self.undo_stack.clear();
+        self.dirty = true;
     }
 
     pub fn screen_to_world(&self, screen_x: f64, screen_y: f64) -> Point {
@@ -151,6 +176,7 @@ impl GameEngine {
     pub fn select_number(&mut self, num: usize) {
         self.active_number = num;
         self.hint_region_id = None;
+        self.dirty = true;
     }
 
     /// Fast O(1) grid hit-testing for Diamond Art, fallback to polygon test
@@ -160,22 +186,30 @@ impl GameEngine {
             return None;
         }
 
-        let is_diamond_art = self.artwork.id.contains("diamond");
-        if is_diamond_art && total_regions >= 100 {
-            let n_side = (total_regions as f64).sqrt().round() as usize;
-            if n_side * n_side == total_regions {
-                if let Some(p0) = self.artwork.regions[0].polygon.first() {
-                    let margin = p0.x;
-                    let avail = self.artwork.width - margin * 2.0;
-                    if avail > 0.0 {
-                        let cell_size = avail / (n_side as f64);
-                        if world_pt.x >= margin && world_pt.x < self.artwork.width - margin
-                            && world_pt.y >= margin && world_pt.y < self.artwork.height - margin {
-                            let col = ((world_pt.x - margin) / cell_size).floor() as usize;
-                            let row = ((world_pt.y - margin) / cell_size).floor() as usize;
-                            if col < n_side && row < n_side {
-                                let idx = row * n_side + col;
-                                if idx < total_regions {
+        if self.is_diamond_art() && total_regions >= 100 {
+            if let (Some(p0), Some(p2)) = (
+                self.artwork.regions[0].polygon.first(),
+                self.artwork.regions[0].polygon.get(2),
+            ) {
+                let cell_w = (p2.x - p0.x).abs();
+                let cell_h = (p2.y - p0.y).abs();
+                if cell_w > 0.01 && cell_h > 0.01 {
+                    let origin_x = p0.x;
+                    let origin_y = p0.y;
+                    let cols = ((self.artwork.width - origin_x * 2.0) / cell_w).round().max(1.0) as usize;
+                    let rows = (total_regions + cols - 1) / cols;
+                    if world_pt.x >= origin_x && world_pt.y >= origin_y {
+                        let col = ((world_pt.x - origin_x) / cell_w).floor() as usize;
+                        let row = ((world_pt.y - origin_y) / cell_h).floor() as usize;
+                        if col < cols && row < rows {
+                            let idx = row * cols + col;
+                            if idx < total_regions {
+                                let r = &self.artwork.regions[idx];
+                                if world_pt.x >= r.bbox.0 - 0.1
+                                    && world_pt.x <= r.bbox.2 + 0.1
+                                    && world_pt.y >= r.bbox.1 - 0.1
+                                    && world_pt.y <= r.bbox.3 + 0.1
+                                {
                                     return Some(idx);
                                 }
                             }
@@ -189,17 +223,12 @@ impl GameEngine {
             if region.polygon.len() < 3 {
                 return false;
             }
-            let mut min_x = f64::INFINITY;
-            let mut max_x = f64::NEG_INFINITY;
-            let mut min_y = f64::INFINITY;
-            let mut max_y = f64::NEG_INFINITY;
-            for pt in &region.polygon {
-                if pt.x < min_x { min_x = pt.x; }
-                if pt.x > max_x { max_x = pt.x; }
-                if pt.y < min_y { min_y = pt.y; }
-                if pt.y > max_y { max_y = pt.y; }
-            }
-            if world_pt.x < min_x - 0.5 || world_pt.x > max_x + 0.5 || world_pt.y < min_y - 0.5 || world_pt.y > max_y + 0.5 {
+            let (min_x, min_y, max_x, max_y) = region.bbox;
+            if world_pt.x < min_x - 0.5
+                || world_pt.x > max_x + 0.5
+                || world_pt.y < min_y - 0.5
+                || world_pt.y > max_y + 0.5
+            {
                 return false;
             }
             region.contains_point(world_pt)
@@ -271,6 +300,7 @@ impl GameEngine {
                         }
                     }
 
+                    self.dirty = true;
                     return TapFeedback {
                         success: true,
                         region_id: Some(reg_id),
@@ -280,7 +310,7 @@ impl GameEngine {
                         artwork_completed,
                         total_filled: filled_count,
                         total_regions,
-                        percent: (filled_count as f64 / total_regions as f64) * 100.0,
+                        percent: (filled_count as f64 / total_regions.max(1) as f64) * 100.0,
                         target_point: Some(centroid),
                     };
                 } else {
@@ -300,7 +330,7 @@ impl GameEngine {
                         artwork_completed: false,
                         total_filled: filled_count,
                         total_regions,
-                        percent: (filled_count as f64 / total_regions as f64) * 100.0,
+                        percent: (filled_count as f64 / total_regions.max(1) as f64) * 100.0,
                         target_point: Some(centroid),
                     };
                 }
@@ -322,13 +352,14 @@ impl GameEngine {
             artwork_completed: false,
             total_filled: filled_count,
             total_regions,
-            percent: (filled_count as f64 / total_regions as f64) * 100.0,
+            percent: (filled_count as f64 / total_regions.max(1) as f64) * 100.0,
             target_point: None,
         }
     }
 
     /// Finds an uncompleted region matching the active number and centers camera on it
     pub fn trigger_hint(&mut self, canvas_w: f64, canvas_h: f64) -> Option<Point> {
+        let is_diamond_art = self.is_diamond_art();
         let uncompleted = self
             .artwork
             .regions
@@ -338,9 +369,9 @@ impl GameEngine {
         if let Some(reg) = uncompleted {
             self.hint_region_id = Some(reg.id);
             self.hint_timer = 5.0; // 5 seconds highlight
+            self.dirty = true;
 
             // Smoothly pan camera to center this region with zoom scaled to drill size
-            let is_diamond_art = self.artwork.id.contains("diamond") || (self.artwork.regions.len() > 300 && self.artwork.regions.get(0).map_or(false, |r| r.polygon.len() == 4));
             let drill_world_size = if is_diamond_art && !self.artwork.regions.is_empty() {
                 let p0 = self.artwork.regions[0].polygon.first();
                 let p1 = self.artwork.regions[0].polygon.get(1);
@@ -359,16 +390,7 @@ impl GameEngine {
                 let d = (reg.label_radius * 2.0).max(4.0);
                 (26.0 / d).clamp(1.35, 4.5)
             } else {
-                let mut min_x = f64::INFINITY;
-                let mut max_x = f64::NEG_INFINITY;
-                let mut min_y = f64::INFINITY;
-                let mut max_y = f64::NEG_INFINITY;
-                for p in &reg.polygon {
-                    if p.x < min_x { min_x = p.x; }
-                    if p.x > max_x { max_x = p.x; }
-                    if p.y < min_y { min_y = p.y; }
-                    if p.y > max_y { max_y = p.y; }
-                }
+                let (min_x, min_y, max_x, max_y) = reg.bbox;
                 let span = (max_x - min_x).min(max_y - min_y).max(4.0);
                 (32.0 / span).clamp(1.35, 4.5)
             };
@@ -385,12 +407,14 @@ impl GameEngine {
     /// Toggle highlight on all matching tiles of the active number
     pub fn toggle_matching_hints(&mut self) -> bool {
         self.highlight_matching_tiles = !self.highlight_matching_tiles;
+        self.dirty = true;
         self.highlight_matching_tiles
     }
 
     /// Set matching tiles highlight directly
     pub fn set_matching_hints(&mut self, enabled: bool) {
         self.highlight_matching_tiles = enabled;
+        self.dirty = true;
     }
 
     /// Erase / remove color from a region under screen coordinates
@@ -431,6 +455,7 @@ impl GameEngine {
                     .filter(|r| r.is_filled)
                     .count();
 
+                self.dirty = true;
                 return TapFeedback {
                     success: true,
                     region_id: Some(reg_id),
@@ -440,7 +465,7 @@ impl GameEngine {
                     artwork_completed: false,
                     total_filled: filled_count,
                     total_regions,
-                    percent: (filled_count as f64 / total_regions as f64) * 100.0,
+                    percent: (filled_count as f64 / total_regions.max(1) as f64) * 100.0,
                     target_point: Some(centroid),
                 };
             }
@@ -462,7 +487,7 @@ impl GameEngine {
             artwork_completed: false,
             total_filled: filled_count,
             total_regions,
-            percent: (filled_count as f64 / total_regions as f64) * 100.0,
+            percent: (filled_count as f64 / total_regions.max(1) as f64) * 100.0,
             target_point: None,
         }
     }
@@ -479,6 +504,7 @@ impl GameEngine {
             pal_item.is_completed = false;
         }
         self.undo_stack.clear();
+        self.dirty = true;
 
         let total_regions = self.artwork.regions.len();
         TapFeedback {
@@ -524,10 +550,17 @@ impl GameEngine {
 
         let total_filled = self.artwork.regions.iter().filter(|r| r.is_filled).count();
         let total = self.artwork.regions.len();
-        let artwork_completed = total_filled == total;
+        let artwork_completed = total > 0 && total_filled == total;
 
         if filled_any {
-            if let Some(pt) = last_pt {
+            self.dirty = true;
+            if artwork_completed {
+                for i in 0..5 {
+                    let rx = ((i + 1) as f64 * 137.0) % self.artwork.width;
+                    let ry = ((i + 1) as f64 * 193.0) % self.artwork.height;
+                    self.spawn_burst(rx, ry, "#FFD700", 25);
+                }
+            } else if let Some(pt) = last_pt {
                 self.spawn_burst(pt.x, pt.y, "#FFD700", 24);
             }
             if let Some(next_pal) = self.artwork.palette.iter().find(|p| !p.is_completed) {
@@ -540,11 +573,11 @@ impl GameEngine {
             region_id: None,
             number: Some(active),
             correct_number: Some(self.active_number),
-            color_completed: true,
+            color_completed: filled_any,
             artwork_completed,
             total_filled,
             total_regions: total,
-            percent: (total_filled as f64 / total as f64) * 100.0,
+            percent: (total_filled as f64 / total.max(1) as f64) * 100.0,
             target_point: last_pt,
         }
     }
@@ -589,6 +622,7 @@ impl GameEngine {
 
         if let Some(num) = undone_number {
             self.active_number = num;
+            self.dirty = true;
         }
 
         let total_filled = self.artwork.regions.iter().filter(|r| r.is_filled).count();
@@ -613,6 +647,7 @@ impl GameEngine {
         self.target_pan_x = px;
         self.target_pan_y = py;
         self.target_scale = s;
+        self.dirty = true;
     }
 
     pub fn fit_to_screen(&mut self, canvas_w: f64, canvas_h: f64) {
@@ -630,6 +665,7 @@ impl GameEngine {
         self.target_scale = s;
         self.target_pan_x = px;
         self.target_pan_y = py;
+        self.dirty = true;
     }
 
     /// Render complete high-resolution artwork to canvas context without viewport panning, zooming, numbers, or UI overlays
@@ -648,9 +684,7 @@ impl GameEngine {
         let _ = ctx.translate(ox, oy);
         let _ = ctx.scale(s, s);
 
-        let is_diamond_art = self.artwork.id.contains("diamond")
-            || (self.artwork.regions.len() > 300
-                && self.artwork.regions.get(0).map_or(false, |r| r.polygon.len() == 4));
+        let is_diamond_art = self.is_diamond_art();
         let has_line_art = self.line_art_image.is_some();
         let drill_screen_size = if is_diamond_art && !self.artwork.regions.is_empty() {
             let p0 = self.artwork.regions[0].polygon.first();
@@ -834,22 +868,15 @@ impl GameEngine {
         let _ = ctx.translate(self.pan_x, self.pan_y);
         let _ = ctx.scale(self.scale, self.scale);
 
-        // 1. Draw artwork drop shadow / paper boundary
-        ctx.set_shadow_color("rgba(0, 0, 0, 0.25)");
-        ctx.set_shadow_blur(30.0);
-        ctx.set_shadow_offset_x(0.0);
-        ctx.set_shadow_offset_y(8.0);
+        // 1. Draw artwork paper boundary (avoid per-frame shadowBlur GPU pass)
         ctx.set_fill_style_str("#FFFFFF");
         ctx.fill_rect(0.0, 0.0, self.artwork.width, self.artwork.height);
-
-        // Completely reset shadow state so lines and numbers render sharp and clean
-        ctx.set_shadow_blur(0.0);
-        ctx.set_shadow_offset_x(0.0);
-        ctx.set_shadow_offset_y(0.0);
-        ctx.set_shadow_color("transparent");
+        ctx.set_stroke_style_str("rgba(148, 163, 184, 0.35)");
+        ctx.set_line_width(1.5 / self.scale.max(0.25));
+        ctx.stroke_rect(0.0, 0.0, self.artwork.width, self.artwork.height);
 
         let active_pulse = self.pulse_phase.sin() * 0.5 + 0.5; // 0.0 to 1.0
-        let is_diamond_art = self.artwork.id.contains("diamond") || (self.artwork.regions.len() > 300 && self.artwork.regions.get(0).map_or(false, |r| r.polygon.len() == 4));
+        let is_diamond_art = self.is_diamond_art();
 
         // Viewport Frustum Culling in world coordinates
         let pad = 24.0 / self.scale.max(0.1);
@@ -898,16 +925,7 @@ impl GameEngine {
                     continue;
                 }
             } else {
-                let mut r_min_x = f64::INFINITY;
-                let mut r_max_x = f64::NEG_INFINITY;
-                let mut r_min_y = f64::INFINITY;
-                let mut r_max_y = f64::NEG_INFINITY;
-                for pt in &region.polygon {
-                    if pt.x < r_min_x { r_min_x = pt.x; }
-                    if pt.x > r_max_x { r_max_x = pt.x; }
-                    if pt.y < r_min_y { r_min_y = pt.y; }
-                    if pt.y > r_max_y { r_max_y = pt.y; }
-                }
+                let (r_min_x, r_min_y, r_max_x, r_max_y) = region.bbox;
                 if r_max_x < view_min_x || r_min_x > view_max_x || r_max_y < view_min_y || r_min_y > view_max_y {
                     continue;
                 }
@@ -931,12 +949,14 @@ impl GameEngine {
             let cell_w = p1.x - p0.x;
             let cell_h = p2.y - p1.y;
 
+            let mut path_traced = false;
             if region.is_filled {
                 ctx.set_fill_style_str(&region.color_hex);
                 if is_quad {
                     ctx.fill_rect(p0.x, p0.y, cell_w, cell_h);
                 } else {
                     Self::trace_region_path(ctx, region);
+                    path_traced = true;
                     ctx.fill_with_canvas_winding_rule(CanvasWindingRule::Evenodd);
 
                     // Seam-seal stroke: prevents anti-aliasing white cracks between adjacent polygons
@@ -988,19 +1008,19 @@ impl GameEngine {
             } else {
                 // Unfilled region
                 if is_quad {
-                    let unfill_color = if is_hinted {
+                    if is_hinted {
                         let alpha = 0.45 + active_pulse * 0.35;
-                        format!("rgba(255, 215, 0, {:.2})", alpha)
+                        ctx.set_fill_style_str(&format!("rgba(255, 215, 0, {:.2})", alpha));
                     } else if is_active_target {
                         let alpha = 0.16 + active_pulse * 0.12;
-                        format!("rgba(99, 102, 241, {:.2})", alpha)
+                        ctx.set_fill_style_str(&format!("rgba(99, 102, 241, {:.2})", alpha));
                     } else {
-                        "#F8FAFC".to_string()
-                    };
-                    ctx.set_fill_style_str(&unfill_color);
+                        ctx.set_fill_style_str("#F8FAFC");
+                    }
                     ctx.fill_rect(p0.x, p0.y, cell_w, cell_h);
                 } else {
                     Self::trace_region_path(ctx, region);
+                    path_traced = true;
                     if is_hinted {
                         let alpha = 0.45 + active_pulse * 0.35;
                         let c = format!("rgba(255, 215, 0, {:.2})", alpha);
@@ -1028,7 +1048,7 @@ impl GameEngine {
                 }
             }
 
-            // Outline strokes
+            // Outline strokes (reuse already-traced path when possible)
             if can_draw_outlines {
                 if is_quad {
                     if is_hinted {
@@ -1043,12 +1063,12 @@ impl GameEngine {
                     }
                     ctx.stroke_rect(p0.x, p0.y, cell_w, cell_h);
                 } else if is_hinted {
-                    Self::trace_region_path(ctx, region);
+                    if !path_traced { Self::trace_region_path(ctx, region); }
                     ctx.set_stroke_style_str("#F59E0B");
                     ctx.set_line_width(2.5 / self.scale.max(0.5));
                     ctx.stroke();
                 } else if !has_line_art {
-                    Self::trace_region_path(ctx, region);
+                    if !path_traced { Self::trace_region_path(ctx, region); }
                     if is_active_target {
                         ctx.set_stroke_style_str("rgba(99, 102, 241, 0.6)");
                         ctx.set_line_width(1.3 / self.scale.max(0.5));
@@ -1058,8 +1078,7 @@ impl GameEngine {
                     }
                     ctx.stroke();
                 } else if !region.is_filled {
-                    // Subtle guide border for unfilled regions so lineless boundaries stay clear
-                    Self::trace_region_path(ctx, region);
+                    if !path_traced { Self::trace_region_path(ctx, region); }
                     ctx.set_stroke_style_str("rgba(148, 163, 184, 0.42)");
                     ctx.set_line_width(0.8 / self.scale.max(0.5));
                     ctx.stroke();
@@ -1083,6 +1102,8 @@ impl GameEngine {
         // 3. Render Number Labels on uncolored regions
         ctx.set_text_align("center");
         ctx.set_text_baseline("middle");
+        let mut last_font = String::new();
+        let mut last_fill_str = "";
 
         for region in &self.artwork.regions {
             if region.is_filled {
@@ -1104,16 +1125,7 @@ impl GameEngine {
                 let rw = region.label_radius * 2.0;
                 (rw, rw * self.scale)
             } else {
-                let mut min_x = f64::INFINITY;
-                let mut max_x = f64::NEG_INFINITY;
-                let mut min_y = f64::INFINITY;
-                let mut max_y = f64::NEG_INFINITY;
-                for p in &region.polygon {
-                    if p.x < min_x { min_x = p.x; }
-                    if p.x > max_x { max_x = p.x; }
-                    if p.y < min_y { min_y = p.y; }
-                    if p.y > max_y { max_y = p.y; }
-                }
+                let (min_x, min_y, max_x, max_y) = region.bbox;
                 let span_w = (max_x - min_x).max(1.0);
                 let span_h = (max_y - min_y).max(1.0);
                 let rw = span_w.min(span_h);
@@ -1146,11 +1158,14 @@ impl GameEngine {
                     let dot_r = (region_world_size * 0.35).min(3.5 / self.scale).max(1.2 / self.scale);
                     ctx.begin_path();
                     let _ = ctx.arc(cx, cy, dot_r, 0.0, 2.0 * PI);
-                    ctx.set_fill_style_str(if is_hinted { "#F59E0B" } else { "rgba(99, 102, 241, 0.85)" });
+                    let fill_c = if is_hinted { "#F59E0B" } else { "rgba(99, 102, 241, 0.85)" };
+                    if fill_c != last_fill_str {
+                        ctx.set_fill_style_str(fill_c);
+                        last_fill_str = fill_c;
+                    }
                     ctx.fill();
                 }
             } else {
-                let num_str = region.number.to_string();
                 let digits = if region.number >= 100 {
                     3
                 } else if region.number >= 10 {
@@ -1177,27 +1192,39 @@ impl GameEngine {
                     if is_hinted { (base * 1.12).min(region_world_size * 0.56) } else { base }
                 };
                 let font_weight = if is_hinted || is_active_target { "bold" } else { "600" };
-                ctx.set_font(&format!("{} {:.2}px 'Outfit', sans-serif", font_weight, font_size));
-
-                if is_hinted {
-                    ctx.set_fill_style_str("#B45309");
-                } else if is_active_target {
-                    ctx.set_fill_style_str("#3730A3");
-                } else {
-                    ctx.set_fill_style_str(if is_diamond_art { "rgba(71, 85, 105, 0.78)" } else { "rgba(30, 41, 59, 0.88)" });
+                let font_str = format!("{} {:.2}px 'Outfit', sans-serif", font_weight, font_size);
+                if font_str != last_font {
+                    ctx.set_font(&font_str);
+                    last_font = font_str;
                 }
-                let _ = ctx.fill_text(&num_str, cx, cy);
+
+                let fill_c = if is_hinted {
+                    "#B45309"
+                } else if is_active_target {
+                    "#3730A3"
+                } else if is_diamond_art {
+                    "rgba(71, 85, 105, 0.78)"
+                } else {
+                    "rgba(30, 41, 59, 0.88)"
+                };
+                if fill_c != last_fill_str {
+                    ctx.set_fill_style_str(fill_c);
+                    last_fill_str = fill_c;
+                }
+                let _ = ctx.fill_text(&region.number.to_string(), cx, cy);
             }
         }
 
-        // 4. Update and render particle physics
+        // 4. Update and render particle physics (frame-rate independent)
+        let dt_scale = dt * 60.0;
+        let drag = 0.96_f64.powf(dt_scale);
         let mut i = 0;
         while i < self.particles.len() {
             let p = &mut self.particles[i];
-            p.x += p.vx;
-            p.y += p.vy;
-            p.vy += 0.08; // subtle gravity
-            p.vx *= 0.96;
+            p.x += p.vx * dt_scale;
+            p.y += p.vy * dt_scale;
+            p.vy += 0.08 * dt_scale; // subtle gravity
+            p.vx *= drag;
             p.life -= dt / p.max_life;
 
             if p.life <= 0.0 {
@@ -1216,5 +1243,6 @@ impl GameEngine {
 
         // Restore canvas transform
         ctx.restore();
+        self.dirty = false;
     }
 }

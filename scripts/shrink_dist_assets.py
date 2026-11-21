@@ -12,7 +12,7 @@ MAX_DIM = 400
 JPEG_QUALITY = "82"
 
 try:
-    from PIL import Image
+    from PIL import Image, ImageOps
     HAS_PIL = True
 except ImportError:
     HAS_PIL = False
@@ -31,7 +31,8 @@ def shrink_file(path, max_dim=MAX_DIM):
 
     try:
         if HAS_PIL:
-            with Image.open(path) as im:
+            with Image.open(path) as raw_im:
+                im = ImageOps.exif_transpose(raw_im)
                 w, h = im.size
                 if max(w, h) <= max_dim:
                     return orig_size, orig_size
@@ -39,7 +40,11 @@ def shrink_file(path, max_dim=MAX_DIM):
                 nw, nh = max(1, int(round(w * scale))), max(1, int(round(h * scale)))
                 resized = im.resize((nw, nh), Image.Resampling.LANCZOS)
                 if ext in (".jpg", ".jpeg"):
-                    if resized.mode != "RGB":
+                    if resized.mode in ("RGBA", "LA") or (resized.mode == "P" and "transparency" in resized.info):
+                        rgba = resized.convert("RGBA")
+                        bg = Image.new("RGBA", rgba.size, (255, 255, 255, 255))
+                        resized = Image.alpha_composite(bg, rgba).convert("RGB")
+                    elif resized.mode != "RGB":
                         resized = resized.convert("RGB")
                     resized.save(tmp_path, "JPEG", quality=int(JPEG_QUALITY), optimize=True)
                 elif ext == ".png":
@@ -48,13 +53,19 @@ def shrink_file(path, max_dim=MAX_DIM):
                     resized.save(tmp_path, "WEBP", quality=int(JPEG_QUALITY))
         else:
             pb = GdkPixbuf.Pixbuf.new_from_file(path)
+            pb = pb.apply_embedded_orientation()
             w, h = pb.get_width(), pb.get_height()
             if max(w, h) <= max_dim:
                 return orig_size, orig_size
             scale = max_dim / max(w, h)
             nw, nh = max(1, int(round(w * scale))), max(1, int(round(h * scale)))
-            scaled = pb.scale_simple(nw, nh, GdkPixbuf.InterpType.BILINEAR)
+            scaled = pb.scale_simple(nw, nh, GdkPixbuf.InterpType.HYPER)
             if ext in (".jpg", ".jpeg"):
+                if scaled.get_has_alpha():
+                    flat = GdkPixbuf.Pixbuf.new(GdkPixbuf.Colorspace.RGB, False, 8, nw, nh)
+                    flat.fill(0xFFFFFFFF)
+                    scaled.composite(flat, 0, 0, nw, nh, 0, 0, 1.0, 1.0, GdkPixbuf.InterpType.NEAREST, 255)
+                    scaled = flat
                 scaled.savev(tmp_path, "jpeg", ["quality"], [JPEG_QUALITY])
             elif ext == ".png":
                 scaled.savev(tmp_path, "png", ["compression"], ["9"])

@@ -9,12 +9,10 @@ Uses PIL if available, or GdkPixbuf + PyCairo seamlessly.
 import os
 import sys
 import json
-import math
 import random
-from collections import deque, Counter
 
 try:
-    from PIL import Image, ImageDraw, ImageFilter
+    from PIL import Image, ImageDraw, ImageOps
     HAS_PIL = True
 except ImportError:
     HAS_PIL = False
@@ -30,9 +28,15 @@ def get_luminance(r, g, b):
     return 0.299 * r + 0.587 * g + 0.114 * b
 
 def load_framed_rgb_grid(img_path, target_size):
-    """Loads an image, trims uniform white/transparent borders, and frames it into a target_size x target_size RGB list."""
+    """Loads an image, composites transparency onto white, trims uniform borders, and frames into target_size x target_size."""
     if HAS_PIL:
-        im = Image.open(img_path).convert('RGB')
+        raw_im = ImageOps.exif_transpose(Image.open(img_path))
+        if raw_im.mode in ('RGBA', 'LA') or (raw_im.mode == 'P' and 'transparency' in raw_im.info):
+            rgba = raw_im.convert('RGBA')
+            bg = Image.new('RGBA', rgba.size, (255, 255, 255, 255))
+            im = Image.alpha_composite(bg, rgba).convert('RGB')
+        else:
+            im = raw_im.convert('RGB')
         w, h = im.size
         sample = im.resize((200, 200), Image.Resampling.BOX)
         spix = sample.load()
@@ -40,6 +44,7 @@ def load_framed_rgb_grid(img_path, target_size):
             return spix[x, y]
     else:
         pb = GdkPixbuf.Pixbuf.new_from_file(img_path)
+        pb = pb.apply_embedded_orientation()
         w, h = pb.get_width(), pb.get_height()
         samp = pb.scale_simple(200, 200, GdkPixbuf.InterpType.BILINEAR)
         sdata = samp.get_pixels()
@@ -47,7 +52,14 @@ def load_framed_rgb_grid(img_path, target_size):
         sch = samp.get_n_channels()
         def get_sp(x, y):
             i = y * srs + x * sch
-            return (sdata[i], sdata[i+1], sdata[i+2])
+            if sch >= 4:
+                a = sdata[i + 3] / 255.0
+                return (
+                    int(sdata[i] * a + 255 * (1.0 - a)),
+                    int(sdata[i + 1] * a + 255 * (1.0 - a)),
+                    int(sdata[i + 2] * a + 255 * (1.0 - a)),
+                )
+            return (sdata[i], sdata[i + 1], sdata[i + 2])
 
     def is_bg(c):
         return c[0] > 240 and c[1] > 240 and c[2] > 240
@@ -102,7 +114,15 @@ def load_framed_rgb_grid(img_path, target_size):
             dst_off = (y + dy) * target_size + dx
             for x in range(dw):
                 pi = row_off + x * rch
-                grid_rgb[dst_off + x] = (rdata[pi], rdata[pi+1], rdata[pi+2])
+                if rch >= 4:
+                    a = rdata[pi + 3] / 255.0
+                    grid_rgb[dst_off + x] = (
+                        int(rdata[pi] * a + 255 * (1.0 - a)),
+                        int(rdata[pi + 1] * a + 255 * (1.0 - a)),
+                        int(rdata[pi + 2] * a + 255 * (1.0 - a)),
+                    )
+                else:
+                    grid_rgb[dst_off + x] = (rdata[pi], rdata[pi+1], rdata[pi+2])
 
     return grid_rgb
 
@@ -947,8 +967,15 @@ def main():
             "desc": f"{title} artwork",
         }
 
+    conv_script_dir = os.path.dirname(os.path.abspath(__file__))
+    pbn_script_path = os.path.join(conv_script_dir, "convert_pbn.mjs")
+    script_mtime = max(
+        os.path.getmtime(__file__),
+        os.path.getmtime(pbn_script_path) if os.path.exists(pbn_script_path) else 0
+    )
+
     def is_up_to_date(src_path, out_paths):
-        src_mtime = os.path.getmtime(src_path)
+        src_mtime = max(os.path.getmtime(src_path), script_mtime)
         for p in out_paths:
             if not os.path.exists(p) or os.path.getmtime(p) < src_mtime:
                 return False
@@ -975,9 +1002,8 @@ def main():
         })
         entry["pbn_path"] = abs_path
         entry["pbn_rel"] = rel_path
-        if entry["diamond_path"] is None:
-            entry["diamond_path"] = abs_path
-            entry["diamond_rel"] = rel_path
+        entry["diamond_path"] = abs_path
+        entry["diamond_rel"] = rel_path
 
     for fname in sorted(os.listdir(diamond_only_dir)):
         ext = os.path.splitext(fname)[1].lower()
@@ -1126,6 +1152,24 @@ def main():
     with open(manifest_path, 'w', encoding='utf-8') as f:
         json.dump(manifest_entries, f, indent=2)
     print(f"Manifest saved to {manifest_path} with {len(manifest_entries)} gallery entries.")
+
+    if not target_key and not pbn_only:
+        keep_files = {"manifest.json"}
+        for entry in manifest_entries:
+            for v in entry.get("diamondVariants", []) + entry.get("pbnVariants", []):
+                for field in ("jsonFile", "lineArtUrl", "thumbnailUrl"):
+                    rel = v.get(field)
+                    if rel:
+                        keep_files.add(os.path.basename(rel))
+        pruned = 0
+        for fname in os.listdir(output_dir):
+            if fname not in keep_files:
+                fpath = os.path.join(output_dir, fname)
+                if os.path.isfile(fpath):
+                    os.remove(fpath)
+                    pruned += 1
+        if pruned:
+            print(f"Pruned {pruned} orphaned files from {output_dir}")
 
 if __name__ == '__main__':
     main()

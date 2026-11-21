@@ -15,8 +15,9 @@ pub fn main_js() -> Result<(), JsValue> {
 #[wasm_bindgen]
 pub struct GameController {
     engine: GameEngine,
-    canvas: HtmlCanvasElement,
     ctx: CanvasRenderingContext2d,
+    viewport_w: f64,
+    viewport_h: f64,
 }
 
 #[wasm_bindgen]
@@ -39,12 +40,34 @@ impl GameController {
             .ok_or_else(|| JsValue::from_str("Canvas 2d context not available"))?
             .dyn_into::<CanvasRenderingContext2d>()?;
 
-        let mut engine = GameEngine::new(artwork_id);
-        let canvas_w = canvas.width() as f64;
-        let canvas_h = canvas.height() as f64;
-        engine.fit_to_screen(canvas_w, canvas_h);
+        let dpr = window.device_pixel_ratio().max(1.0);
+        let viewport_w = (canvas.width() as f64 / dpr).max(1.0);
+        let viewport_h = (canvas.height() as f64 / dpr).max(1.0);
 
-        Ok(GameController { engine, canvas, ctx })
+        let mut engine = GameEngine::new(artwork_id);
+        engine.fit_to_screen(viewport_w, viewport_h);
+
+        Ok(GameController {
+            engine,
+            ctx,
+            viewport_w,
+            viewport_h,
+        })
+    }
+
+    pub fn set_viewport_size(&mut self, css_width: f64, css_height: f64) {
+        self.viewport_w = css_width.max(1.0);
+        self.viewport_h = css_height.max(1.0);
+        self.engine.dirty = true;
+    }
+
+    pub fn needs_render(&self) -> bool {
+        self.engine.needs_render()
+    }
+
+    #[wasm_bindgen(getter)]
+    pub fn is_diamond_mode(&self) -> bool {
+        self.engine.is_diamond_art()
     }
 
     pub fn handle_tap(&mut self, screen_x: f64, screen_y: f64) -> String {
@@ -71,12 +94,11 @@ impl GameController {
         self.engine.target_scale = new_scale;
         self.engine.target_pan_x = anchor_x - wx * new_scale + delta_x;
         self.engine.target_pan_y = anchor_y - wy * new_scale + delta_y;
+        self.engine.dirty = true;
     }
 
     pub fn fit_to_screen(&mut self) {
-        let w = self.canvas.width() as f64;
-        let h = self.canvas.height() as f64;
-        self.engine.fit_to_screen(w, h);
+        self.engine.fit_to_screen(self.viewport_w, self.viewport_h);
     }
 
     pub fn world_to_screen(&self, world_x: f64, world_y: f64) -> String {
@@ -90,9 +112,7 @@ impl GameController {
     }
 
     pub fn trigger_hint(&mut self) -> String {
-        let w = self.canvas.width() as f64;
-        let h = self.canvas.height() as f64;
-        let pt = self.engine.trigger_hint(w, h);
+        let pt = self.engine.trigger_hint(self.viewport_w, self.viewport_h);
         serde_json::to_string(&pt).unwrap_or_else(|_| "null".to_string())
     }
 
@@ -130,14 +150,13 @@ impl GameController {
 
     pub fn toggle_outlines(&mut self) -> bool {
         self.engine.show_outlines = !self.engine.show_outlines;
+        self.engine.dirty = true;
         self.engine.show_outlines
     }
 
     pub fn load_artwork(&mut self, artwork_id: &str) {
         self.engine.load_artwork_by_id(artwork_id);
-        let w = self.canvas.width() as f64;
-        let h = self.canvas.height() as f64;
-        self.engine.fit_to_screen(w, h);
+        self.engine.fit_to_screen(self.viewport_w, self.viewport_h);
     }
 
     pub fn set_line_art_image(&mut self, img: Option<HtmlImageElement>) {
@@ -145,12 +164,11 @@ impl GameController {
     }
 
     pub fn load_artwork_json(&mut self, json_str: &str) -> bool {
-        if let Ok(artwork) = serde_json::from_str::<crate::models::ArtworkData>(json_str) {
+        if let Ok(mut artwork) = serde_json::from_str::<crate::models::ArtworkData>(json_str) {
+            artwork.precompute_bboxes();
             self.engine.artwork = artwork;
             self.engine.reset_state();
-            let w = self.canvas.width() as f64;
-            let h = self.canvas.height() as f64;
-            self.engine.fit_to_screen(w, h);
+            self.engine.fit_to_screen(self.viewport_w, self.viewport_h);
             true
         } else {
             false
@@ -159,15 +177,11 @@ impl GameController {
 
     pub fn load_procedural_mosaic(&mut self, seed: u32, palette_type: &str) {
         self.engine.load_custom_mosaic(seed, palette_type);
-        let w = self.canvas.width() as f64;
-        let h = self.canvas.height() as f64;
-        self.engine.fit_to_screen(w, h);
+        self.engine.fit_to_screen(self.viewport_w, self.viewport_h);
     }
 
     pub fn render(&mut self, timestamp: f64) {
-        let w = self.canvas.width() as f64;
-        let h = self.canvas.height() as f64;
-        self.engine.render(&self.ctx, w, h, timestamp);
+        self.engine.render(&self.ctx, self.viewport_w, self.viewport_h, timestamp);
     }
 
     pub fn get_palette_json(&self) -> String {

@@ -25,9 +25,28 @@ pub struct Region {
     pub color_hex: String,
     pub is_filled: bool,
     pub fill_anim: f64, // 0.0 to 1.0 animation transition
+    #[serde(skip)]
+    pub bbox: (f64, f64, f64, f64), // (min_x, min_y, max_x, max_y)
 }
 
 impl Region {
+    pub fn compute_bbox(&mut self) {
+        if self.polygon.is_empty() {
+            self.bbox = (0.0, 0.0, 0.0, 0.0);
+            return;
+        }
+        let mut min_x = f64::INFINITY;
+        let mut min_y = f64::INFINITY;
+        let mut max_x = f64::NEG_INFINITY;
+        let mut max_y = f64::NEG_INFINITY;
+        for pt in &self.polygon {
+            if pt.x < min_x { min_x = pt.x; }
+            if pt.y < min_y { min_y = pt.y; }
+            if pt.x > max_x { max_x = pt.x; }
+            if pt.y > max_y { max_y = pt.y; }
+        }
+        self.bbox = (min_x, min_y, max_x, max_y);
+    }
     pub fn calculate_centroid(points: &[Point]) -> Point {
         if points.is_empty() {
             return Point::new(0.0, 0.0);
@@ -121,6 +140,14 @@ pub struct ArtworkData {
     pub line_art_url: Option<String>,
     pub palette: Vec<PaletteItem>,
     pub regions: Vec<Region>,
+}
+
+impl ArtworkData {
+    pub fn precompute_bboxes(&mut self) {
+        for r in &mut self.regions {
+            r.compute_bbox();
+        }
+    }
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]

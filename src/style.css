@@ -35,7 +35,8 @@
   user-select: none;
 }
 
-html, body {
+html,
+body {
   width: 100%;
   height: 100%;
   overflow: hidden;
@@ -64,14 +65,13 @@ html, body {
   justify-content: space-between;
   padding: 12px 20px;
   background: var(--bg-surface);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
   border-bottom: 1px solid var(--border-subtle);
   z-index: 20;
   gap: 16px;
 }
 
-.header-left, .header-right {
+.header-left,
+.header-right {
   display: flex;
   align-items: center;
   gap: 12px;
@@ -303,6 +303,7 @@ html, body {
   background: linear-gradient(135deg, rgba(236, 72, 153, 0.15), rgba(168, 85, 247, 0.15));
   border-color: rgba(236, 72, 153, 0.3);
 }
+
 .btn-accent:hover {
   background: linear-gradient(135deg, rgba(236, 72, 153, 0.25), rgba(168, 85, 247, 0.25));
   border-color: var(--accent-secondary);
@@ -353,9 +354,11 @@ html, body {
 /* Stylus Hold-to-Scroll Feedback Ring */
 .stylus-pan-ring {
   position: fixed;
-  pointer-events: none;
+  width: 48px;
+  height: 48px;
   border-radius: 50%;
-  border: 2px solid rgba(255, 255, 255, 0.95);
+  pointer-events: none;
+  border: 2.5px solid #6366f1;
   box-shadow: 0 0 14px rgba(99, 102, 241, 0.85), inset 0 0 8px rgba(129, 140, 248, 0.6);
   background: radial-gradient(circle, rgba(99, 102, 241, 0.3) 0%, rgba(99, 102, 241, 0) 70%);
   transform: translate(-50%, -50%);
@@ -365,16 +368,13 @@ html, body {
 
 @keyframes stylusPanRingExpand {
   0% {
-    width: 14px;
-    height: 14px;
     opacity: 1;
-    transform: translate(-50%, -50%) scale(0.6);
+    transform: translate(-50%, -50%) scale(0.3);
   }
+
   100% {
-    width: 64px;
-    height: 64px;
     opacity: 0;
-    transform: translate(-50%, -50%) scale(1.3);
+    transform: translate(-50%, -50%) scale(1.4);
   }
 }
 
@@ -405,7 +405,6 @@ html, body {
   height: 44px;
   border-radius: var(--radius-md);
   background: var(--bg-surface-elevated);
-  backdrop-filter: blur(12px);
   border: 1px solid var(--border-subtle);
   color: var(--text-main);
   font-size: 20px;
@@ -414,7 +413,7 @@ html, body {
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: transform 0.2s ease, background-color 0.2s ease;
   box-shadow: var(--shadow-lg);
 }
 
@@ -439,8 +438,6 @@ html, body {
    ========================================================================== */
 .palette-container {
   background: var(--bg-surface);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
   border-top: 1px solid var(--border-subtle);
   padding: 12px 16px;
   padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px));
@@ -458,6 +455,7 @@ html, body {
 .palette-scroll-wrap::-webkit-scrollbar {
   height: 4px;
 }
+
 .palette-scroll-wrap::-webkit-scrollbar-thumb {
   background: rgba(46, 37, 32, 0.2);
   border-radius: 4px;
@@ -529,7 +527,7 @@ html, body {
   width: 22px;
   height: 22px;
   color: #10b981;
-  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.6));
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.6));
 }
 
 .swatch-check {
@@ -544,7 +542,7 @@ html, body {
 }
 
 .palette-item.active .swatch-count {
-  color: #a5b4fc;
+  color: var(--accent-primary);
   font-weight: 800;
 }
 
@@ -585,6 +583,14 @@ html.has-art-param #loading-overlay {
   z-index: 200;
   opacity: 0;
   pointer-events: none;
+}
+
+html:not(.has-art-param) #loading-overlay {
+  display: none;
+}
+
+html:not(.has-art-param) progress.loading-spinner:indeterminate {
+  animation: none;
 }
 
 .loading-card {
@@ -654,15 +660,11 @@ progress.loading-spinner:indeterminate {
   height: var(--size);
   border-radius: 50%;
   appearance: none;
-  background: conic-gradient(
-      from var(--_from),
+  background: conic-gradient(from var(--_from),
       var(--spinner-color) calc(var(--_to) - var(--_from)),
-      transparent 0
-    )
-    var(--track-color);
+      transparent 0) var(--track-color);
   animation:
-    progress-spin var(--_used-spinner-duration) linear infinite
-    var(--progress-dash-animation, );
+    progress-spin var(--_used-spinner-duration) linear infinite var(--progress-dash-animation, );
 }
 
 @supports (background-clip: border-area) {
@@ -676,11 +678,9 @@ progress.loading-spinner:indeterminate {
 @supports not (background-clip: border-area) {
   progress.loading-spinner:indeterminate {
     --clip-boundary: calc(100% - var(--thickness));
-    mask-image: radial-gradient(
-      farthest-side,
-      transparent var(--clip-boundary),
-      black var(--clip-boundary)
-    );
+    mask-image: radial-gradient(farthest-side,
+        transparent var(--clip-boundary),
+        black var(--clip-boundary));
     border: 0;
   }
 }
@@ -712,10 +712,12 @@ progress.loading-spinner:indeterminate {
     --arc-start: 0deg;
     --arc-end: 3deg;
   }
+
   50% {
     --arc-start: 100deg;
     --arc-end: 358deg;
   }
+
   to {
     --arc-start: 360deg;
     --arc-end: 363deg;
@@ -828,6 +830,7 @@ progress.loading-spinner:indeterminate {
   background: linear-gradient(135deg, rgba(99, 102, 241, 0.25), rgba(236, 72, 153, 0.25));
   border-color: rgba(168, 85, 247, 0.4);
 }
+
 .btn-diamond-zoom:hover {
   background: linear-gradient(135deg, rgba(99, 102, 241, 0.45), rgba(236, 72, 153, 0.45));
   box-shadow: 0 0 12px rgba(168, 85, 247, 0.5);
@@ -841,6 +844,7 @@ progress.loading-spinner:indeterminate {
   padding-bottom: 14px;
   scrollbar-width: none;
 }
+
 .gallery-tabs::-webkit-scrollbar {
   display: none;
 }
@@ -960,13 +964,7 @@ input[type="range"].pbn-pieces-slider {
   --slider-fill-color: var(--accent-primary);
   --slider-thumb-color: var(--accent-primary);
   --slider-direction: to right;
-
-  --attr-min: attr(min type(<number>), 49);
-  --attr-max: attr(max type(<number>), 594);
-  --control-value: attr(value type(<number>), 594);
-  --slider-progress: calc(
-    progress(var(--control-value), var(--attr-min), var(--attr-max)) * 100%
-  );
+  --slider-progress: 100%;
 
   appearance: none;
   flex: 1;
@@ -984,15 +982,6 @@ input[type="range"].pbn-pieces-slider:dir(rtl) {
   --slider-direction: to left;
 }
 
-@supports not (opacity: progress(1, 0, 100)) {
-  input[type="range"].pbn-pieces-slider {
-    --slider-progress: calc(
-      (var(--control-value) - var(--attr-min)) /
-      (var(--attr-max) - var(--attr-min)) * 100%
-    );
-  }
-}
-
 input[type="range"].pbn-pieces-slider:focus-visible {
   outline: 2px solid var(--slider-fill-color);
   outline-offset: 4px;
@@ -1003,11 +992,9 @@ input[type="range"].pbn-pieces-slider::-webkit-slider-runnable-track {
   block-size: var(--slider-track-size);
   border: 0;
   border-radius: var(--slider-track-radius);
-  background: linear-gradient(
-    var(--slider-direction),
-    var(--slider-fill-color) var(--slider-progress),
-    var(--slider-track-color) var(--slider-progress)
-  );
+  background: linear-gradient(var(--slider-direction),
+      var(--slider-fill-color) var(--slider-progress),
+      var(--slider-track-color) var(--slider-progress));
 }
 
 input[type="range"].pbn-pieces-slider::-webkit-slider-thumb {
@@ -1015,9 +1002,7 @@ input[type="range"].pbn-pieces-slider::-webkit-slider-thumb {
   appearance: none;
   inline-size: var(--slider-thumb-size);
   block-size: var(--slider-thumb-size);
-  margin-block-start: calc(
-    (var(--slider-track-size) - var(--slider-thumb-size)) / 2
-  );
+  margin-block-start: calc((var(--slider-track-size) - var(--slider-thumb-size)) / 2);
   border: 2px solid #FFFDF9;
   border-radius: var(--slider-thumb-radius);
   background: var(--slider-thumb-color);
@@ -1106,10 +1091,8 @@ input[type="range"].pbn-pieces-slider::-moz-range-thumb {
   border-radius: var(--radius-full);
   font-size: 11px;
   font-weight: 700;
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
   z-index: 2;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
 }
 
 .artwork-badge.diamond {
@@ -1159,7 +1142,7 @@ input[type="range"].pbn-pieces-slider::-moz-range-thumb {
   align-items: center;
   margin-top: 10px;
   padding-top: 8px;
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  border-top: 1px solid var(--border-subtle);
 }
 
 .artwork-pieces-count {
@@ -1248,7 +1231,8 @@ input[type="range"].pbn-pieces-slider::-moz-range-thumb {
   text-align: left;
 }
 
-.btn-preset.active, .btn-preset:hover {
+.btn-preset.active,
+.btn-preset:hover {
   background: rgba(79, 109, 90, 0.14);
   border-color: var(--accent-primary);
   color: var(--accent-primary-hover);
@@ -1555,8 +1539,8 @@ input[type="range"].pbn-pieces-slider::-moz-range-thumb {
   justify-content: center;
   text-align: center;
   padding: 48px 24px;
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px dashed rgba(255, 255, 255, 0.15);
+  background: rgba(46, 37, 32, 0.02);
+  border: 1px dashed var(--border-subtle);
   border-radius: var(--radius-md);
   margin: 12px 0;
   gap: 12px;
@@ -1591,15 +1575,15 @@ input[type="range"].pbn-pieces-slider::-moz-range-thumb {
 }
 
 .btn-delete-saved {
-  background: rgba(239, 68, 68, 0.15);
-  color: #f87171;
-  border: 1px solid rgba(239, 68, 68, 0.3);
+  background: rgba(220, 38, 38, 0.1);
+  color: #B91C1C;
+  border: 1px solid rgba(220, 38, 38, 0.28);
   font-size: 11px;
   font-weight: 600;
   padding: 4px 8px;
   border-radius: var(--radius-sm);
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
 }
 
 .btn-delete-saved:hover {
@@ -1627,11 +1611,11 @@ input[type="range"].pbn-pieces-slider::-moz-range-thumb {
   display: flex;
   flex-direction: column;
   gap: 14px;
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(255, 255, 255, 0.07);
+  background: rgba(46, 37, 32, 0.02);
+  border: 1px solid var(--border-subtle);
   border-radius: var(--radius-lg);
   padding: 18px 20px 22px;
-  transition: all 0.25s ease;
+  transition: border-color 0.25s ease, background-color 0.25s ease;
 }
 
 #saved-in-progress-section {
@@ -2110,6 +2094,8 @@ input[type="range"].pbn-pieces-slider::-moz-range-thumb {
   font-size: 14px;
   color: var(--text-main);
   outline: none;
+  -webkit-user-select: text;
+  user-select: text;
   transition: border-color 0.2s ease;
 }
 
@@ -2269,7 +2255,9 @@ input[type="range"].pbn-pieces-slider::-moz-range-thumb {
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .conversion-card h3 {
@@ -2280,14 +2268,14 @@ input[type="range"].pbn-pieces-slider::-moz-range-thumb {
 
 .conversion-status {
   font-size: 13px;
-  color: #94a3b8;
+  color: var(--text-muted);
   min-height: 20px;
 }
 
 .conversion-progress-bar {
   width: 100%;
   height: 8px;
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(46, 37, 32, 0.12);
   border-radius: var(--radius-full);
   overflow: hidden;
   margin-top: 6px;
@@ -2404,6 +2392,7 @@ input[type="range"].pbn-pieces-slider::-moz-range-thumb {
     opacity: 0;
     transform: translateY(-6px) scale(0.97);
   }
+
   100% {
     opacity: 1;
     transform: translateY(0) scale(1);
@@ -2809,7 +2798,8 @@ input[type="range"].pbn-pieces-slider::-moz-range-thumb {
    Alert & Confirm Dialog Modal
    ========================================================================== */
 .modal-dialog-overlay {
-  z-index: 2500; /* Stays above all other modals (gallery, victory, resolution picker) */
+  z-index: 2500;
+  /* Stays above all other modals (gallery, victory, resolution picker) */
   background: rgba(46, 37, 32, 0.52);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
@@ -2841,6 +2831,7 @@ input[type="range"].pbn-pieces-slider::-moz-range-thumb {
     opacity: 0;
     transform: scale(0.92) translateY(8px);
   }
+
   100% {
     opacity: 1;
     transform: scale(1) translateY(0);
@@ -2974,6 +2965,7 @@ input[type="range"].pbn-pieces-slider::-moz-range-thumb {
    ========================================================================== */
 
 @media (max-width: 768px) {
+
   /* ------------------------------------------------------------------------
      1. Top Header Bar & Action Menus
      ------------------------------------------------------------------------ */
@@ -3010,7 +3002,7 @@ input[type="range"].pbn-pieces-slider::-moz-range-thumb {
     justify-content: space-between;
     gap: 4px;
     padding-top: 6px;
-    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    border-top: 1px solid var(--border-subtle);
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
@@ -3120,7 +3112,7 @@ input[type="range"].pbn-pieces-slider::-moz-range-thumb {
   }
 
   /* Header action buttons */
-  .header-right > .btn-icon {
+  .header-right>.btn-icon {
     height: 30px;
     min-width: 30px;
     padding: 0 6px;
@@ -3171,8 +3163,13 @@ input[type="range"].pbn-pieces-slider::-moz-range-thumb {
   }
 
   @keyframes fadeInBackdrop {
-    from { opacity: 0; }
-    to { opacity: 1; }
+    from {
+      opacity: 0;
+    }
+
+    to {
+      opacity: 1;
+    }
   }
 
   .header-res-dropdown-wrap {
@@ -3181,7 +3178,7 @@ input[type="range"].pbn-pieces-slider::-moz-range-thumb {
 
   .quick-style-dropdown {
     position: fixed;
-    top: 72px;
+    top: 96px;
     left: 8px;
     right: 8px;
     width: auto;
@@ -3204,7 +3201,7 @@ input[type="range"].pbn-pieces-slider::-moz-range-thumb {
     display: block;
     width: 40px;
     height: 4px;
-    background: rgba(255, 255, 255, 0.28);
+    background: rgba(46, 37, 32, 0.22);
     border-radius: 4px;
     margin: 0 auto 12px auto;
   }
@@ -3532,22 +3529,24 @@ input[type="range"].pbn-pieces-slider::-moz-range-thumb {
   .artwork-title {
     max-width: 85px;
   }
+
   .btn-res-pill {
     max-width: 105px;
   }
+
   #label-current-resolution {
     max-width: 55px;
   }
+
   .header-center {
     max-width: 70px;
   }
+
   .studio-mode-toggle {
     grid-template-columns: 1fr;
   }
+
   .preset-buttons {
     grid-template-columns: 1fr;
   }
 }
-
-
-

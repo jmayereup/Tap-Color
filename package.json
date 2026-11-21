@@ -9,7 +9,6 @@
     "dev": "vite",
     "build": "npm run build:assets && npm run build:wasm && vite build && python3 scripts/shrink_dist_assets.py",
     "preview": "vite preview",
-    "serve": "npx serve -l 8080 .",
     "deploy": "npm run build && npx wrangler pages deploy dist"
   },
   "keywords": [
@@ -28,7 +27,6 @@
     "vite": "^8.3.2"
   },
   "dependencies": {
-    "imagetracerjs": "^1.2.6",
     "ml-kmeans": "^7.0.1"
   }
 }

@@ -309,16 +309,20 @@ for (let i = 0; i < N; i++) {
   compPixels.set(cid, pixList);
 }
 
-// --- Step 4: Filter Tiny Noise & Preserve Eye Sparkles ---
+// --- Step 4: Filter Tiny Noise & Preserve Eye Sparkles (Two-Pass, Order-Independent) ---
 const MIN_REGION_PIXELS = 42; // ~6.5x6.5 px at 800x800
 const validCompIds = new Set();
+const tinyComps = [];
 
 for (const [cid, pix] of compPixels.entries()) {
   if (pix.length >= MIN_REGION_PIXELS) {
     validCompIds.add(cid);
-    continue;
+  } else {
+    tinyComps.push([cid, pix]);
   }
+}
 
+for (const [cid, pix] of tinyComps) {
   // Check if this tiny region is a bright white highlight completely surrounded by ink (e.g. eye sparkle)
   let sumLum = 0;
   let touchesOtherValid = false;
@@ -326,10 +330,10 @@ for (const [cid, pix] of compPixels.entries()) {
     const p = pix[k];
     sumLum += lum[p];
     const px = p % W, py = (p - px) / W;
-    if (px > 0 && seedMap[p - 1] !== cid && seedMap[p - 1] !== 0) touchesOtherValid = true;
-    if (px < W - 1 && seedMap[p + 1] !== cid && seedMap[p + 1] !== 0) touchesOtherValid = true;
-    if (py > 0 && seedMap[p - W] !== cid && seedMap[p - W] !== 0) touchesOtherValid = true;
-    if (py < H - 1 && seedMap[p + W] !== cid && seedMap[p + W] !== 0) touchesOtherValid = true;
+    if (px > 0 && validCompIds.has(seedMap[p - 1])) touchesOtherValid = true;
+    if (px < W - 1 && validCompIds.has(seedMap[p + 1])) touchesOtherValid = true;
+    if (py > 0 && validCompIds.has(seedMap[p - W])) touchesOtherValid = true;
+    if (py < H - 1 && validCompIds.has(seedMap[p + W])) touchesOtherValid = true;
   }
 
   if (!touchesOtherValid && (sumLum / pix.length) > 190) {
@@ -348,22 +352,34 @@ for (const [cid, pix] of compPixels.entries()) {
   }
 }
 
-// --- Step 5: Compute Pure Median RGB for Each Valid Region ---
+// --- Step 5: Compute Pure Median RGB for Each Valid Region (O(K) Histogram) ---
 const compColor = new Map();
+const histR = new Int32Array(256);
+const histG = new Int32Array(256);
+const histB = new Int32Array(256);
+const medianFromHist = (hist, target) => {
+  let acc = 0;
+  for (let v = 0; v < 256; v++) {
+    acc += hist[v];
+    if (acc > target) return v;
+  }
+  return 0;
+};
 for (const cid of validCompIds) {
   const pix = compPixels.get(cid);
-  const rs = new Uint8Array(pix.length);
-  const gs = new Uint8Array(pix.length);
-  const bs = new Uint8Array(pix.length);
+  histR.fill(0); histG.fill(0); histB.fill(0);
   for (let k = 0; k < pix.length; k++) {
     const o = pix[k] * 4;
-    rs[k] = data[o];
-    gs[k] = data[o + 1];
-    bs[k] = data[o + 2];
+    histR[data[o]]++;
+    histG[data[o + 1]]++;
+    histB[data[o + 2]]++;
   }
-  rs.sort(); gs.sort(); bs.sort();
   const mid = pix.length >> 1;
-  compColor.set(cid, [rs[mid], gs[mid], bs[mid]]);
+  compColor.set(cid, [
+    medianFromHist(histR, mid),
+    medianFromHist(histG, mid),
+    medianFromHist(histB, mid),
+  ]);
 }
 
 // --- Step 6: Voronoi / Multi-Source BFS Expansion ---
@@ -442,7 +458,7 @@ while (qHead < qTail) {
 
 // --- Step 7: Natural Palette Merging in CIELAB ---
 // Group regions with perceptually identical colors (ΔE < 11) so the same color shares one number.
-const clusters = [];
+let clusters = [];
 for (const cid of validCompIds) {
   const rgb = compColor.get(cid);
   const weight = compPixels.get(cid).length;
@@ -456,22 +472,38 @@ for (const cid of validCompIds) {
 
 const MERGE_DELTA_E = 11.5;
 const MAX_COLORS = 26;
+const M = clusters.length;
+const distMat = new Float64Array(M * M);
+for (let i = 0; i < M; i++) {
+  for (let j = i + 1; j < M; j++) {
+    const d = labDist(clusters[i].lab, clusters[j].lab);
+    distMat[i * M + j] = d;
+    distMat[j * M + i] = d;
+  }
+}
+const activeIdx = [];
+for (let i = 0; i < M; i++) activeIdx.push(i);
 
-while (clusters.length > 1) {
+while (activeIdx.length > 1) {
   let bestDist = Infinity;
-  let bi = -1, bj = -1;
-  for (let i = 0; i < clusters.length; i++) {
-    for (let j = i + 1; j < clusters.length; j++) {
-      const d = labDist(clusters[i].lab, clusters[j].lab);
+  let biPos = -1, bjPos = -1;
+  for (let p = 0; p < activeIdx.length; p++) {
+    const i = activeIdx[p];
+    const row = i * M;
+    for (let q = p + 1; q < activeIdx.length; q++) {
+      const d = distMat[row + activeIdx[q]];
       if (d < bestDist) {
         bestDist = d;
-        bi = i; bj = j;
+        biPos = p;
+        bjPos = q;
       }
     }
   }
-  if (bestDist > MERGE_DELTA_E && clusters.length <= MAX_COLORS) break;
-  const a = clusters[bi];
-  const b = clusters[bj];
+  if (bestDist > MERGE_DELTA_E && activeIdx.length <= MAX_COLORS) break;
+  const i = activeIdx[biPos];
+  const j = activeIdx[bjPos];
+  const a = clusters[i];
+  const b = clusters[j];
   const tot = a.weight + b.weight;
   a.r = Math.round((a.r * a.weight + b.r * b.weight) / tot);
   a.g = Math.round((a.g * a.weight + b.g * b.weight) / tot);
@@ -479,8 +511,18 @@ while (clusters.length > 1) {
   a.lab = rgbToLab(a.r, a.g, a.b);
   a.weight = tot;
   a.cids.push(...b.cids);
-  clusters.splice(bj, 1);
+  activeIdx.splice(bjPos, 1);
+
+  for (let p = 0; p < activeIdx.length; p++) {
+    const k = activeIdx[p];
+    if (k === i) continue;
+    const d = labDist(a.lab, clusters[k].lab);
+    distMat[i * M + k] = d;
+    distMat[k * M + i] = d;
+  }
 }
+
+clusters = activeIdx.map(i => clusters[i]);
 
 // Sort palette lightest to darkest for a pleasing paint tray
 clusters.sort((a, b) => {
