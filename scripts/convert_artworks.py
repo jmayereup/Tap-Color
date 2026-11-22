@@ -1002,6 +1002,10 @@ def main():
             add("loi-krathong")
         if key.startswith("dia_de_los_muertos_"):
             add("dia-de-los-muertos")
+        if key.startswith("native_american_"):
+            add("native-american")
+        if "mandala" in key or "mandala" in text:
+            add("mandala")
         if (
             key.startswith("highland_")
             or key.startswith("yorkie_")
