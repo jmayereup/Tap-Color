@@ -959,13 +959,98 @@ def main():
 
     def get_meta(key, raw_stem):
         if key in METADATA_BY_KEY:
-            return METADATA_BY_KEY[key]
-        title = raw_stem.replace("_", " ").replace("-", " ").title()
-        return {
-            "title": title,
-            "artist": "Tap Color Studio",
-            "desc": f"{title} artwork",
-        }
+            meta = dict(METADATA_BY_KEY[key])
+        else:
+            title = raw_stem.replace("_", " ").replace("-", " ").title()
+            meta = {
+                "title": title,
+                "artist": "Tap Color Studio",
+                "desc": f"{title} artwork",
+            }
+        if key == target_key and explicit_tags:
+            meta["tags"] = explicit_tags
+        elif not meta.get("tags"):
+            meta["tags"] = infer_tags(key, meta.get("title", ""), meta.get("desc", ""))
+        return meta
+
+    def infer_tags(key, title="", desc=""):
+        text = f"{key} {title} {desc}".lower()
+        tags = []
+
+        def add(tag):
+            if tag not in tags:
+                tags.append(tag)
+
+        if key.startswith("stained_glass_") or "stained glass" in text:
+            add("stained-glass")
+        if (
+            key.startswith("stained_glass_")
+            or key.startswith("nativity")
+            or key in ("sermon_on_the_mount", "washing_of_the_feet")
+        ):
+            add("christian")
+        if (
+            key.startswith("christmas")
+            or key.startswith("santa")
+            or key.startswith("nativity")
+            or key in ("jolly_snowman", "snowy_cottage", "cozy_fireplace")
+        ):
+            add("christmas")
+        if key.startswith("thanksgiving_"):
+            add("thanksgiving")
+        if key.startswith("loi_krathong_"):
+            add("loi-krathong")
+        if key.startswith("dia_de_los_muertos_"):
+            add("dia-de-los-muertos")
+        if (
+            key.startswith("highland_")
+            or key.startswith("yorkie_")
+            or key.startswith("yorky_")
+            or key.startswith("baby_")
+            or key.startswith("mother_deer")
+            or key.startswith("mother_fox")
+            or key.startswith("mother_whale")
+            or key in (
+                "fluffy_cow",
+                "hummingbird",
+                "country_rooster",
+                "country_puppy",
+                "pasture_horses",
+                "autumn_fox",
+                "arctic_fox_snow",
+                "polar_bear_aurora",
+                "winter_cardinal",
+                "winter_penguin",
+                "florida_flamingo_lagoon",
+                "florida_manatee_springs",
+                "loi_krathong_elephant_festival",
+                "thanksgiving_turkey_pilgrim",
+                "dia_de_los_muertos_xolo_dog",
+                "dia_de_los_muertos_monarch_marigolds",
+            )
+        ):
+            add("animals")
+        if key.startswith("mother_"):
+            add("family")
+        if (
+            key.startswith("florida_")
+            or key.startswith("country_")
+            or key in (
+                "covered_bridge",
+                "vintage_tractor",
+                "rural_windmill",
+                "autumn_fox",
+                "hummingbird",
+                "thanksgiving_barn_harvest",
+                "thanksgiving_covered_bridge",
+                "thanksgiving_autumn_wreath",
+                "thanksgiving_cranberry_harvest",
+            )
+        ):
+            add("nature")
+        if not tags:
+            add("general")
+        return tags
 
     def is_up_to_date(src_path, out_paths):
         src_mtime = os.path.getmtime(src_path)
@@ -1026,6 +1111,14 @@ def main():
 
     pbn_only = '--pbn-only' in sys.argv
     force = '--force' in sys.argv
+    explicit_tags = []
+    for a in sys.argv[1:]:
+        if a.startswith('--tags='):
+            explicit_tags = [
+                re.sub(r'[^a-z0-9-]+', '-', t.strip().lower()).strip('-')
+                for t in a.split('=', 1)[1].split(',')
+                if t.strip()
+            ]
     args = [a for a in sys.argv[1:] if not a.startswith('-')]
     target_key = args[0].strip() if args else None
 
@@ -1055,6 +1148,10 @@ def main():
                 prev_entry = dict(existing_manifest[key])
                 if not prev_entry.get("addedAt") and src_added_at:
                     prev_entry["addedAt"] = src_added_at
+                if not prev_entry.get("tags"):
+                    prev_entry["tags"] = infer_tags(
+                        key, prev_entry.get("title", ""), prev_entry.get("desc", "")
+                    )
                 manifest_entries.append(prev_entry)
             continue
 
@@ -1133,6 +1230,7 @@ def main():
             "title": meta["title"],
             "artist": meta["artist"],
             "desc": meta["desc"],
+            "tags": meta["tags"],
             "addedAt": added_at,
             "originalAsset": item["diamond_rel"] or item["pbn_rel"],
             "pbnAsset": item["pbn_rel"],

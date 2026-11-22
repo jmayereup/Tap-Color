@@ -228,6 +228,7 @@ class TapColorApp {
     this.currentArtworkId = 'fluffy_cow_pbn';
     this.activeNumber = 1;
     this.activeCategory = 'classic'; // 'classic', 'diamond', 'saved', 'custom'
+    this.activeTagFilters = new Set();
     this.pbnMinPiecesFilter = null;
     this.pbnMaxPiecesFilter = null;
 
@@ -611,6 +612,7 @@ class TapColorApp {
             title: entry.title,
             artist: entry.artist,
             category: 'diamond',
+            tags: Array.isArray(entry.tags) ? entry.tags : [],
             pieces: defVar.pieces,
             desc: entry.desc,
             defaultVariantId: defVar.id,
@@ -631,6 +633,7 @@ class TapColorApp {
             title: entry.title,
             artist: entry.artist,
             category: 'classic',
+            tags: Array.isArray(entry.tags) ? entry.tags : [],
             pieces: pbnVar.pieces,
             desc: entry.desc,
             defaultVariantId: pbnVar.id,
@@ -1203,15 +1206,18 @@ class TapColorApp {
         const customPanel = document.getElementById('tab-custom-panel');
         const savedPanel = document.getElementById('tab-saved-panel');
         const pbnFilter = document.getElementById('pbn-pieces-filter');
+        const tagFilter = document.getElementById('gallery-tag-filter');
 
         if (this.activeCategory === 'custom') {
           if (grid) grid.style.display = 'none';
+          if (tagFilter) tagFilter.classList.add('hidden');
           if (pbnFilter) pbnFilter.classList.add('hidden');
           if (savedPanel) savedPanel.classList.add('hidden');
           if (customPanel) customPanel.classList.remove('hidden');
           if (this.updateStudioPreview) this.updateStudioPreview();
         } else if (this.activeCategory === 'saved') {
           if (grid) grid.style.display = 'none';
+          if (tagFilter) tagFilter.classList.add('hidden');
           if (pbnFilter) pbnFilter.classList.add('hidden');
           if (customPanel) customPanel.classList.add('hidden');
           if (savedPanel) savedPanel.classList.remove('hidden');
@@ -1219,11 +1225,53 @@ class TapColorApp {
         } else {
           if (customPanel) customPanel.classList.add('hidden');
           if (savedPanel) savedPanel.classList.add('hidden');
+          if (tagFilter) tagFilter.classList.remove('hidden');
           if (grid) grid.style.display = 'grid';
           this.populateGalleryModal();
         }
       });
     });
+
+    // Gallery Category Multi-Select Dropdown
+    const tagDropdown = document.getElementById('tag-dropdown');
+    const tagDropdownBtn = document.getElementById('tag-dropdown-btn');
+    const tagDropdownMenu = document.getElementById('tag-dropdown-menu');
+    const clearTagBtn = document.getElementById('btn-clear-tag-filter');
+
+    const closeTagDropdown = () => {
+      if (tagDropdownMenu) tagDropdownMenu.classList.add('hidden');
+      if (tagDropdownBtn) tagDropdownBtn.setAttribute('aria-expanded', 'false');
+    };
+
+    if (tagDropdownBtn && tagDropdownMenu) {
+      tagDropdownBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const isOpen = !tagDropdownMenu.classList.contains('hidden');
+        tagDropdownMenu.classList.toggle('hidden', isOpen);
+        tagDropdownBtn.setAttribute('aria-expanded', isOpen ? 'false' : 'true');
+      });
+
+      document.addEventListener('click', (e) => {
+        if (tagDropdown && !tagDropdown.contains(e.target)) {
+          closeTagDropdown();
+        }
+      });
+
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && !tagDropdownMenu.classList.contains('hidden')) {
+          closeTagDropdown();
+          tagDropdownBtn.focus();
+        }
+      });
+    }
+
+    if (clearTagBtn) {
+      clearTagBtn.addEventListener('click', () => {
+        this.activeTagFilters.clear();
+        this.syncTagDropdownUI();
+        this.filterGalleryCards();
+      });
+    }
 
     // Paint by Number Dual Pieces Slider
     const pbnMinSlider = document.getElementById('pbn-pieces-min-slider');
@@ -2255,12 +2303,15 @@ class TapColorApp {
       ? this.activeCategory
       : 'classic';
 
+    this.renderGalleryTagFilter(category);
+
     this.artworksMeta
       .filter(meta => meta.category === category)
       .forEach(meta => {
       const card = document.createElement('div');
       card.className = 'artwork-card';
       card.dataset.category = meta.category;
+      card.dataset.tags = (meta.tags || []).join(',');
       card.setAttribute('role', 'button');
       card.setAttribute('tabindex', '0');
       card.setAttribute('aria-label', `${meta.title} by ${meta.artist}`);
@@ -2459,37 +2510,166 @@ class TapColorApp {
     }
   }
 
+  formatTagLabel(tag) {
+    const labels = {
+      'all': 'All',
+      'animals': 'Animals',
+      'christian': 'Christian',
+      'christmas': 'Christmas',
+      'dia-de-los-muertos': 'Día de los Muertos',
+      'family': 'Family',
+      'loi-krathong': 'Loi Krathong',
+      'nature': 'Nature & Country',
+      'stained-glass': 'Stained Glass',
+      'thanksgiving': 'Thanksgiving',
+    };
+    if (labels[tag]) return labels[tag];
+    return tag.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+  }
+
+  syncTagDropdownUI() {
+    const labelEl = document.getElementById('tag-dropdown-label');
+    const clearBtn = document.getElementById('btn-clear-tag-filter');
+    const menu = document.getElementById('tag-dropdown-menu');
+    const selected = Array.from(this.activeTagFilters);
+
+    if (menu) {
+      menu.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+        cb.checked = this.activeTagFilters.has(cb.value);
+      });
+    }
+
+    if (labelEl) {
+      if (selected.length === 0) {
+        labelEl.textContent = 'Categories: All';
+      } else if (selected.length === 1) {
+        labelEl.textContent = `Category: ${this.formatTagLabel(selected[0])}`;
+      } else {
+        const names = selected.map(t => this.formatTagLabel(t)).join(', ');
+        labelEl.textContent = `Categories (${selected.length}): ${names}`;
+      }
+    }
+
+    if (clearBtn) {
+      clearBtn.classList.toggle('hidden', selected.length === 0);
+    }
+  }
+
+  renderGalleryTagFilter(category) {
+    const container = document.getElementById('gallery-tag-filter');
+    const menu = document.getElementById('tag-dropdown-menu');
+    if (!container || !menu) return;
+
+    const items = this.artworksMeta.filter(m => m.category === category);
+    const counts = new Map();
+    for (const item of items) {
+      for (const tag of (item.tags || [])) {
+        counts.set(tag, (counts.get(tag) || 0) + 1);
+      }
+    }
+
+    const sortedTags = Array.from(counts.keys()).sort((a, b) =>
+      this.formatTagLabel(a).localeCompare(this.formatTagLabel(b))
+    );
+
+    for (const tag of Array.from(this.activeTagFilters)) {
+      if (!counts.has(tag)) this.activeTagFilters.delete(tag);
+    }
+
+    container.classList.toggle('hidden', sortedTags.length === 0);
+    menu.innerHTML = sortedTags.map(tag => `
+      <label class="tag-dropdown-option" role="option" aria-selected="${this.activeTagFilters.has(tag) ? 'true' : 'false'}">
+        <input type="checkbox" value="${escapeHtml(tag)}" ${this.activeTagFilters.has(tag) ? 'checked' : ''}>
+        <span class="tag-option-text">${escapeHtml(this.formatTagLabel(tag))}</span>
+        <span class="tag-option-count">(${counts.get(tag)})</span>
+      </label>
+    `).join('');
+
+    menu.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+      cb.addEventListener('change', () => {
+        if (cb.checked) {
+          this.activeTagFilters.add(cb.value);
+        } else {
+          this.activeTagFilters.delete(cb.value);
+        }
+        const opt = cb.closest('.tag-dropdown-option');
+        if (opt) opt.setAttribute('aria-selected', cb.checked ? 'true' : 'false');
+        this.syncTagDropdownUI();
+        this.filterGalleryCards();
+      });
+    });
+
+    this.syncTagDropdownUI();
+  }
+
   filterGalleryCards() {
     const pbnFilter = document.getElementById('pbn-pieces-filter');
+    const tagFilter = document.getElementById('gallery-tag-filter');
+    const tagMenu = document.getElementById('tag-dropdown-menu');
     const countEl = document.getElementById('pbn-pieces-count');
     const minSlider = document.getElementById('pbn-pieces-min-slider');
     const maxSlider = document.getElementById('pbn-pieces-max-slider');
+    const grid = document.getElementById('artwork-grid');
 
     if (pbnFilter) {
       pbnFilter.classList.toggle('hidden', this.activeCategory !== 'classic');
     }
+    if (tagFilter) {
+      const showTags = this.activeCategory === 'classic' || this.activeCategory === 'diamond';
+      tagFilter.classList.toggle('hidden', !showTags || (tagMenu && tagMenu.children.length === 0));
+    }
 
     const minPieces = minSlider ? Number(minSlider.value) : 0;
     const maxPieces = maxSlider ? Number(maxSlider.value) : Infinity;
-    let visibleClassicCount = 0;
+    const hasTagFilters = this.activeTagFilters.size > 0;
+    let visibleCount = 0;
 
     document.querySelectorAll('.artwork-card').forEach(card => {
+      const cardTags = card.dataset.tags ? card.dataset.tags.split(',').filter(Boolean) : [];
+      const matchesTag = !hasTagFilters || cardTags.some(t => this.activeTagFilters.has(t));
+
       if (this.activeCategory === 'diamond') {
-        card.style.display = card.dataset.category === 'diamond' ? 'flex' : 'none';
+        const show = card.dataset.category === 'diamond' && matchesTag;
+        card.style.display = show ? 'flex' : 'none';
+        if (show) visibleCount++;
       } else if (this.activeCategory === 'classic') {
         const isClassic = card.dataset.category === 'classic';
         const pieces = Number(card.dataset.pieces || 0);
         const matchesPieces = pieces >= minPieces && pieces <= maxPieces;
-        const show = isClassic && matchesPieces;
+        const show = isClassic && matchesTag && matchesPieces;
         card.style.display = show ? 'flex' : 'none';
-        if (show) visibleClassicCount++;
+        if (show) visibleCount++;
       } else {
         card.style.display = 'flex';
       }
     });
 
     if (countEl && this.activeCategory === 'classic') {
-      countEl.textContent = `${visibleClassicCount} ${visibleClassicCount === 1 ? 'picture' : 'pictures'}`;
+      countEl.textContent = `${visibleCount} ${visibleCount === 1 ? 'picture' : 'pictures'}`;
+    }
+
+    if (grid) {
+      const existingEmpty = grid.querySelector('.gallery-empty-filter');
+      if (existingEmpty) existingEmpty.remove();
+      if (visibleCount === 0 && (this.activeCategory === 'classic' || this.activeCategory === 'diamond')) {
+        const emptyEl = document.createElement('div');
+        emptyEl.className = 'gallery-empty-filter';
+        emptyEl.innerHTML = `
+          <p>No pictures match the current filters.</p>
+          <button type="button" class="pbn-filter-reset">Show All Pictures</button>
+        `;
+        emptyEl.querySelector('button')?.addEventListener('click', () => {
+          this.activeTagFilters.clear();
+          this.syncTagDropdownUI();
+          const resetBtn = document.getElementById('btn-reset-pbn-filter');
+          if (resetBtn && !resetBtn.classList.contains('hidden')) {
+            resetBtn.click();
+          } else {
+            this.filterGalleryCards();
+          }
+        });
+        grid.appendChild(emptyEl);
+      }
     }
   }
 

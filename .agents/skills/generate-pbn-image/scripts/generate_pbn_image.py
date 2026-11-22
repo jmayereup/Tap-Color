@@ -196,10 +196,12 @@ def generate_image(
     return out_path
 
 
-def verify_key(key: str, tier: str, pbn_only: bool = False) -> None:
+def verify_key(key: str, tier: str, pbn_only: bool = False, tags: str = "") -> None:
     cmd = [sys.executable, str(CONVERT_SCRIPT), key]
     if pbn_only:
         cmd.append("--pbn-only")
+    if tags.strip():
+        cmd.append(f"--tags={tags.strip()}")
     subprocess.run(cmd, check=True, cwd=str(REPO_ROOT))
 
     if not MANIFEST_PATH.exists():
@@ -252,6 +254,9 @@ def load_batch_items(batch_path: Path, default_tier: str, default_model: str) ->
         tier = item.get("tier", default_tier)
         if tier not in DIFFICULTY_MODIFIERS:
             raise ValueError(f"Batch item #{idx} has invalid tier {tier!r}.")
+        raw_tags = item.get("tags", "")
+        if isinstance(raw_tags, list):
+            raw_tags = ",".join(str(t).strip() for t in raw_tags if str(t).strip())
         items.append({
             "key": validate_key(item["key"]),
             "subject": item.get("subject", ""),
@@ -259,6 +264,7 @@ def load_batch_items(batch_path: Path, default_tier: str, default_model: str) ->
             "model": item.get("model", default_model),
             "extra": item.get("extra", ""),
             "raw_prompt": item.get("raw_prompt", ""),
+            "tags": str(raw_tags or ""),
         })
     return items
 
@@ -284,6 +290,7 @@ def main() -> None:
     parser.add_argument("--dry-run", action="store_true", help="Print resolved prompt(s) without calling OpenRouter")
     parser.add_argument("--verify", action="store_true", help="Run scripts/convert_artworks.py <key> after generation and check tier targets")
     parser.add_argument("--pbn-only", action="store_true", help="Pass --pbn-only when running --verify (faster for existing keys)")
+    parser.add_argument("--tags", default="", help="Comma-separated category tags passed to convert_artworks.py during --verify")
     args = parser.parse_args()
 
     if args.batch:
@@ -333,7 +340,7 @@ def main() -> None:
         if args.verify:
             # Run verification sequentially so manifest.json writes never race.
             for item in succeeded:
-                verify_key(item["key"], item["tier"], pbn_only=args.pbn_only)
+                verify_key(item["key"], item["tier"], pbn_only=args.pbn_only, tags=item.get("tags") or args.tags)
 
         if failed:
             print(f"\nBatch finished with {len(failed)} failure(s) out of {len(items)}.", file=sys.stderr)
@@ -356,7 +363,7 @@ def main() -> None:
     if out_path is not None:
         print(f"Saved {out_path} ({out_path.stat().st_size} bytes)")
         if args.verify:
-            verify_key(args.key, args.tier, pbn_only=args.pbn_only)
+            verify_key(args.key, args.tier, pbn_only=args.pbn_only, tags=args.tags)
 
 
 if __name__ == "__main__":

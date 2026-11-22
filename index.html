@@ -222,6 +222,18 @@
           <button class="gallery-tab" data-tab="custom">📸 Make from Photo</button>
         </div>
 
+        <!-- Gallery Category Tag Filter -->
+        <div id="gallery-tag-filter" class="gallery-tag-filter">
+          <div class="tag-dropdown" id="tag-dropdown">
+            <button type="button" id="tag-dropdown-btn" class="tag-dropdown-btn" aria-haspopup="listbox" aria-expanded="false">
+              <span class="tag-dropdown-label" id="tag-dropdown-label">Categories: All</span>
+              <span class="tag-dropdown-chevron" aria-hidden="true">▾</span>
+            </button>
+            <div id="tag-dropdown-menu" class="tag-dropdown-menu hidden" role="listbox" aria-multiselectable="true" aria-label="Filter pictures by category"></div>
+          </div>
+          <button type="button" id="btn-clear-tag-filter" class="pbn-filter-reset hidden">Clear Categories</button>
+        </div>
+
         <!-- Paint by Number Pieces Filter -->
         <div id="pbn-pieces-filter" class="pbn-pieces-filter">
           <div class="pbn-filter-header">

@@ -74,18 +74,22 @@ Choose a difficulty tier based on the user's request; **default to `medium`** wh
      - `--raw-prompt "<full prompt>"` to bypass the built-in template
      - `--dry-run` to preview the resolved prompt without calling OpenRouter
      - `--verify` to immediately run `scripts/convert_artworks.py <key>` and check region/color counts against the tier target (combine with `--pbn-only` when iterating on an existing key)
+     - `--tags "<tag1,tag2>"` to assign gallery category tags (e.g., `--tags "christian,stained-glass"`) when running `--verify`
      - `--model <provider/model>` (defaults to `meta/muse-image`; note that `/api/v1/images/generations` only supports dedicated image models, not chat-modality image models)
-   - **Batch generation** (for themed sets): pass `--batch <jobs.json|jobs.jsonl>` (each entry: `{"key", "subject", "tier"?, "extra"?, "model"?}`) with `--jobs 3` (generation runs concurrently; `--verify` runs sequentially so `manifest.json` never races).
+   - **Batch generation** (for themed sets): pass `--batch <jobs.json|jobs.jsonl>` (each entry: `{"key", "subject", "tier"?, "extra"?, "model"?, "tags"?}`) with `--jobs 3` (generation runs concurrently; `--verify` runs sequentially so `manifest.json` never races).
 2. **Visually inspect** the saved image by opening it with `read_file`:
    - Pure `#FFFFFF` outer background across all 4 edges/corners with generous margin and no border/frame.
    - Continuous, closed black ink outlines with no gaps (especially around white/light elements like snow, clouds, or white petals).
    - Flat solid fills with no soft gradients or tiny confetti speckles.
 
-### Step 2: Asset Placement & Optional Metadata
+### Step 2: Asset Placement, Category Tags & Optional Metadata
 - The script saves directly to `public/assets/paint_by_number/<snake_case_name>.<ext>` (sniffing actual image magic bytes and removing any stale conflicting extension for the same key).
 - `public/assets/converted/` is gitignored; only source images in `public/assets/paint_by_number/` (and optional metadata edits) are committed.
-- `scripts/convert_artworks.py` automatically discovers all images in `public/assets/paint_by_number/`, derives the key (stripping any trailing `_pbn`), generates both PBN and 3 Diamond Art variants, and orders `manifest.json` newest-first by `addedAt`.
-- *(Optional)* To set a custom title, artist, or description, add an entry to `METADATA_BY_KEY` in `scripts/convert_artworks.py`.
+- `scripts/convert_artworks.py` automatically discovers all images in `public/assets/paint_by_number/`, derives the key (stripping any trailing `_pbn`), generates both PBN and 3 Diamond Art variants, assigns category `tags`, and orders `manifest.json` newest-first by `addedAt`.
+- **Category Tags**: Check the existing categories in `infer_tags` in `scripts/convert_artworks.py` (`animals`, `christian`, `christmas`, `dia-de-los-muertos`, `family`, `loi-krathong`, `nature`, `stained-glass`, `thanksgiving`).
+  - **Reuse an existing category** whenever the new artwork fits (pass `--tags` or use a matching key prefix).
+  - **Create a new category** only when introducing a distinct new theme: pass `--tags "<new-kebab-tag>"` with `--verify`, and add the rule to `infer_tags` in `scripts/convert_artworks.py` (plus this list) so full rebuilds preserve it.
+- *(Optional)* To set a custom title, artist, description, or tags, add an entry to `METADATA_BY_KEY` in `scripts/convert_artworks.py`.
 
 ### Step 3: Verify Build-Time Conversion
 If you did not pass `--verify` in Step 1, run the converter for the new artwork key:
