@@ -2518,9 +2518,10 @@ class TapColorApp {
       'christmas': 'Christmas',
       'dia-de-los-muertos': 'Día de los Muertos',
       'family': 'Family',
-      'loi-krathong': 'Loi Krathong',
+      'holidays': 'Holidays',
       'nature': 'Nature & Country',
       'stained-glass': 'Stained Glass',
+      'thai': 'Thai',
       'thanksgiving': 'Thanksgiving',
     };
     if (labels[tag]) return labels[tag];

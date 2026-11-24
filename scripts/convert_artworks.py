@@ -985,6 +985,7 @@ def main():
             add("stained-glass")
         if (
             key.startswith("stained_glass_")
+            or key.startswith("christian_")
             or key.startswith("nativity")
             or key in ("sermon_on_the_mount", "washing_of_the_feet")
         ):
@@ -998,8 +999,10 @@ def main():
             add("christmas")
         if key.startswith("thanksgiving_"):
             add("thanksgiving")
-        if key.startswith("loi_krathong_"):
-            add("loi-krathong")
+        if key.startswith("holidays_") or key.startswith("holiday_"):
+            add("holidays")
+        if key.startswith("loi_krathong_") or key.startswith("thai_"):
+            add("thai")
         if key.startswith("dia_de_los_muertos_"):
             add("dia-de-los-muertos")
         if key.startswith("native_american_"):
@@ -1007,7 +1010,9 @@ def main():
         if "mandala" in key or "mandala" in text:
             add("mandala")
         if (
-            key.startswith("highland_")
+            key.startswith("animals_")
+            or key.startswith("animal_")
+            or key.startswith("highland_")
             or key.startswith("yorkie_")
             or key.startswith("yorky_")
             or key.startswith("baby_")
@@ -1034,10 +1039,11 @@ def main():
             )
         ):
             add("animals")
-        if key.startswith("mother_"):
+        if key.startswith("mother_") or key.startswith("family_"):
             add("family")
         if (
-            key.startswith("florida_")
+            key.startswith("nature_")
+            or key.startswith("florida_")
             or key.startswith("country_")
             or key in (
                 "covered_bridge",
