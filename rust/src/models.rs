@@ -138,6 +138,8 @@ pub struct ArtworkData {
     pub height: f64,
     #[serde(default)]
     pub line_art_url: Option<String>,
+    #[serde(default)]
+    pub color_art_url: Option<String>,
     pub palette: Vec<PaletteItem>,
     pub regions: Vec<Region>,
 }

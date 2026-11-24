@@ -141,6 +141,7 @@ pub fn generate_procedural_mosaic(seed: u32, palette_type: &str) -> ArtworkData 
         width,
         height,
         line_art_url: None,
+        color_art_url: None,
         palette,
         regions,
     }

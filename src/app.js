@@ -2514,6 +2514,7 @@ class TapColorApp {
     const labels = {
       'all': 'All',
       'animals': 'Animals',
+      'anime': 'Anime',
       'christian': 'Christian',
       'christmas': 'Christmas',
       'dia-de-los-muertos': 'Día de los Muertos',
@@ -3759,26 +3760,49 @@ class TapColorApp {
       return Promise.resolve();
     }
     const gen = ++this.lineArtGeneration;
-    const url = artworkData && artworkData.line_art_url;
-    if (!url) {
-      this.controller.set_line_art_image(null);
-      return Promise.resolve();
-    }
+    const lineUrl = artworkData && artworkData.line_art_url;
+    const colorUrl = artworkData && artworkData.color_art_url;
+    const hasColorSetter = typeof this.controller.set_color_art_image === 'function';
+
     this.controller.set_line_art_image(null);
-    return new Promise((resolve) => {
-      const img = new Image();
-      img.onload = () => {
-        if (gen === this.lineArtGeneration && this.controller && typeof this.controller.set_line_art_image === 'function') {
-          this.controller.set_line_art_image(img);
-        }
-        resolve();
-      };
-      img.onerror = () => {
-        console.warn('Could not load line art overlay:', url);
-        resolve();
-      };
-      img.src = url;
-    });
+    if (hasColorSetter) {
+      this.controller.set_color_art_image(null);
+    }
+
+    const loads = [];
+    if (lineUrl) {
+      loads.push(new Promise((resolve) => {
+        const img = new Image();
+        img.onload = () => {
+          if (gen === this.lineArtGeneration && this.controller && typeof this.controller.set_line_art_image === 'function') {
+            this.controller.set_line_art_image(img);
+          }
+          resolve();
+        };
+        img.onerror = () => {
+          console.warn('Could not load line art overlay:', lineUrl);
+          resolve();
+        };
+        img.src = lineUrl;
+      }));
+    }
+    if (colorUrl && hasColorSetter) {
+      loads.push(new Promise((resolve) => {
+        const img = new Image();
+        img.onload = () => {
+          if (gen === this.lineArtGeneration && this.controller && typeof this.controller.set_color_art_image === 'function') {
+            this.controller.set_color_art_image(img);
+          }
+          resolve();
+        };
+        img.onerror = () => {
+          console.warn('Could not load color art reveal image:', colorUrl);
+          resolve();
+        };
+        img.src = colorUrl;
+      }));
+    }
+    return loads.length ? Promise.all(loads) : Promise.resolve();
   }
 
   async selectArtwork(id, variantId = null) {
@@ -4976,6 +5000,7 @@ class FallbackJsController {
     this.precomputeBboxes(this.artwork);
     this.undoStack = [];
     this.lineArtImage = null;
+    this.colorArtImage = null;
     this.activeNumber = palette[0]?.number || 1;
     this.fit_to_screen();
     this.dirty = true;
@@ -4984,6 +5009,35 @@ class FallbackJsController {
   set_line_art_image(img) {
     this.lineArtImage = img || null;
     this.dirty = true;
+  }
+
+  set_color_art_image(img) {
+    this.colorArtImage = img || null;
+    this.dirty = true;
+  }
+
+  drawClippedColorArt(ctx, img, region, artW, artH) {
+    const imgW = img.naturalWidth;
+    const imgH = img.naturalHeight;
+    if (!imgW || !imgH || !artW || !artH || !region.bbox) return;
+    const [minX, minY, maxX, maxY] = region.bbox;
+    const pad = 2;
+    const dx = Math.max(0, minX - pad);
+    const dy = Math.max(0, minY - pad);
+    const dx2 = Math.min(artW, maxX + pad);
+    const dy2 = Math.min(artH, maxY + pad);
+    const dw = dx2 - dx;
+    const dh = dy2 - dy;
+    if (dw <= 0 || dh <= 0) return;
+    const sx = dx * (imgW / artW);
+    const sy = dy * (imgH / artH);
+    const sw = dw * (imgW / artW);
+    const sh = dh * (imgH / artH);
+    ctx.save();
+    this.traceRegionPath(ctx, region);
+    ctx.clip('evenodd');
+    ctx.drawImage(img, sx, sy, sw, sh, dx, dy, dw, dh);
+    ctx.restore();
   }
 
   ensureHatchPattern() {
@@ -5508,6 +5562,9 @@ class FallbackJsController {
           this.ctx.strokeStyle = region.color_hex;
           this.ctx.lineWidth = hasLineArt ? 0.8 : (1.4 / Math.max(0.5, this.scale));
           this.ctx.stroke();
+          if (this.colorArtImage && this.colorArtImage.complete && this.colorArtImage.naturalWidth > 0) {
+            this.drawClippedColorArt(this.ctx, this.colorArtImage, region, this.artwork.width, this.artwork.height);
+          }
         }
 
         if (isQuad && drillScreenSize >= 10.0) {
@@ -5831,6 +5888,9 @@ class FallbackJsController {
           ctx.strokeStyle = region.color_hex;
           ctx.lineWidth = hasLineArt ? 0.8 : Math.max(0.8, 1.5 / s);
           ctx.stroke();
+          if (this.colorArtImage && this.colorArtImage.complete && this.colorArtImage.naturalWidth > 0) {
+            this.drawClippedColorArt(ctx, this.colorArtImage, region, artW, artH);
+          }
         }
 
         // 3D Diamond facet highlights

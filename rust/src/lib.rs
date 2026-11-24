@@ -163,6 +163,10 @@ impl GameController {
         self.engine.set_line_art_image(img);
     }
 
+    pub fn set_color_art_image(&mut self, img: Option<HtmlImageElement>) {
+        self.engine.set_color_art_image(img);
+    }
+
     pub fn load_artwork_json(&mut self, json_str: &str) -> bool {
         if let Ok(mut artwork) = serde_json::from_str::<crate::models::ArtworkData>(json_str) {
             artwork.precompute_bboxes();

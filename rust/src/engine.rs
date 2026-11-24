@@ -22,6 +22,7 @@ pub struct GameEngine {
     pub pulse_phase: f64,
     pub highlight_matching_tiles: bool,
     pub line_art_image: Option<HtmlImageElement>,
+    pub color_art_image: Option<HtmlImageElement>,
     pub hatch_pattern: Option<CanvasPattern>,
     pub undo_stack: Vec<Vec<usize>>,
     pub dirty: bool,
@@ -50,6 +51,7 @@ impl GameEngine {
             last_time: 0.0,
             pulse_phase: 0.0,
             line_art_image: None,
+            color_art_image: None,
             hatch_pattern: None,
             undo_stack: Vec::new(),
             dirty: true,
@@ -76,6 +78,48 @@ impl GameEngine {
     pub fn set_line_art_image(&mut self, img: Option<HtmlImageElement>) {
         self.line_art_image = img;
         self.dirty = true;
+    }
+
+    pub fn set_color_art_image(&mut self, img: Option<HtmlImageElement>) {
+        self.color_art_image = img;
+        self.dirty = true;
+    }
+
+    fn draw_clipped_color_art(
+        ctx: &CanvasRenderingContext2d,
+        img: &HtmlImageElement,
+        region: &Region,
+        art_w: f64,
+        art_h: f64,
+    ) {
+        let img_w = img.natural_width() as f64;
+        let img_h = img.natural_height() as f64;
+        if img_w <= 0.0 || img_h <= 0.0 || art_w <= 0.0 || art_h <= 0.0 {
+            return;
+        }
+        let (r_min_x, r_min_y, r_max_x, r_max_y) = region.bbox;
+        let pad = 2.0;
+        let dx = (r_min_x - pad).max(0.0);
+        let dy = (r_min_y - pad).max(0.0);
+        let dx2 = (r_max_x + pad).min(art_w);
+        let dy2 = (r_max_y + pad).min(art_h);
+        let dw = dx2 - dx;
+        let dh = dy2 - dy;
+        if dw <= 0.0 || dh <= 0.0 {
+            return;
+        }
+        let sx = dx * (img_w / art_w);
+        let sy = dy * (img_h / art_h);
+        let sw = dw * (img_w / art_w);
+        let sh = dh * (img_h / art_h);
+
+        ctx.save();
+        Self::trace_region_path(ctx, region);
+        ctx.clip_with_canvas_winding_rule(CanvasWindingRule::Evenodd);
+        let _ = ctx.draw_image_with_html_image_element_and_sw_and_sh_and_dx_and_dy_and_dw_and_dh(
+            img, sx, sy, sw, sh, dx, dy, dw, dh,
+        );
+        ctx.restore();
     }
 
     fn ensure_hatch_pattern(&mut self, ctx: &CanvasRenderingContext2d) {
@@ -150,6 +194,7 @@ impl GameEngine {
         self.hint_timer = 0.0;
         self.highlight_matching_tiles = false;
         self.line_art_image = None;
+        self.color_art_image = None;
         self.pan_x = 0.0;
         self.pan_y = 0.0;
         self.scale = 1.0;
@@ -942,6 +987,12 @@ impl GameEngine {
                     ctx.set_stroke_style_str(&region.color_hex);
                     ctx.set_line_width(if has_line_art { 0.8 } else { (1.5 / s).max(0.8) });
                     ctx.stroke();
+
+                    if let Some(ref cimg) = self.color_art_image {
+                        if cimg.complete() && cimg.natural_width() > 0 {
+                            Self::draw_clipped_color_art(ctx, cimg, region, self.artwork.width, self.artwork.height);
+                        }
+                    }
                 }
 
                 if is_quad && can_draw_facets {
@@ -1176,6 +1227,13 @@ impl GameEngine {
                     ctx.set_stroke_style_str(&region.color_hex);
                     ctx.set_line_width(if has_line_art { 0.8 } else { (1.5 / self.scale).max(0.8) });
                     ctx.stroke();
+
+                    if let Some(ref cimg) = self.color_art_image {
+                        if cimg.complete() && cimg.natural_width() > 0 {
+                            Self::draw_clipped_color_art(ctx, cimg, region, self.artwork.width, self.artwork.height);
+                            path_traced = false;
+                        }
+                    }
                 }
 
                 // Authentic 5D Diamond Facet Cut for diamond art tiles when zoomed in

@@ -16,10 +16,13 @@ if (args.length < 8) {
   process.exit(1);
 }
 
-const [rawBinPath, wStr, outputId, title, artist, outJsonPath, outLinesPath, lineArtUrl] = args;
+const [rawBinPath, wStr, outputId, title, artist, outJsonPath, outLinesPath, lineArtUrl, worldWStr, colorArtUrl] = args;
 const W = parseInt(wStr, 10);
 const H = W;
 const N = W * H;
+const worldW = worldWStr ? parseInt(worldWStr, 10) : W;
+const scaleFactor = W / worldW;
+const invScale = worldW / W;
 
 const rgbaBuf = fs.readFileSync(rawBinPath);
 const data = new Uint8ClampedArray(rgbaBuf.buffer, rgbaBuf.byteOffset, rgbaBuf.byteLength);
@@ -91,13 +94,14 @@ function getLocalMeanLum(x, y, rad) {
 const coreInk = new Uint8Array(N);
 let inkR = 0, inkG = 0, inkB = 0, inkCount = 0;
 
+const localMeanRad = Math.max(4, Math.round(6 * scaleFactor));
 for (let y = 0; y < H; y++) {
   const row = y * W;
   for (let x = 0; x < W; x++) {
     const i = row + x;
     const lv = lum[i];
     const ch = chromaArr[i];
-    const localMean = getLocalMeanLum(x, y, 6);
+    const localMean = getLocalMeanLum(x, y, localMeanRad);
 
     // 1) Solid dark ink (thick black/dark-brown outlines, eyes, nose)
     // 2) Thin dark ridge (anti-aliased thin lines & veins that are sharply darker than surroundings)
@@ -310,8 +314,8 @@ for (let i = 0; i < N; i++) {
 }
 
 // --- Step 4: Filter Tiny Noise (Two-Stage: Preserve Ink-Enclosed Regions & Eye Sparkles) ---
-const MIN_REGION_PIXELS = 42;    // ~6.5x6.5 px at 800x800 for non-enclosed color-jump regions
-const MIN_ENCLOSED_PIXELS = 10;  // ~3.2x3.2 seed px (~25-35 visible px) for ink-enclosed pockets
+const MIN_REGION_PIXELS = Math.round(42 * scaleFactor * scaleFactor);    // ~6.5x6.5 world px for non-enclosed color-jump regions
+const MIN_ENCLOSED_PIXELS = Math.round(14 * scaleFactor * scaleFactor);  // ~3.7x3.7 world seed px for ink-enclosed pockets
 const validCompIds = new Set();
 const tinyComps = [];
 
@@ -389,10 +393,94 @@ if (qTail > 0) {
   runPassABfs();
 }
 
-// Handle truly microscopic (< MIN_ENCLOSED_PIXELS) ink-enclosed pockets (e.g. eye sparkles & pinholes)
-// by baking them into linesRgba so they never become unfillable white holes.
+// Handle truly microscopic (< MIN_ENCLOSED_PIXELS) ink-enclosed pockets:
+// When colorArtUrl is used (clipped original-image reveal), absorb micro-pockets into
+// their nearest valid neighboring region across the ink so nothing appears pre-colored
+// on the blank canvas, yet the original detail is revealed crisply when tapped!
+const maxBridgeDist = Math.round(14 * scaleFactor);
+const bridgeVisited = new Int32Array(N);
+let bridgeRunId = 0;
+
 for (const [, pix] of stillTinyEnclosed) {
   if (labelMap[pix[0]] !== 0) continue; // absorbed by a rescued sibling in Pass A2
+
+  if (colorArtUrl) {
+    // Find nearest valid region across ink via bounded BFS (tracking parent to bridge under ink)
+    bridgeRunId++;
+    const bQueue = [];
+    const bDist = [];
+    const bParent = [];
+    for (let k = 0; k < pix.length; k++) {
+      const p = pix[k];
+      bridgeVisited[p] = bridgeRunId;
+      bQueue.push(p);
+      bDist.push(0);
+      bParent.push(-1);
+    }
+    let nearestCid = 0;
+    let hitIdx = -1;
+    let bHead = 0;
+    while (bHead < bQueue.length) {
+      const curr = bQueue[bHead];
+      const d = bDist[bHead];
+      const curIdx = bHead;
+      bHead++;
+      if (d > 0 && labelMap[curr] > 0) {
+        nearestCid = labelMap[curr];
+        hitIdx = curIdx;
+        break;
+      }
+      if (d >= maxBridgeDist) continue;
+      const cx = curr % W;
+      const cy = (curr - cx) / W;
+      const tryStep = (nb) => {
+        if (bridgeVisited[nb] === bridgeRunId || isExteriorBg[nb]) return;
+        bridgeVisited[nb] = bridgeRunId;
+        bQueue.push(nb);
+        bDist.push(d + 1);
+        bParent.push(curIdx);
+      };
+      if (cx > 0) tryStep(curr - 1);
+      if (cx < W - 1) tryStep(curr + 1);
+      if (cy > 0) tryStep(curr - W);
+      if (cy < H - 1) tryStep(curr + W);
+    }
+
+    if (nearestCid > 0) {
+      // Connect pocket to nearestCid underneath ink so they form one unified polygon
+      let walk = bParent[hitIdx];
+      while (walk >= 0) {
+        const wp = bQueue[walk];
+        if (labelMap[wp] === 0) labelMap[wp] = nearestCid;
+        walk = bParent[walk];
+      }
+      // Flood-fill the tiny pocket's non-coreInk pixels into nearestCid
+      qHead = 0; qTail = 0;
+      for (let k = 0; k < pix.length; k++) {
+        const p = pix[k];
+        if (labelMap[p] === 0) {
+          labelMap[p] = nearestCid;
+          queue[qTail++] = p;
+        }
+      }
+      while (qHead < qTail) {
+        const curr = queue[qHead++];
+        const cx = curr % W;
+        const cy = (curr - cx) / W;
+        const tryPocket = (nb) => {
+          if (labelMap[nb] !== 0 || isExteriorBg[nb] || coreInk[nb]) return;
+          labelMap[nb] = nearestCid;
+          queue[qTail++] = nb;
+        };
+        if (cx > 0) tryPocket(curr - 1);
+        if (cx < W - 1) tryPocket(curr + 1);
+        if (cy > 0) tryPocket(curr - W);
+        if (cy < H - 1) tryPocket(curr + W);
+      }
+      continue;
+    }
+  }
+
   let sumR = 0, sumG = 0, sumB = 0, sumLum = 0, sumChroma = 0;
   for (let k = 0; k < pix.length; k++) {
     const p = pix[k];
@@ -404,10 +492,31 @@ for (const [, pix] of stillTinyEnclosed) {
     sumChroma += chromaArr[p];
   }
   const n = pix.length;
-  const isWhiteSparkle = (sumLum / n) > 215 && (sumChroma / n) < 25;
-  const fillR = isWhiteSparkle ? 255 : Math.round(sumR / n);
-  const fillG = isWhiteSparkle ? 255 : Math.round(sumG / n);
-  const fillB = isWhiteSparkle ? 255 : Math.round(sumB / n);
+  const avgLum = sumLum / n;
+  const avgChroma = sumChroma / n;
+  // Only force pure white for genuine eye sparkles completely enclosed by very dark solid ink
+  let darkBorder = 0, borderTotal = 0;
+  for (let k = 0; k < n; k++) {
+    const p = pix[k];
+    const px = p % W, py = (p - px) / W;
+    const nbs = [
+      px > 0 ? p - 1 : -1,
+      px < W - 1 ? p + 1 : -1,
+      py > 0 ? p - W : -1,
+      py < H - 1 ? p + W : -1,
+    ];
+    for (let j = 0; j < 4; j++) {
+      const nb = nbs[j];
+      if (nb >= 0 && coreInk[nb]) {
+        borderTotal++;
+        if (lum[nb] < 45) darkBorder++;
+      }
+    }
+  }
+  const isEyeSparkle = avgLum > 232 && avgChroma < 18 && borderTotal > 0 && (darkBorder / borderTotal) > 0.85;
+  const fillR = isEyeSparkle ? 255 : Math.round(sumR / n);
+  const fillG = isEyeSparkle ? 255 : Math.round(sumG / n);
+  const fillB = isEyeSparkle ? 255 : Math.round(sumB / n);
 
   // Flood-fill the tiny enclosed pocket's non-coreInk pixels (including its 1px halo) into linesRgba
   qHead = 0; qTail = 0;
@@ -478,8 +587,8 @@ for (const cid of validCompIds) {
   ]);
 }
 
-// Pass B: Expand up to 3px underneath coreInk (stopping before exterior background)
-const UNDER_INK_PX = 3;
+// Pass B: Expand up to 3 world px underneath coreInk (stopping before exterior background)
+const UNDER_INK_PX = Math.max(3, Math.round(3 * scaleFactor));
 qHead = 0; qTail = 0;
 distSteps.fill(0);
 for (let i = 0; i < N; i++) {
@@ -531,8 +640,9 @@ for (const cid of validCompIds) {
   });
 }
 
-const MERGE_DELTA_E = 11.5;
-const MAX_COLORS = 26;
+const regionCount = validCompIds.size;
+const MERGE_DELTA_E = regionCount >= 250 ? 8.0 : (regionCount >= 150 ? 9.5 : 11.0);
+const MAX_COLORS = regionCount >= 250 ? 42 : (regionCount >= 150 ? 32 : 26);
 const M = clusters.length;
 const distMat = new Float64Array(M * M);
 for (let i = 0; i < M; i++) {
@@ -705,9 +815,9 @@ function computeLabelPos(cid) {
   }
 
   return {
-    x: Math.round(((bestP % W) + 0.5) * 10) / 10,
-    y: Math.round((Math.floor(bestP / W) + 0.5) * 10) / 10,
-    radius: Math.max(2.0, Math.round(maxD * 10) / 10),
+    x: Math.round(((bestP % W) + 0.5) * invScale * 10) / 10,
+    y: Math.round((Math.floor(bestP / W) + 0.5) * invScale * 10) / 10,
+    radius: Math.max(2.0, Math.round(maxD * invScale * 10) / 10),
   };
 }
 
@@ -791,12 +901,13 @@ function smoothAndSimplifyLoop(rawPts) {
 
   // Douglas-Peucker simplification (closed loop)
   const closed = [...pts, pts[0]];
-  const simp = simplifyDP(closed, 0.75 * 0.75);
+  const dpTol = 0.6 * scaleFactor;
+  const simp = simplifyDP(closed, dpTol * dpTol);
   if (simp.length > 1) simp.pop(); // remove duplicate closing vertex
 
   return simp.map(p => ({
-    x: Math.round(p.x * 10) / 10,
-    y: Math.round(p.y * 10) / 10,
+    x: Math.round(p.x * invScale * 10) / 10,
+    y: Math.round(p.y * invScale * 10) / 10,
   }));
 }
 
@@ -894,11 +1005,12 @@ function traceRegionLoops(cid) {
     }
   }
 
+  const holeAreaThresh = 25 * scaleFactor * scaleFactor;
   for (const lp of loops) {
     if (lp === outer) continue;
     const area = signedArea(lp);
-    // Negative signed area = interior hole (only keep meaningful holes >= 25 sq px)
-    if (area < -25) {
+    // Negative signed area = interior hole (only keep meaningful holes >= 25 sq world px)
+    if (area < -holeAreaThresh) {
       holes.push(smoothAndSimplifyLoop(lp));
     }
   }
@@ -979,9 +1091,10 @@ const artwork = {
   title,
   artist,
   category: 'classic',
-  width: W,
-  height: H,
+  width: worldW,
+  height: worldW,
   line_art_url: lineArtUrl,
+  ...(colorArtUrl ? { color_art_url: colorArtUrl } : {}),
   palette: activePalette,
   regions,
 };

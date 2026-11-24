@@ -86,7 +86,7 @@ Choose a difficulty tier based on the user's request; **default to `medium`** wh
 - The script saves directly to `public/assets/paint_by_number/<snake_case_name>.<ext>` (sniffing actual image magic bytes and removing any stale conflicting extension for the same key).
 - `public/assets/converted/` is gitignored; only source images in `public/assets/paint_by_number/` (and optional metadata edits) are committed.
 - `scripts/convert_artworks.py` automatically discovers all images in `public/assets/paint_by_number/`, derives the key (stripping any trailing `_pbn`), generates both PBN and 3 Diamond Art variants, assigns category `tags`, and orders `manifest.json` newest-first by `addedAt`.
-- **Category Tags**: Check the existing categories in `infer_tags` in `scripts/convert_artworks.py` (`animals`, `christian`, `christmas`, `dia-de-los-muertos`, `family`, `holidays`, `mandala`, `native-american`, `nature`, `stained-glass`, `thai`, `thanksgiving`).
+- **Category Tags**: Check the existing categories in `infer_tags` in `scripts/convert_artworks.py` (`animals`, `anime`, `christian`, `christmas`, `dia-de-los-muertos`, `family`, `holidays`, `mandala`, `native-american`, `nature`, `stained-glass`, `thai`, `thanksgiving`).
   - **Reuse an existing category** whenever the new artwork fits (pass `--tags` or use a matching key prefix).
   - **Create a new category** only when introducing a distinct new theme: pass `--tags "<new-kebab-tag>"` with `--verify`, and add the rule to `infer_tags` in `scripts/convert_artworks.py` (plus this list) so full rebuilds preserve it.
 - *(Optional)* To set a custom title, artist, description, or tags, add an entry to `METADATA_BY_KEY` in `scripts/convert_artworks.py`.

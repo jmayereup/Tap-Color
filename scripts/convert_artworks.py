@@ -18,7 +18,7 @@ except ImportError:
     HAS_PIL = False
     import gi
     gi.require_version('GdkPixbuf', '2.0')
-    from gi.repository import GdkPixbuf
+    from gi.repository import GdkPixbuf, GLib
     import cairo
 
 def rgb_to_hex(r, g, b):
@@ -732,19 +732,47 @@ def save_rgba_to_png(rgba_bytes, W, H, png_path):
         surf.write_to_png(png_path)
 
 
+def save_rgba_to_jpeg(rgba_bytes, W, H, jpg_path, quality=90):
+    """Saves straight-alpha RGBA bytes (W*H*4) as a compact RGB JPEG file."""
+    if HAS_PIL:
+        im = Image.frombytes('RGBA', (W, H), bytes(rgba_bytes)).convert('RGB')
+        im.save(jpg_path, 'JPEG', quality=quality, optimize=True)
+    else:
+        rgb = bytearray(W * H * 3)
+        j = 0
+        for i in range(0, W * H * 4, 4):
+            rgb[j] = rgba_bytes[i]
+            rgb[j + 1] = rgba_bytes[i + 1]
+            rgb[j + 2] = rgba_bytes[i + 2]
+            j += 3
+        pb = GdkPixbuf.Pixbuf.new_from_bytes(
+            GLib.Bytes.new(bytes(rgb)),
+            GdkPixbuf.Colorspace.RGB,
+            False,
+            8,
+            W,
+            H,
+            W * 3,
+        )
+        pb.savev(jpg_path, 'jpeg', ['quality'], [str(quality)])
+
+
 def convert_to_paint_by_number(img_path, title, artist, output_id, output_dir):
     import subprocess, tempfile
     json_path = os.path.join(output_dir, f"{output_id}.json")
     lines_png_path = os.path.join(output_dir, f"{output_id}_lines.png")
+    color_jpg_path = os.path.join(output_dir, f"{output_id}_color.jpg")
     thumb_path = os.path.join(output_dir, f"{output_id}_thumb.png")
     line_art_url = f"assets/converted/{output_id}_lines.png"
+    color_art_url = f"assets/converted/{output_id}_color.jpg"
 
-    W = 800
-    pad = 24
+    W = 1600
+    pad = 48
+    world_w = 800
     inner_w = W - pad * 2
     inner_rgb = load_framed_rgb_grid(img_path, inner_w)
 
-    # Place framed artwork inside 800x800 white canvas with 24px margin for 1:1 world alignment
+    # Place framed artwork inside 1600x1600 white canvas with 48px margin (2x supersampled for crisp zoom)
     buf = bytearray([255] * (W * W * 4))
     for y in range(inner_w):
         src_row = y * inner_w
@@ -757,6 +785,8 @@ def convert_to_paint_by_number(img_path, title, artist, output_id, output_dir):
             buf[o + 2] = b
             buf[o + 3] = 255
 
+    save_rgba_to_jpeg(buf, W, W, color_jpg_path, quality=90)
+
     base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     pbn_script = os.path.join(base_dir, "scripts", "convert_pbn.mjs")
 
@@ -768,7 +798,7 @@ def convert_to_paint_by_number(img_path, title, artist, output_id, output_dir):
 
     try:
         subprocess.run(
-            ["node", pbn_script, raw_bin_path, str(W), output_id, title, artist, json_path, lines_bin_path, line_art_url],
+            ["node", pbn_script, raw_bin_path, str(W), output_id, title, artist, json_path, lines_bin_path, line_art_url, str(world_w), color_art_url],
             check=True,
             cwd=base_dir,
         )
@@ -997,6 +1027,8 @@ def main():
             or key in ("jolly_snowman", "snowy_cottage", "cozy_fireplace")
         ):
             add("christmas")
+        if key.startswith("anime_"):
+            add("anime")
         if key.startswith("thanksgiving_"):
             add("thanksgiving")
         if key.startswith("holidays_") or key.startswith("holiday_"):
@@ -1232,6 +1264,7 @@ def main():
                     "colors": len(art["palette"]),
                     "jsonFile": f"assets/converted/{art_id}.json",
                     "lineArtUrl": f"assets/converted/{art_id}_lines.png",
+                    "colorArtUrl": f"assets/converted/{art_id}_color.jpg",
                     "thumbnailUrl": f"assets/converted/{art_id}_thumb.png",
                 }]
 
@@ -1258,7 +1291,7 @@ def main():
         keep_files = {"manifest.json"}
         for entry in manifest_entries:
             for v in entry.get("diamondVariants", []) + entry.get("pbnVariants", []):
-                for field in ("jsonFile", "lineArtUrl", "thumbnailUrl"):
+                for field in ("jsonFile", "lineArtUrl", "colorArtUrl", "thumbnailUrl"):
                     rel = v.get(field)
                     if rel:
                         keep_files.add(os.path.basename(rel))
